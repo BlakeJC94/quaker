@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 # TODO docs
 def write_content(download: Request, output_file: str):
     mode = "a" if path.exists(output_file) else "w"
-    exit_signal = False
+    error_recived = None
     with open(output_file, mode, encoding="utf-8") as csvfile:
         try:
             lines = download.iter_lines(decode_unicode=True)
@@ -18,8 +18,12 @@ def write_content(download: Request, output_file: str):
                 _ = next(lines)
             csvfile.writelines(line + "\n" for line in lines)
         except KeyboardInterrupt:
-            logger.error("Keyboard interrupt recieved, safely closing session")
-            exit_signal = True
+            logger.error("Keyboard interrupt recieved, safely closing file")
+            error_recived = KeyboardInterrupt()
+        except Exception as error:
+            logger.error("Unknown error recieved, safely closing file.")
+            error_recived = error
 
-    if exit_signal:  # Signal to parent process that keyboard interrupt was received.
-        raise KeyboardInterrupt
+
+    if error_recived:  # Signal to parent process that keyboard interrupt was received.
+        raise error_recived
