@@ -1,9 +1,14 @@
 """Classes and methods for representation of queries."""
+import os
 import re
+from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
-from typing import Optional
+from typing import Optional, List
+
+from requests import Session, Request
 
 from .globals import ISO8601_REGEX
+from .src import run_query
 
 # TODO proper docstring here
 @dataclass
@@ -61,3 +66,11 @@ class Query:  # pylint: disable=too-many-instance-attributes
             out += "\n" + 4 * " " + f"{key}: {str(value)}"
         out += "\n)"
         return out
+
+
+# TODO docstring
+def download(query_params: Query, output_file: str) -> List[Request]:
+    # TODO check if output_file is given and create parent dirs if needed
+    with Session() as session:
+        # TODO write a try catch here, make sure the file writing is safely handled as well
+        return run_query(query_params, session, output_file)
