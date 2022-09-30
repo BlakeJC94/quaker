@@ -27,7 +27,7 @@ def download(query_params: Query, output_file: str) -> List[Request]:
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session")
             error_recived = KeyboardInterrupt()
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-except
             logger.error("Unknown error recieved, safely closing file.")
             error_recived = error
 

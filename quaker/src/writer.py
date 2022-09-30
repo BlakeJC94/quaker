@@ -20,10 +20,9 @@ def write_content(download: Request, output_file: str):
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing file")
             error_recived = KeyboardInterrupt()
-        except Exception as error:
+        except Exception as error:  # pylint: disable=broad-except
             logger.error("Unknown error recieved, safely closing file.")
             error_recived = error
-
 
     if error_recived:  # Signal to parent process that keyboard interrupt was received.
         raise error_recived

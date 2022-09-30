@@ -65,4 +65,3 @@ class Query:  # pylint: disable=too-many-instance-attributes
             out += "\n" + 4 * " " + f"{key}: {str(value)}"
         out += "\n)"
         return out
-
