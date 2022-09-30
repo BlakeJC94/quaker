@@ -37,7 +37,8 @@ $ pip install .
 
 This is a small personal project, but pull requests are most welcome!
 
-* Code is styled using `[black](https://github.com/psf/black)`
+* Code is styled using `[black](https://github.com/psf/black)` (`pip install black`)
+* Code is linted with `pylint` (`pip install pylint`)
 * Requirements are managed using `pip-tools` (run `pip install pip-tools` if needed)
     * Add dependencies by adding packages to `setup.py` and running `pip-compile`
 * [Semantic versioning](https://semver.org) is used in this repo
