@@ -157,6 +157,7 @@ def run_query(query, session, output_file, _recursion_index=MAX_DEPTH):
 
 def download_data(query_params: QueryParams, output_file) -> List[requests.Request]:
     with requests.Session() as session:
+        # TODO write a try catch here, make sure the file writing is safely handled as well
         return run_query(query_params, session, output_file)
 
 
