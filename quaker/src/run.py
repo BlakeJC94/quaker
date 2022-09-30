@@ -7,7 +7,6 @@ from warnings import warn
 
 from requests import Request
 
-from quaker import Query
 from quaker.globals import (
     MAX_DEPTH,
     RESPONSE_OK,
@@ -15,8 +14,9 @@ from quaker.globals import (
     UPPER_LIMIT,
     ISO8601_DT_FORMAT,
     BASE_URL,
-
+    DEFAULT_QUERY_PARAMS,
 )
+from .query import Query
 from .writer import write_content
 
 
