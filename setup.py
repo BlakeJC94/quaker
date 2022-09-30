@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with open("README.md", 'r', encoding='utf-8') as f:
     long_description = f.read()
@@ -12,8 +12,12 @@ setup(
     author_email='blakejamescook@gmail.com',
     url='https://github.com/BlakeJC94/sudoku-py',
     python_requires=">=3.7",
+    packages=find_packages(),
+    install_requires=[
+        "requests",
+    ],
     entry_points={
-        'console_scripts': ['sudoku=sudoku_py.__main__:main'],
+        'console_scripts': ['quaker=quaker.__main__:main'],
     }
 )
 

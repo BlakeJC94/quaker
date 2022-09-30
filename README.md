@@ -31,7 +31,16 @@ $ pip install .
     - [ ] Proper setup.py and requierments.txt
 - [ ] CLI bindings
 - [ ] Dash app to visualise clustered query results
+- [ ] Publish to pypi?
 
 ## Contributing
 
-This is a small personal project, but pull requests are welcome.
+This is a small personal project, but pull requests are most welcome!
+
+* Code is styled using `[black](https://github.com/psf/black)`
+* Requirements are managed using `pip-tools` (run `pip install pip-tools` if needed)
+    * Add dependencies by adding packages to `setup.py` and running `pip-compile`
+* [Semantic versioning](https://semver.org) is used in this repo
+    * Major version: rare, substantial changes that break backward compatibility
+    * Minor version: most changes - new features, models or improvements
+    * Patch version: small bug fixes and documentation-only changes
