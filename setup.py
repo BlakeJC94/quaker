@@ -11,7 +11,7 @@ setup(
     author='BlakeJC94',
     author_email='blakejamescook@gmail.com',
     url='https://github.com/BlakeJC94/sudoku-py',
-    python_requires=">=3.7",
+    python_requires=">=3.9",
     packages=find_packages(),
     install_requires=[
         "requests",
