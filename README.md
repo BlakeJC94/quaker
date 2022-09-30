@@ -5,6 +5,18 @@ Lightweight python API to USGS earthquake dataset
 
 [API Docs are located here](https://earthquake.usgs.gov/fdsnws/event/1/)
 
+## Installation
+Clone the repo to your system and install
+
+```bash
+$ git clone https://github.com/BlakeJC94/quaker.git
+$ cd quaker
+$ pip install .
+```
+
+## Quickstart
+***TODO***
+
 ## Ideas to implement
 
 - [X] Links to robust documentation by USGS
@@ -17,3 +29,8 @@ Lightweight python API to USGS earthquake dataset
         - [ ] README quickstart and install instructions
     - [ ] Proper setup.py and requierments.txt
 - [ ] CLI bindings
+- [ ] Dash app to visualise clustered query results
+
+## Contributing
+
+This is a small personal project, but pull requests are welcome.
