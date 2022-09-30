@@ -1,4 +1,5 @@
 """Function for recursively querying USGS earthquake API"""
+import logging
 import os
 from dataclasses import asdict
 from datetime import datetime, timedelta
@@ -19,6 +20,7 @@ from quaker.globals import (
 from .query import Query
 from .writer import write_content
 
+logger = logging.getLogger(__name__)
 
 # TODO docs
 # TODO typehint
@@ -29,13 +31,8 @@ def run_query(query, session, output_file, _recursion_index=MAX_DEPTH):
         warn(f"Exceeded maximum recursion depth {MAX_DEPTH}.")
         return None
 
-    if _recursion_index == MAX_DEPTH:
-        # check if output path exists, eremove if needed
-        if os.path.exists(output_file):
-            print("output file already exists, removing")
-            os.remove(output_file)
-    else:
-        print(f"Remaining recursions: {_recursion_index}")
+    if _recursion_index != MAX_DEPTH:
+        logger.info(f"Remaining recursions: {_recursion_index}")
 
     # Try input query
     download = get_data(query, session)
