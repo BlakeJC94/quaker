@@ -22,8 +22,11 @@ $ pip install .
 - [X] Links to robust documentation by USGS
 - [ ] Stable Python API for querying the USGS earthquake API
     - [ ] Add safety for KeyboardInterrupt error
-    - [ ] Finalise object model for python API
-    - [ ] Add io helpers and functions
+    - [X] Finalise object model for python API and imports
+    - [X] Mkdirs if needed
+    - [X] Add io helpers and functions
+    - [ ] Fix issue where `__post_init__` method doesn't fire
+        - [ ] put datetime handling back into `Query`
     - [ ] Documentation for python api
         - [ ] Docstrings
         - [ ] Type hints

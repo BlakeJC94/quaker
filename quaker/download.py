@@ -1,18 +1,18 @@
-"""""" # TODO
-import os
-import re
-from datetime import datetime, timedelta
-from dataclasses import dataclass, asdict
-from typing import Optional, List
+"""Script to open a session and stream CSV data."""
+from os import path, makedirs
+from typing import List
 
 from requests import Session, Request
 
-from quaker.globals import ISO8601_REGEX
 from quaker.src import run_query, Query
 
 # TODO docstring
 def download(query_params: Query, output_file: str) -> List[Request]:
-    # TODO check if output_file is given and create parent dirs if needed
+    parent_dir, _ = path.split(output_file)
+    if not path.exists(parent_dir):
+        print(f"INFO: parent dir {parent_dir} doesnt exist, creating")
+        makedirs(parent_dir, exist_ok=True)
+
     with Session() as session:
         # TODO write a try catch here, make sure the file writing is safely handled as well
         return run_query(query_params, session, output_file)
