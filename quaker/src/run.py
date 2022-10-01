@@ -29,6 +29,7 @@ def run_query(
     session: Session,
     output_file: str,
     max_api_calls: int = MAX_DEPTH,
+    write_header: bool = True,
 ) -> None:
     """Recursive function to query the USGS API.
 
@@ -37,6 +38,7 @@ def run_query(
         session: Session class for connection.
         output_file: Path to destination file.
         max_api_calls: Maximum number of calls to API.
+        write_header: Flag controlling whether to write the header to the file
     """
     # Check recursion guard
     if max_api_calls < 1:
@@ -56,7 +58,7 @@ def run_query(
 
     # If successful, add it to the memory stack and return
     if download.status_code == RESPONSE_OK:
-        write_content(download, output_file)
+        write_content(download, output_file, write_header)
         return None
 
     # Otherwise, split the query into a capped query and a remainder query
@@ -67,7 +69,7 @@ def run_query(
         raise RuntimeError(f"Unexpected response code on split query: {download.status_code}")
 
     # Add successful query to stack
-    write_content(download_hat, output_file)
+    write_content(download_hat, output_file, write_header)
 
     # Create remainder query
     next_endtime = get_last_time(download_hat) + timedelta(microseconds=1)
@@ -76,7 +78,8 @@ def run_query(
 
     # (subtract one from recursion index on each recursive call to guard against infinite loop)
     logger.info(f"Remaining recursions: {max_api_calls - 1}")
-    run_query(remainder, session, output_file, max_api_calls - 1)
+    run_query(remainder, session, output_file, max_api_calls - 1, write_header=False)
+    return None
 
 
 def get_data(query: Query, session: Session) -> Request:

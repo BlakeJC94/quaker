@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def download(
-    output_file: str,
     query: Optional[Query] = None,
+    output_file = "/dev/stdout",
     **kwargs,
 ) -> None:
     """Main function to download data to a CSV file.
@@ -24,13 +24,16 @@ def download(
         output_file: Path to file to dump output to.
         query: Configured query dataclass. Defaults to query for all events in last 30 days.
     """
-    if path.exists(output_file):
-        raise FileExistsError("output_file already exists.")
+    if output_file != "/dev/stdout":
+        output_file = path.abspath(output_file)
+        if path.exists(output_file):
+            logger.error("File exists, remove the file or select a different destination.")
+            return None
 
-    parent_dir, _ = path.split(output_file)
-    if not path.exists(parent_dir):
-        logger.info(f"INFO: parent dir {parent_dir} doesnt exist, creating")
-        makedirs(parent_dir, exist_ok=True)
+        parent_dir, _ = path.split(output_file)
+        if not path.exists(parent_dir):
+            logger.info(f"INFO: parent dir {parent_dir} doesnt exist, creating")
+            makedirs(parent_dir, exist_ok=True)
 
     if not isinstance(query, Query):
         query = Query(**kwargs)
