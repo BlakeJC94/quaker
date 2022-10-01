@@ -6,6 +6,8 @@ from typing import Optional
 from quaker.globals import ISO8601_REGEX
 
 
+# TODO add args in docstring
+# TODO add remaining params
 @dataclass
 class Query:  # pylint: disable=too-many-instance-attributes
     """Class for managing inputs for queries

@@ -11,8 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def download(
+    output_file: str,
     query: Optional[Query] = None,
-    output_file = "/dev/stdout",
     **kwargs,
 ) -> None:
     """Main function to download data to a CSV file.
@@ -36,7 +36,9 @@ def download(
             makedirs(parent_dir, exist_ok=True)
 
     if not isinstance(query, Query):
-        query = Query(**kwargs)
+        # filter kwargs
+        query_inputs = {k: v for k, v in kwargs.items() if k in Query.__annotations__}
+        query = Query(query_inputs)
 
     error_recived = None
     with Session() as session:
