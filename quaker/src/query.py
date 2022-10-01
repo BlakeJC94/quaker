@@ -22,7 +22,6 @@ class Query:  # pylint: disable=too-many-instance-attributes
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     maxradiuskm: Optional[float] = None
-    limit: Optional[int] = None
     minmagnitude: Optional[int] = None
     maxmagnitude: Optional[int] = None
     limit: Optional[int] = None
