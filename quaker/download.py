@@ -1,17 +1,21 @@
 """Script to open a session and stream CSV data."""
 import logging
 from os import path, makedirs
-from typing import List
 
-from requests import Session, Request
+from requests import Session
 
 from quaker.src import run_query, Query
 
 logger = logging.getLogger(__name__)
 
 
-# TODO docstring
-def download(query_params: Query, output_file: str) -> List[Request]:
+def download(query: Query, output_file: str) -> None:
+    """Main function to download data to a CSV file.
+
+    Args:
+        query: Configured query dataclass.
+        output_file: Path to file to dump output to.
+    """
     if path.exists(output_file):
         raise FileExistsError("output_file already exists.")
 
@@ -23,7 +27,7 @@ def download(query_params: Query, output_file: str) -> List[Request]:
     error_recived = None
     with Session() as session:
         try:
-            return run_query(query_params, session, output_file)
+            run_query(query, session, output_file)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session")
             error_recived = KeyboardInterrupt()

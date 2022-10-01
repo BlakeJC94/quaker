@@ -46,25 +46,27 @@ your query according to their [documentation](https://earthquake.usgs.gov/fdsnws
 ## Future developments
 
 - [X] Links to robust documentation by USGS
-- [ ] Stable Python API for querying the USGS earthquake API
+- [X] Stable Python API for querying the USGS earthquake API
     - [X] Add safety for KeyboardInterrupt error
     - [X] Finalise object model for python API and imports
     - [X] Mkdirs if needed
     - [X] Add io helpers and functions
-    - [ ] Documentation for python api
-        - [ ] Docstrings
-        - [ ] Type hints
+    - [X] Documentation for python api
+        - [X] Docstrings
+        - [X] Type hints
         - [X] README quickstart and install instructions
     - [X] Proper setup.py and requierments.txt
+- [ ] Match split query by last `id` instead of last `time`
 - [ ] Fix issue where `__post_init__` method doesn't fire
     - [ ] put datetime handling back into `Query`
+    - [ ] Handle timezones as well
 - [ ] CLI bindings with `Fire`
 - [ ] Dash app to visualise clustered query results
 - [ ] Expose parameters for formats other than CSV
+- [ ] Testing suite
 - [ ] Publish to pypi?
 
 ## Contributing
-
 This is a small personal project, but pull requests are most welcome!
 
 * Code is styled using `[black](https://github.com/psf/black)` (`pip install black`)

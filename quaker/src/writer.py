@@ -7,8 +7,14 @@ from requests import Request
 
 logger = logging.getLogger(__name__)
 
-# TODO docs
-def write_content(download: Request, output_file: str):
+
+def write_content(download: Request, output_file: str) -> None:
+    """Write content from a http request.
+
+    Args:
+        download: Returned response from request.
+        output_file: Location of file to rite results to.
+    """
     mode = "a" if path.exists(output_file) else "w"
     error_recived = None
     with open(output_file, mode, encoding="utf-8") as csvfile:

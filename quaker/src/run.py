@@ -1,43 +1,56 @@
 """Function for recursively querying USGS earthquake API"""
 import logging
-import os
 from dataclasses import asdict
 from datetime import datetime, timedelta
-from typing import Optional, Union, List
-from warnings import warn
+from time import sleep
 
-from requests import Request
+from requests import Request, Session
 
 from quaker.globals import (
-    MAX_DEPTH,
-    RESPONSE_OK,
-    RESPONSE_BAD_REQUEST,
-    UPPER_LIMIT,
-    ISO8601_DT_FORMAT,
     BASE_URL,
     DEFAULT_QUERY_PARAMS,
+    ISO8601_DT_FORMAT,
+    MAX_ATTEMPTS,
+    MAX_DEPTH,
+    RESPONSE_BAD_REQUEST,
+    RESPONSE_NOT_FOUND,
+    RESPONSE_NO_CONTENT,
+    RESPONSE_OK,
+    UPPER_LIMIT,
 )
 from .query import Query
 from .writer import write_content
 
 logger = logging.getLogger(__name__)
 
-# TODO docs
-# TODO typehint
-def run_query(query, session, output_file, _recursion_index=MAX_DEPTH):
 
+def run_query(
+    query: Query,
+    session: Session,
+    output_file: str,
+    max_api_calls: int = MAX_DEPTH,
+) -> None:
+    """Recursive function to query the USGS API.
+
+    Args:
+        query: Query dataclass object.
+        session: Session class for connection.
+        output_file: Path to destination file.
+        max_api_calls: Maximum number of calls to API.
+    """
     # Check recursion guard
-    if _recursion_index < 1 or _recursion_index > MAX_DEPTH:
-        warn(f"Exceeded maximum recursion depth {MAX_DEPTH}.")
+    if max_api_calls < 1:
+        logger.warning("Exceeded maximum recursion depth.")
         return None
-
-    if _recursion_index != MAX_DEPTH:
-        logger.info(f"Remaining recursions: {_recursion_index}")
 
     # Try input query
     download = get_data(query, session)
 
-    # Exit if there's an unexpected error
+    # Exit if no data is found
+    if download.status_code == RESPONSE_NO_CONTENT:
+        logger.warning("No data found.")
+        return None
+    # Crash if there's an unexpected error
     if download.status_code not in [RESPONSE_OK, RESPONSE_BAD_REQUEST]:
         raise RuntimeError(f"Unexpected response code on query: {download.status_code}")
 
@@ -50,34 +63,58 @@ def run_query(query, session, output_file, _recursion_index=MAX_DEPTH):
     query_hat = Query(**{**asdict(query).copy(), "limit": UPPER_LIMIT})
     download_hat = get_data(query_hat, session)
     if download_hat.status_code != RESPONSE_OK:
-        raise RuntimeError(
-            f"Unexpected response code on split query: {download.status_code}"
-        )
+        # Crash if the capped query unexpectedly fails
+        raise RuntimeError(f"Unexpected response code on split query: {download.status_code}")
 
     # Add successful query to stack
     write_content(download_hat, output_file)
 
-    # Create remainder query and recurse
+    # Create remainder query
     next_endtime = get_last_time(download_hat) + timedelta(microseconds=1)
     next_endtime = next_endtime.strftime(ISO8601_DT_FORMAT)
     remainder = Query(**{**asdict(query).copy(), "endtime": next_endtime})
 
     # (subtract one from recursion index on each recursive call to guard against infinite loop)
-    return run_query(remainder, session, output_file, _recursion_index - 1)
+    logger.info(f"Remaining recursions: {max_api_calls - 1}")
+    run_query(remainder, session, output_file, max_api_calls - 1)
 
 
-# TODO docs
-# TODO typehint
-def get_data(query_params, session) -> Request:
-    return session.get(
-        BASE_URL,
-        params={**DEFAULT_QUERY_PARAMS, **asdict(query_params)},
-    )
+def get_data(query: Query, session: Session) -> Request:
+    """Parse URL from query and use session to retrieve response.
+
+    If a 404 error is encountered, download will re-try the download (up to MAX_ATTEMPTS).
+
+    Args:
+        query (Query):
+        session (Session):
+
+    Returns:
+        Results from query request.
+    """
+    download = None
+    for attempts in range(MAX_ATTEMPTS):
+        download = session.get(
+            BASE_URL,
+            params={**DEFAULT_QUERY_PARAMS, **asdict(query)},
+        )
+        if download.status_code != RESPONSE_NOT_FOUND:
+            return download
+        logger.warning(f"No connection could be made, retrying ({attempts}).")
+        sleep(2)
+
+    logger.error("No connection could be made.")
+    return download
 
 
-# TODO docs
-# TODO typehint
-def get_last_time(download):
+def get_last_time(download: Request) -> str:
+    """Get final time value from a request.
+
+    Args:
+        download: Successful response from API.
+
+    Returns:
+        ISO8601 datetime string.
+    """
     reversed_clipped_content = download.content[:1:-1]
     reversed_last_row = reversed_clipped_content.split(b"\n")[1]
     last_row = reversed_last_row[::-1]

@@ -5,8 +5,11 @@ ISO8601_REGEX = r"^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2}(\+\d{2}:d{2})?)?(\.\d{6}
 ISO8601_DT_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 RESPONSE_BAD_REQUEST = 400
+RESPONSE_NO_CONTENT = 204
+RESPONSE_NOT_FOUND = 404
 RESPONSE_OK = 200
 
-MAX_DEPTH = 3
+MAX_ATTEMPTS = 3
+MAX_DEPTH = 10
 UPPER_LIMIT = 20000
 DEFAULT_QUERY_PARAMS = {"format": "csv", "orderby": "time"}
