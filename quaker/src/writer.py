@@ -14,7 +14,7 @@ def write_content(download: Request, output_file: str, write_header: bool = True
     Args:
         download: Returned response from request.
         output_file: Location of file to rite results to.
-        write_header: Flag controlling whether to write the header to the file
+        write_header: Flag controlling whether to write the header to the file.
     """
     mode = "w" if not path.exists(output_file) else "a"
     error_recived = None
@@ -25,8 +25,7 @@ def write_content(download: Request, output_file: str, write_header: bool = True
                 _ = next(lines)
             csvfile.writelines(line + "\n" for line in lines)
         except KeyboardInterrupt:
-            logger.error("Keyboard interrupt recieved, safely closing file")
-            error_recived = KeyboardInterrupt()
+            logger.error("Keyboard interrupt recieved, safely closing file.")
         except Exception as error:  # pylint: disable=broad-except
             logger.error("Unknown error recieved, safely closing file.")
             error_recived = error

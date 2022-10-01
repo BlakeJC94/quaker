@@ -32,7 +32,7 @@ def download(
 
         parent_dir, _ = path.split(output_file)
         if not path.exists(parent_dir):
-            logger.info(f"INFO: parent dir {parent_dir} doesnt exist, creating")
+            logger.info(f"Creatin dir {parent_dir} doesnt exist, creating.")
             makedirs(parent_dir, exist_ok=True)
 
     if not isinstance(query, Query):
@@ -43,11 +43,10 @@ def download(
         try:
             run_query(query, session, output_file)
         except KeyboardInterrupt:
-            logger.error("Keyboard interrupt recieved, safely closing session")
-            error_recived = KeyboardInterrupt()
+            logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
-            logger.error("Unknown error recieved, safely closing file.")
+            logger.error(f"Unknown error recieved ({error.__name__}), safely closing session.")
             error_recived = error
 
-    if error_recived:  # Signal to parent process that keyboard interrupt was received.
+    if error_recived is not None:
         raise error_recived

@@ -38,7 +38,7 @@ def run_query(
         session: Session class for connection.
         output_file: Path to destination file.
         max_api_calls: Maximum number of calls to API.
-        write_header: Flag controlling whether to write the header to the file
+        write_header: Flag controlling whether to write the header to the file.
     """
     # Check recursion guard
     if max_api_calls < 1:

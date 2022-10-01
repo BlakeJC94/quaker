@@ -9,9 +9,9 @@ from . import (
 
 download_cli = partial(download, query=None)
 download_cli.__doc__ = download.__doc__
-# TODO improve CLI docs
 # TODO add CLI to quickstart
 # TODO make output_file a kwarg and download to a default location (filename with time of req)
+# TODO append docs from Query
 
 
 def main():
