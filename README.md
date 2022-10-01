@@ -22,40 +22,29 @@ your query according to their [documentation](https://earthquake.usgs.gov/fdsnws
 >>> from quaker import Query, download
 # An empty query defaults to all events in the last 30 days
 >>> events_from_last_30_days = Query()
->>> download(events_from_last_30_days, "./path/to/output.csv")
+>>> download(events_from_last_30_days, "./path/to/example/output_1.csv")
 # Large queries can also be handled
 >>> events_from_last_5_months = Query(
 ...     starttime="2022-05-01",
 ...     endtime="2022-10-01",
 ... )
->>> download(events_from_last_30_days, "./path/to/output.csv")
+>>> download(events_from_last_5_months, "./path/to/example/output_2.csv")
 # You can filter results by location using the API
 >>> fields = {
 ...     "starttime": "2022-08-01",
 ...     "endtime": "2022-09-01",
 ...     "latitude": 35.652832,
 ...     "longitude": 139.839478,
-...     "maxradiuskm": 30.0,
-...     "minmagnitude": 4.0,
+...     "maxradiuskm": 120.0,
+...     "minmagnitude": 3.0,
 ... }
->>> large_events_in_august_in_30km_within_tokyo = Query(**fields)
->>> download(large_events_in_august_in_30km_within_tokyo, "./path/to/output.csv")
+>>> events_in_august_in_120km_within_tokyo_above_mag_3 = Query(**fields)
+>>> download(events_in_august_in_120km_within_tokyo_above_mag_3, "./path/to/example/output_3.csv")
 # See `help(Query)` and https://earthquake.usgs.gov/fdsnws/event/1/ for more details
 ```
 
 ## Future developments
 
-- [X] Links to robust documentation by USGS
-- [X] Stable Python API for querying the USGS earthquake API
-    - [X] Add safety for KeyboardInterrupt error
-    - [X] Finalise object model for python API and imports
-    - [X] Mkdirs if needed
-    - [X] Add io helpers and functions
-    - [X] Documentation for python api
-        - [X] Docstrings
-        - [X] Type hints
-        - [X] README quickstart and install instructions
-    - [X] Proper setup.py and requierments.txt
 - [ ] Match split query by last `id` instead of last `time`
 - [ ] Fix issue where `__post_init__` method doesn't fire
     - [ ] put datetime handling back into `Query`
