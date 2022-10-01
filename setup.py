@@ -17,8 +17,8 @@ setup(
         "requests",
         "fire",
     ],
-    # entry_points={
-    #     'console_scripts': ['quaker=quaker.__main__:main'],
-    # }
+    entry_points={
+        'console_scripts': ['quaker=quaker.__main__:main'],
+    }
 )
 
