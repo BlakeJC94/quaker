@@ -8,9 +8,15 @@ certifi==2022.9.24
     # via requests
 charset-normalizer==2.1.1
     # via requests
+fire==0.4.0
+    # via quaker (setup.py)
 idna==3.4
     # via requests
 requests==2.28.1
     # via quaker (setup.py)
+six==1.16.0
+    # via fire
+termcolor==2.0.1
+    # via fire
 urllib3==1.26.12
     # via requests
