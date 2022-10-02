@@ -6,13 +6,29 @@ from typing import Optional
 from quaker.globals import ISO8601_REGEX
 
 
-# TODO add args in docstring
 # TODO add remaining params
 @dataclass
 class Query:  # pylint: disable=too-many-instance-attributes
     """Class for managing inputs for queries
 
     API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
+
+    Args:
+        endtime: Limit to events on or before the specified end time. NOTE: All times use ISO8601
+            Date/Time format. UTC is assumed.
+        starttime: Limit to events on or after the specified start time. NOTE: All times use
+            ISO8601 Date/Time format. UTC is assumed.
+        minlatitude: Limit to events with a latitude larger than the specified minimum.
+        minlongitude: Limit to events with a longitude larger than the specified minimum.
+        maxlatitude: Limit to events with a latitude smaller than the specified maximum.
+        maxlongitude: Limit to events with a longitude smaller than the specified maximum.
+        latitude: Specify the latitude to be used for a radius search.
+        longitude: Specify the longitude to be used for a radius search.
+        maxradiuskm: Limit to events within the specified maximum number of kilometers from the
+            geographic point defined by the latitude and longitude parameters.
+        maxmagnitude: Limit to events with a magnitude smaller than the specified maximum.
+        minmagnitude: Limit to events with a magnitude larger than the specified minimum.
+        limit: Limit the results to the specified number of events.
     """
 
     endtime: Optional[str] = None
