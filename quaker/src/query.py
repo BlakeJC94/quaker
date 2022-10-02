@@ -7,13 +7,18 @@ from quaker.globals import ISO8601_REGEX
 
 
 # TODO add remaining params
+# TODO add timezone handling
+# WARNING: doc parsing relies on:
+#   * Args must be written in the style "name: description of arg."
+#     * Full stop is required at end of description!
+#   * Types are inferred from first arg of `Optional[..]` typing
 @dataclass
 class Query:  # pylint: disable=too-many-instance-attributes
     """Class for managing inputs for queries
 
     API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
 
-    NOTE: All times use ISO8601 Date/Time format. UTC is assumed.
+    NOTE: All times use ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed.
     NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
 
     Args:

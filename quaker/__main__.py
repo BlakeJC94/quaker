@@ -34,21 +34,35 @@ def main():
     parser.add_argument(
         "mode",
         nargs="?",
-        tyep=str,
+        type=str,
         default=default_mode,
         help=f"action to perform (default: {default_mode})",
     )
 
-    for k, v in Query.__annotations__.items():
+    query_annotations = Query.__annotations__
+    for k, v in query_annotations.items():
+
         # Get the first type in square brackets, requires Optional[..]!
         type_str = str(v).replace(",", "[").split("[")[1][:-1].strip()
         type_clb = str
         if type_clb in ["str", "float", "int"]:
             type_clb = eval(type_str)  # pylint: disable=eval-used
+
+        metavar = "VAL"
+        k_no_3_char_prefix, k_no_5_char_prefix = k[3:], k[5:]
+        if "latitude" in [k, k_no_3_char_prefix]:
+            metavar = "LAT"
+        if "longitude" in [k, k_no_3_char_prefix]:
+            metavar = "LNG"
+        if "time" in [k, k_no_3_char_prefix, k_no_5_char_prefix]:
+            metavar = "TIME"
+        if "radiuskm" in [k, k_no_3_char_prefix]:
+            metavar = "DIST"
+
         parser.add_argument(
             "--" + k,
             help=arg_doc_dict[k],
-            metavar="VAL",
+            metavar=metavar,
             type=type_clb,
             required=False,
             default=None,
@@ -56,10 +70,10 @@ def main():
 
     args = parser.parse_args()
 
-    # TODO move query handling here
-    # query = Query(**dict(args))
+    fields = {k: v for k, v in vars(args).items() if k in query_annotations}
+    query = Query(**fields)
     if args.mode == "download":
-        download(output_file="/dev/stdout", query=None, **vars(args))
+        download(output_file="/dev/stdout", query=query)
     else:
         logger.error("Only 'download' mode is supported for now")
         # logger.error("Invalid mode selected")
