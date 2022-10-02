@@ -13,11 +13,12 @@ class Query:  # pylint: disable=too-many-instance-attributes
 
     API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
 
+    NOTE: All times use ISO8601 Date/Time format. UTC is assumed.
+    NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
+
     Args:
-        endtime: Limit to events on or before the specified end time. NOTE: All times use ISO8601
-            Date/Time format. UTC is assumed.
-        starttime: Limit to events on or after the specified start time. NOTE: All times use
-            ISO8601 Date/Time format. UTC is assumed.
+        endtime: Limit to events on or before the specified end time.
+        starttime: Limit to events on or after the specified start time.
         minlatitude: Limit to events with a latitude larger than the specified minimum.
         minlongitude: Limit to events with a longitude larger than the specified minimum.
         maxlatitude: Limit to events with a latitude smaller than the specified maximum.
