@@ -1,6 +1,5 @@
 # Quaker
-Lightweight python API to USGS earthquake dataset
-
+Lightweight python API to USGS earthquake dataset.
 [API Docs are located here](https://earthquake.usgs.gov/fdsnws/event/1/)
 
 ## Installation
@@ -57,7 +56,7 @@ optional arguments:
 Run `quaker download` and specify the parameters as keyword arguments and pipe the output to any
 location:
 ```bash
-$ quaker download --starttime 2022-09-01 > earthquake_data.csv
+$ quaker download --starttime 2022-08-01 --endtime 2022-09-01 > earthquake_data.csv
 ```
 
 For more details on the available query parameters, use `quaker --help` or view the
