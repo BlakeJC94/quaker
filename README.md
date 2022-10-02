@@ -15,9 +15,17 @@ $ pip install .
 ```
 
 ## Quickstart
-To retrieve a CSV of the latest earthquake events from USGS, fire up a python session and specify
-your query according to their [documentation](https://earthquake.usgs.gov/fdsnws/event/1/)
+This package comes equiped with a batteries-included CLI interface for downloading the latest
+earthquake event data in CSV format from the USGS database. Run `quaker download` and specify the
+parameters as keyword arguments and pipe the output to any location:
+```bash
+$ quaker download --starttime 2022-09-01 > earthquake_data.csv
+```
 
+For more details on the available query parameters, use `quaker --help` or view the
+[USGS documentation](https://earthquake.usgs.gov/fdsnws/event/1/).
+
+Using the python API is also fairly straight-forward:
 ```python
 >>> from quaker import Query, download
 # An empty query defaults to all events in the last 30 days
