@@ -5,7 +5,7 @@ from typing import Optional
 
 from requests import Session
 
-from quaker.src import run_query, Query
+from quaker.core import run_query, Query
 
 logger = logging.getLogger(__name__)
 
