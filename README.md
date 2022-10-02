@@ -74,3 +74,11 @@ This is a small personal project, but pull requests are most welcome!
     * Major version: rare, substantial changes that break backward compatibility
     * Minor version: most changes - new features, models or improvements
     * Patch version: small bug fixes and documentation-only changes
+
+Virtual environment handling by `pyenv` is preferred:
+```bash
+# in the project directory
+$ pyenv virtualenv 3.9.7 quaker
+$ pyenv local quaker
+$ pip install -e .
+```
