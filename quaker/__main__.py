@@ -3,6 +3,7 @@ import logging
 
 from . import (
     __version__,
+    dashboard,
     download,
     Query,
 )
@@ -30,13 +31,14 @@ def main():
     )
 
     # Allow one optional positional arg to select mode
-    default_mode = "download"
+    modes = ["download", "dashboard"]
+    default_mode = modes[0]
     parser.add_argument(
         "mode",
         nargs="?",
         type=str,
         default=default_mode,
-        help=f"action to perform (default: {default_mode})",
+        help=f"action to perform (default: '{default_mode}', options: {', '.join(modes)})",
     )
 
     query_annotations = Query.__annotations__
@@ -74,6 +76,8 @@ def main():
     query = Query(**fields)
     if args.mode == "download":
         download(output_file="/dev/stdout", query=query)
+    elif args.mode == "dashboard":
+        dashboard()
     else:
         logger.error("Only 'download' mode is supported for now")
         # logger.error("Invalid mode selected")

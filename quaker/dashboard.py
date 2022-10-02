@@ -1,0 +1,3 @@
+def dashboard():
+    print("foo")
+
