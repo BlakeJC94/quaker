@@ -44,7 +44,7 @@ class Query:  # pylint: disable=too-many-instance-attributes
         ]
         for lat, lng in lat_lngs:
             lat = (float(lat) + 90) % 180 - 90 if lat is not None else None
-            lng = (float(lng) + 180) % 360 - 180 if lng is not None else None
+            lng = (float(lng) + 360) % 720 - 360 if lng is not None else None
 
         assert self.maxradiuskm is None or 0 < self.maxradiuskm <= 20001.6, "Invalid `maxradiuskm`."
         assert self.limit is None or 0 < self.limit <= 20000, "Invalid `limit`."
