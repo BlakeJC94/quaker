@@ -15,6 +15,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         "requests",
+        "dash",
+        "dash_bootstrap_components",
     ],
     entry_points={
         'console_scripts': ['quaker=quaker.__main__:main'],

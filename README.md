@@ -117,4 +117,8 @@ Virtual environment handling by `pyenv` is preferred:
 $ pyenv virtualenv 3.9.7 quaker
 $ pyenv local quaker
 $ pip install -e .
+# Or to sync the virtual env to specified requirements
+# $ pip install pip-tools
+# $ pip-sync
+# $ pip install -e . --no-deps
 ```
