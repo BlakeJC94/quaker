@@ -14,15 +14,15 @@ logger = logging.getLogger(__name__)
 def main():
 
     docs = Query.__doc__
-    head, arg_doc = docs.split("Args:")
+    head, tail = docs.split("Args:")
     extra_info = "\n".join(head.splitlines()[1:])
 
-    arg_doc_dict = {}
-    for entry in arg_doc.split(".\n"):  # relies on full stops after args!
+    arg_doc = {}
+    for entry in tail.split(".\n"):  # relies on full stops after args!
         if ":" not in entry:
             continue
         name, desc = entry.split(":", 1)
-        arg_doc_dict[name.strip()] = desc.replace("\n" + " " * 8, " ").strip().lower()
+        arg_doc[name.strip()] = desc.replace("\n" + " " * 8, " ").strip().lower()
 
     main_doc = "Access USGS Earthquake dataset" + extra_info
     parser = argparse.ArgumentParser(
@@ -63,25 +63,26 @@ def main():
 
         parser.add_argument(
             "--" + k,
-            help=arg_doc_dict[k],
+            help=arg_doc[k],
             metavar=metavar,
             type=type_clb,
             required=False,
             default=None,
         )
 
-    args = parser.parse_args()
-
-    fields = {k: v for k, v in vars(args).items() if k in query_annotations}
-    query = Query(**fields)
-    if args.mode == "download":
-        download(output_file="/dev/stdout", query=query)
-    elif args.mode == "dashboard":
-        dashboard()
-    else:
-        logger.error("Only 'download' mode is supported for now")
-        # logger.error("Invalid mode selected")
+    args = vars(parser.parse_args())
+    mode = args.pop("mode", None)
+    if mode not in modes:
+        logger.error("Invalid mode {mode} specified (allowed values: {modes})")
         return 1
+
+    fields = {k: v for k, v in args.items() if k in query_annotations}
+    query = Query(**fields)
+
+    if mode == "download":
+        download(output_file="/dev/stdout", query=query)
+    if mode == "dashboard":
+        dashboard()
 
     return 0
 
