@@ -57,7 +57,6 @@ Using the python API is also fairly straight-forward:
 - [ ] Fix issue where `__post_init__` method doesn't fire
     - [ ] put datetime handling back into `Query`
     - [ ] Handle timezones as well
-- [ ] CLI bindings with `Fire`
 - [ ] Dash app to visualise clustered query results
 - [ ] Expose parameters for formats other than CSV
 - [ ] Testing suite
