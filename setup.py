@@ -5,7 +5,7 @@ with open("README.md", 'r', encoding='utf-8') as f:
 
 setup(
     name="quaker",
-    version='0.5.1',
+    version='0.6.0',
     description="Lightweight python API to USGS earthquake dataset",
     long_description=long_description,
     author='BlakeJC94',
@@ -17,6 +17,7 @@ setup(
         "requests",
         "dash",
         "dash_bootstrap_components",
+        "dash_leaflet",
     ],
     entry_points={
         'console_scripts': ['quaker=quaker.__main__:main'],
