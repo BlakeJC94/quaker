@@ -30,9 +30,12 @@ class Query:  # pylint: disable=too-many-instance-attributes
 
     def __post_init__(self):
         for time in [self.starttime, self.endtime]:
-            assert (
-                time is None or isinstance(time, str) and re.match(ISO8601_REGEX, time)
-            ), "Invalid time provided"
+            try:
+                assert (
+                    time is None or isinstance(time, str) and re.match(ISO8601_REGEX, time)
+                ), "Invalid time provided"
+            except:
+                breakpoint()
 
         lat_lngs = [
             (self.minlatitude, self.minlongitude),
