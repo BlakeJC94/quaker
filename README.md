@@ -1,7 +1,5 @@
-# quaker
+# Quaker
 Lightweight python API to USGS earthquake dataset
-
-*This is a work in progress, documentation will be supplied on the first release*
 
 [API Docs are located here](https://earthquake.usgs.gov/fdsnws/event/1/)
 
