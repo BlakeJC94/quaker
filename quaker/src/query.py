@@ -8,8 +8,6 @@ from quaker.globals import ISO8601_REGEX
 
 # TODO add remaining params
 # TODO add timezone handling
-# WARNING: doc parsing relies on:
-#   * Types are inferred from first arg of `Optional[..]` typing
 @dataclass
 class Query:  # pylint: disable=too-many-instance-attributes
     """Class for managing inputs for queries
