@@ -65,7 +65,7 @@ def main():
 
         parser.add_argument(
             "--" + k,
-            help=arg_doc[k],
+            help=arg_doc_dict[k],
             metavar=metavar,
             type=type_clb,
             required=False,
