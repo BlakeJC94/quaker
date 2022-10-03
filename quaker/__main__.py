@@ -12,16 +12,18 @@ logger = logging.getLogger(__name__)
 
 def main():
 
+    # TODO move this into a Query method
     docs = Query.__doc__
     head, arg_doc = docs.split("Args:")
+    arg_doc = arg_doc.replace("\n" + 12 * " ", " ")
     extra_info = "\n".join(head.splitlines()[1:])
 
     arg_doc_dict = {}
-    for entry in arg_doc.split(".\n"):  # relies on full stops after args!
+    for entry in arg_doc.split("\n" + 4 * " "):
         if ":" not in entry:
             continue
         name, desc = entry.split(":", 1)
-        arg_doc_dict[name.strip()] = desc.replace("\n" + " " * 8, " ").strip().lower()
+        arg_doc_dict[name.strip()] = desc.strip().lower()
 
     main_doc = "Access USGS Earthquake dataset" + extra_info
     parser = argparse.ArgumentParser(
