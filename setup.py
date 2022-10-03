@@ -18,6 +18,7 @@ setup(
         "dash",
         "dash_bootstrap_components",
         "dash_leaflet",
+        "dash_extensions",
     ],
     entry_points={
         'console_scripts': ['quaker=quaker.__main__:main'],

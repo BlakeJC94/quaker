@@ -6,6 +6,8 @@
 #
 brotli==1.0.9
     # via flask-compress
+cachelib==0.9.0
+    # via flask-caching
 certifi==2022.9.24
     # via requests
 charset-normalizer==2.1.1
@@ -17,21 +19,29 @@ click==8.1.3
 dash==2.6.2
     # via
     #   dash-bootstrap-components
+    #   dash-extensions
     #   quaker (setup.py)
 dash-bootstrap-components==1.2.1
     # via quaker (setup.py)
 dash-core-components==2.0.0
     # via dash
+dash-extensions==0.1.6
+    # via quaker (setup.py)
 dash-html-components==2.0.0
     # via dash
 dash-leaflet==0.1.23
     # via quaker (setup.py)
 dash-table==5.0.0
     # via dash
-flask==2.2.2
+editorconfig==0.12.3
+    # via jsbeautifier
+flask==2.1.2
     # via
     #   dash
+    #   flask-caching
     #   flask-compress
+flask-caching==2.0.0
+    # via dash-extensions
 flask-compress==1.13
     # via dash
 geobuf==1.1.1
@@ -42,10 +52,14 @@ itsdangerous==2.1.2
     # via flask
 jinja2==3.1.2
     # via flask
+jsbeautifier==1.14.6
+    # via dash-extensions
 markupsafe==2.1.1
     # via
     #   jinja2
     #   werkzeug
+more-itertools==8.14.0
+    # via dash-extensions
 plotly==5.10.0
     # via dash
 protobuf==4.21.7
@@ -53,7 +67,9 @@ protobuf==4.21.7
 requests==2.28.1
     # via quaker (setup.py)
 six==1.16.0
-    # via geobuf
+    # via
+    #   geobuf
+    #   jsbeautifier
 tenacity==8.1.0
     # via plotly
 urllib3==1.26.12
