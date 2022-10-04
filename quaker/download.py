@@ -47,7 +47,7 @@ def download(
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
-            logger.error(f"Unknown error recieved ({error.__name__}), safely closing session.")
+            logger.error(f"Unknown error recieved ({error}), safely closing session.")
             error_recived = error
 
     if error_recived is not None:

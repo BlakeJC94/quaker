@@ -1,6 +1,6 @@
 from pkg_resources import get_distribution
 
-from .dashboard import dashboard
+# from .dashboard import dashboard
 from .download import download
 from .log import setup_logging
 from .core.query import Query
