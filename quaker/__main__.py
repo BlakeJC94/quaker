@@ -27,12 +27,11 @@ def get_query_docs() -> Tuple[str, Dict[str, Tuple[str, str, callable]]]:
         name = name.strip()
         desc = desc.strip().lower()
 
-        # Get the first type in square brackets, requires Optional[..]!
-        v = annotations[name]
-        type_str = str(v).replace(",", "[").split("[")[1][:-1].strip()
-        type_clb = str
-        if type_str in ["str", "float", "int"]:
-            type_clb = eval(type_str)  # pylint: disable=eval-used
+        type_str = str(annotations[name])
+        type_str = type_str.removeprefix("Optional[").removesuffix("]")
+        type_str = type_str.split(",")[0].strip().removesuffix(",")
+        type_str = type_str if type_str in ["float", "int"] else "str"
+        type_clb = eval(type_str)  # pylint: disable=eval-used
 
         metavar = "VAL"
         name_no_3_char_prefix, name_no_5_char_prefix = name[3:], name[5:]

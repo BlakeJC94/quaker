@@ -33,8 +33,6 @@ class Query:  # pylint: disable=too-many-instance-attributes
         limit: Limit the results to the specified number of events.
     """
 
-    # NOTE: Var type in CLI docs are inferred from `Optional[x]`
-    # (first callable type in square brackets, STR if none)
     endtime: Optional[str] = None
     starttime: Optional[str] = None
     minlatitude: Optional[float] = None
