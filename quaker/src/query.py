@@ -5,6 +5,10 @@ from typing import Optional
 
 from quaker.globals import ISO8601_REGEX
 
+ALLOWED_VALUES = {
+
+}
+
 
 # TODO add remaining params
 # TODO add timezone handling
@@ -33,18 +37,56 @@ class Query:  # pylint: disable=too-many-instance-attributes
         limit: Limit the results to the specified number of events.
     """
 
+    # Format
+    format: Optional[str] = None  # TODO
+    # Time
     endtime: Optional[str] = None
     starttime: Optional[str] = None
+    updatedafter: Optional[str] = None # TODO
+    # Location - rectangle
     minlatitude: Optional[float] = None
     minlongitude: Optional[float] = None
     maxlatitude: Optional[float] = None
     maxlongitude: Optional[float] = None
+    # Location - circle
     latitude: Optional[float] = None
     longitude: Optional[float] = None
     maxradiuskm: Optional[float] = None
-    minmagnitude: Optional[int] = None
-    maxmagnitude: Optional[int] = None
+    # Other
+    catalog: Optional[str] = None  # TODO
+    contributor: Optional[str] = None  # TODO
+    eventid: Optional[str] = None  # TODO
+    includeallmagnitudes: Optional[bool] = None  # TODO
+    includeallorigins: Optional[bool] = None  # TODO
+    includearrivals: Optional[bool] = None  # TODO
+    includedeleted: Optional[bool] = None  # TODO
+    includesuperceded: Optional[bool] = None  # TODO
     limit: Optional[int] = None
+    maxdepth: Optional[int] = None  # TODO
+    maxmagnitude: Optional[int] = None
+    mindepth: Optional[int] = None  # TODO
+    minmagnitude: Optional[int] = None
+    offset: Optional[int] = None  # TODO
+    orderby: Optional[str] = None  # TODO
+    # Extensions
+    alertlevel: Optional[str] = None  # TODO
+    callback: Optional[str] = None  # TODO
+    eventtype: Optional[str] = None  # TODO
+    jsonerror: Optional[str] = None  # TODO
+    kmlanimated: Optional[str] = None  # TODO
+    kmlcolorby: Optional[str] = None  # TODO
+    maxcdi: Optional[str] = None  # TODO
+    maxgap: Optional[str] = None  # TODO
+    maxmmi: Optional[str] = None  # TODO
+    maxsig: Optional[str] = None  # TODO
+    mincdi: Optional[str] = None  # TODO
+    minfelt: Optional[int] = None  # TODO
+    mingap: Optional[float] = None  # TODO
+    minsig: Optional[int] = None  # TODO
+    nodata: Optional[int] = None  # TODO
+    productype: Optional[str] = None  # TODO
+    produccode: Optional[str] = None  # TODO
+    reviewstatus: Optional[str] = None  # TODO
 
     def __post_init__(self):
         for time in [self.starttime, self.endtime]:
