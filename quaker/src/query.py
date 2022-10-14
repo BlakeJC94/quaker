@@ -52,19 +52,65 @@ class Query:  # pylint: disable=too-many-instance-attributes
     NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
 
     Args:
+        format: Specify the output format.
+
+        [Time]
         endtime: Limit to events on or before the specified end time.
         starttime: Limit to events on or after the specified start time.
+        updatedafter: Limit to events updated after the specified time.
+
+        [Location - rectangle]
         minlatitude: Limit to events with a latitude larger than the specified minimum.
         minlongitude: Limit to events with a longitude larger than the specified minimum.
         maxlatitude: Limit to events with a latitude smaller than the specified maximum.
         maxlongitude: Limit to events with a longitude smaller than the specified maximum.
+
+        [Location - circle]
         latitude: Specify the latitude to be used for a radius search.
         longitude: Specify the longitude to be used for a radius search.
+        maxradius: Limit to events within the specified maximum number of degrees from the
+            geographic point defined by the latitude and longitude parameters.
         maxradiuskm: Limit to events within the specified maximum number of kilometers from the
             geographic point defined by the latitude and longitude parameters.
-        maxmagnitude: Limit to events with a magnitude smaller than the specified maximum.
-        minmagnitude: Limit to events with a magnitude larger than the specified minimum.
+
+        [Other]
+        catalog: Limit to events from a specified catalog.
+        contributor: Limit to events contributed by a specified contributor.
+        eventid: Select a specific event by ID; event identifiers are data center specific.
+        includeallmagnitudes: Specify if all magnitudes for the event should be included.
+        includeallorigins: Specify if all origins for the event should be included.
+        includedeleted: Specify if deleted products and events should be included. The value "only"
+            returns only deleted events.
+        includesuperceded: Specify if superseded products should be included. This also includes
+            all deleted products, and is mutually exclusive to the includedeleted parameter.
         limit: Limit the results to the specified number of events.
+        maxdepth: Limit to events with depth less than the specified maximum.
+        maxmagnitude: Limit to events with a magnitude smaller than the specified maximum.
+        mindepth: Limit to events with depth more than the specified minimum.
+        minmagnitude: Limit to events with a magnitude larger than the specified minimum.
+        offset: Return results starting at the event count specified, starting at 1.
+        orderby: Order the results.
+
+        [Extensions]
+        alertlevel: Limit to events with a specific PAGER alert level.
+        callback: Convert GeoJSON output to a JSONP response using this callback.
+        eventtype: Limit to events of a specific type
+        jsonerror: Request JSON(P) formatted output even on API error results. (only for geojson
+            format)
+        kmlanimated: Whether to include timestamp in generated kml, for google earth animation
+            support.
+        kmlcolorby: How earthquakes are colored.
+        maxcdi: Maximum value for Maximum Community Determined Intensity reported by DYFI.
+        maxgap: Limit to events with no more than this azimuthal gap.
+        maxmmi: Maximum value for Maximum Modified Mercalli Intensity reported by ShakeMap.
+        maxsig: Limit to events with no more than this significance.
+        mincdi: Minimum value for Maximum Community Determined Intensity reported by DYFI.
+        minfelt: Limit to events with this many DYFI responses.
+        mingap: Limit to events with no less than this azimuthal gap.
+        minsig: Limit to events with no less than this significance.
+        producttype: Limit to events that have this type of product associated.
+        productcode: Return the event that is associated with the productcode.
+        reviewstatus: Limit to events with a specific review status.
     """
 
     # Format
