@@ -2,7 +2,7 @@ from pkg_resources import get_distribution
 
 from .download import download
 from .log import setup_logging
-from .src.query import Query
+from .core.query import Query
 
 setup_logging()
 
