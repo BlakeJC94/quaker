@@ -8,7 +8,37 @@ from quaker.globals import ISO8601_REGEX
 
 logger = logging.getLogger(__name__)
 
-}
+ALLOWED_VALUES = dict(
+    format=lambda v: v in ["csv", "geojson", "kml", "quakeml", "text", "xml"],
+    endtime=lambda v: re.match(ISO8601_REGEX, v),
+    starttime=lambda v: re.match(ISO8601_REGEX, v),
+    updatedafter=lambda v: re.match(ISO8601_REGEX, v),
+    minlatitude=lambda v: -90 <= v <= 90,
+    minlongitude=lambda v: -360 <= v <= 360,
+    maxlatitude=lambda v: -90 <= v <= 90,
+    maxlongitude=lambda v: -360 <= v <= 360,
+    latitude=lambda v: -90 <= v <= 90,
+    longitude=lambda v: -180 <= v <= 180,
+    maxradius=lambda v: 0 <= v <= 180,
+    maxradiuskm=lambda v: 0 <= v <= 20001.6,
+    includedeleted=lambda v: isinstance(v, bool) or v == "only",
+    limit=lambda v: 1 <= v <= 20000,
+    maxdepth=lambda v: -100 <= v <= 1000,
+    mindepth=lambda v: -100 <= v <= 1000,
+    offest=lambda v: v >= 1,
+    orderby=lambda v: v in ["time", "time-asc", "magnitude", "magnitude-asc"],
+    alertlevel=lambda v: v in ["green", "yellow", "orange", "red"],
+    kmlcolorby=lambda v: v in ["age", "depth"],
+    maxcdi=lambda v: 0 <= v <= 12,
+    maxgap=lambda v: 0 <= v <= 360,
+    maxmmi=lambda v: 0 <= v <= 12,
+    mincdi=lambda v: 0 <= v <= 12,
+    minfelt=lambda v: v >= 1,
+    mingap=lambda v: 0 <= v <= 360,
+    reviewstatus=lambda v: v in ["all", "automatic", "reviewed"],
+)
+
+query_field = field(default=None)
 
 
 # TODO add remaining params
