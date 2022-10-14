@@ -52,7 +52,8 @@ class Query:  # pylint: disable=too-many-instance-attributes
     NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
 
     Args:
-        format: Specify the output format.
+        format: Specify the output format (one of "csv", "geojson", "kml", "quakeml", "text",
+            or "xml").
 
         [Time]
         endtime: Limit to events on or before the specified end time.
@@ -60,18 +61,20 @@ class Query:  # pylint: disable=too-many-instance-attributes
         updatedafter: Limit to events updated after the specified time.
 
         [Location - rectangle]
-        minlatitude: Limit to events with a latitude larger than the specified minimum.
-        minlongitude: Limit to events with a longitude larger than the specified minimum.
-        maxlatitude: Limit to events with a latitude smaller than the specified maximum.
-        maxlongitude: Limit to events with a longitude smaller than the specified maximum.
+        minlatitude: Limit to events with a latitude larger than the specified minimum [-90, 90].
+        minlongitude: Limit to events with a longitude larger than the specified minimum [-360,
+            360].
+        maxlatitude: Limit to events with a latitude smaller than the specified maximum [-90, 90].
+        maxlongitude: Limit to events with a longitude smaller than the specified maximum [-360,
+            360].
 
         [Location - circle]
-        latitude: Specify the latitude to be used for a radius search.
-        longitude: Specify the longitude to be used for a radius search.
+        latitude: Specify the latitude to be used for a radius search [-90, 90].
+        longitude: Specify the longitude to be used for a radius search [-180, 180].
         maxradius: Limit to events within the specified maximum number of degrees from the
-            geographic point defined by the latitude and longitude parameters.
+            geographic point defined by the latitude and longitude parameters [0, 180].
         maxradiuskm: Limit to events within the specified maximum number of kilometers from the
-            geographic point defined by the latitude and longitude parameters.
+            geographic point defined by the latitude and longitude parameters [0, 20001.6].
 
         [Other]
         catalog: Limit to events from a specified catalog.
@@ -89,28 +92,30 @@ class Query:  # pylint: disable=too-many-instance-attributes
         mindepth: Limit to events with depth more than the specified minimum.
         minmagnitude: Limit to events with a magnitude larger than the specified minimum.
         offset: Return results starting at the event count specified, starting at 1.
-        orderby: Order the results.
+        orderby: Order the results (one of "time", "time-asc", "magnitude", or "magnitude-asc").
 
         [Extensions]
-        alertlevel: Limit to events with a specific PAGER alert level.
+        alertlevel: Limit to events with a specific PAGER alert level (one of "green", "yellow",
+            "orange", or "red").
         callback: Convert GeoJSON output to a JSONP response using this callback.
         eventtype: Limit to events of a specific type
         jsonerror: Request JSON(P) formatted output even on API error results. (only for geojson
             format)
         kmlanimated: Whether to include timestamp in generated kml, for google earth animation
             support.
-        kmlcolorby: How earthquakes are colored.
-        maxcdi: Maximum value for Maximum Community Determined Intensity reported by DYFI.
-        maxgap: Limit to events with no more than this azimuthal gap.
-        maxmmi: Maximum value for Maximum Modified Mercalli Intensity reported by ShakeMap.
+        kmlcolorby: How earthquakes are colored (one of "age", "depth").
+        maxcdi: Maximum value for Maximum Community Determined Intensity reported by DYFI [0, 12].
+        maxgap: Limit to events with no more than this azimuthal gap [0, 360].
+        maxmmi: Maximum value for Maximum Modified Mercalli Intensity reported by ShakeMap [0, 12].
         maxsig: Limit to events with no more than this significance.
-        mincdi: Minimum value for Maximum Community Determined Intensity reported by DYFI.
+        mincdi: Minimum value for Maximum Community Determined Intensity reported by DYFI [0, 12].
         minfelt: Limit to events with this many DYFI responses.
-        mingap: Limit to events with no less than this azimuthal gap.
+        mingap: Limit to events with no less than this azimuthal gap [0, 360].
         minsig: Limit to events with no less than this significance.
         producttype: Limit to events that have this type of product associated.
         productcode: Return the event that is associated with the productcode.
-        reviewstatus: Limit to events with a specific review status.
+        reviewstatus: Limit to events with a specific review status (one of "all",
+            "automatic", or "reviewed").
     """
 
     # Format
