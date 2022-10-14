@@ -1,6 +1,5 @@
 """Classes and methods for representation of queries."""
 import logging
-import re
 from dataclasses import dataclass, asdict, field, fields
 from datetime import datetime as dt
 from typing import Union, get_origin, get_args
@@ -47,10 +46,7 @@ ALLOWED_VALUES = dict(
     reviewstatus=lambda v: v in ["all", "automatic", "reviewed"],
 )
 
-query_field = field(default=None)
 
-
-# TODO add timezone handling
 @dataclass
 class Query:  # pylint: disable=too-many-instance-attributes
     """Class for managing inputs for queries
@@ -128,56 +124,56 @@ class Query:  # pylint: disable=too-many-instance-attributes
     """
 
     # Format
-    format: str = query_field
+    format: str = field(default=None)
     # Time
-    endtime: str = query_field
-    starttime: str = query_field
-    updatedafter: str = query_field
+    endtime: str = field(default=None)
+    starttime: str = field(default=None)
+    updatedafter: str = field(default=None)
     # Location - rectangle
-    minlatitude: float = query_field
-    minlongitude: float = query_field
-    maxlatitude: float = query_field
-    maxlongitude: float = query_field
+    minlatitude: float = field(default=None)
+    minlongitude: float = field(default=None)
+    maxlatitude: float = field(default=None)
+    maxlongitude: float = field(default=None)
     # Location - circle
-    latitude: float = query_field
-    longitude: float = query_field
-    maxradius: float = query_field
-    maxradiuskm: float = query_field
+    latitude: float = field(default=None)
+    longitude: float = field(default=None)
+    maxradius: float = field(default=None)
+    maxradiuskm: float = field(default=None)
     # Other
-    catalog: str = query_field
-    contributor: str = query_field
-    eventid: str = query_field
-    includeallmagnitudes: bool = query_field
-    includeallorigins: bool = query_field
-    includedeleted: Union[bool, str] = query_field
-    includesuperceded: bool = query_field
-    limit: int = query_field
-    maxdepth: float = query_field
-    maxmagnitude: float = query_field
-    mindepth: float = query_field
-    minmagnitude: float = query_field
-    offset: int = query_field
-    orderby: str = query_field
+    catalog: str = field(default=None)
+    contributor: str = field(default=None)
+    eventid: str = field(default=None)
+    includeallmagnitudes: bool = field(default=None)
+    includeallorigins: bool = field(default=None)
+    includedeleted: Union[bool, str] = field(default=None)
+    includesuperceded: bool = field(default=None)
+    limit: int = field(default=None)
+    maxdepth: float = field(default=None)
+    maxmagnitude: float = field(default=None)
+    mindepth: float = field(default=None)
+    minmagnitude: float = field(default=None)
+    offset: int = field(default=None)
+    orderby: str = field(default=None)
     # Extensions
-    alertlevel: str = query_field
-    callback: str = query_field
-    eventtype: str = query_field
-    jsonerror: bool = query_field
-    kmlanimated: bool = query_field
-    kmlcolorby: str = query_field
-    maxcdi: float = query_field
-    maxgap: float = query_field
-    maxmmi: float = query_field
-    maxsig: int = query_field
-    mincdi: str = query_field
-    minfelt: int = query_field
-    mingap: float = query_field
-    minsig: int = query_field
-    producttype: str = query_field
-    productcode: str = query_field
-    reviewstatus: str = query_field
+    alertlevel: str = field(default=None)
+    callback: str = field(default=None)
+    eventtype: str = field(default=None)
+    jsonerror: bool = field(default=None)
+    kmlanimated: bool = field(default=None)
+    kmlcolorby: str = field(default=None)
+    maxcdi: float = field(default=None)
+    maxgap: float = field(default=None)
+    maxmmi: float = field(default=None)
+    maxsig: int = field(default=None)
+    mincdi: str = field(default=None)
+    minfelt: int = field(default=None)
+    mingap: float = field(default=None)
+    minsig: int = field(default=None)
+    producttype: str = field(default=None)
+    productcode: str = field(default=None)
+    reviewstatus: str = field(default=None)
 
-    def __post_init__(self):  # pylint: disable=too-many-branches
+    def __post_init__(self):
 
         # Auto-typecast input values
         bad_values = {}
@@ -209,28 +205,21 @@ class Query:  # pylint: disable=too-many-instance-attributes
             self.maxradiuskm is None or self.maxradius is None
         ), "Only one of `maxradiuskm` and `maxradius` allowed to be specified."
 
-        if self.includedeleted is not None:
-            supported_formats = ["csv", "geojson"]
-            assert (
-                self.format in supported_formats
-            ), f"Only formats {supported_formats} allow `includedeleted` to be specified."
-
         if self.includesuperceded is not None:
             assert (
                 self.eventid is not None
             ), "Parameter `includesuperceded` only works when `eventid` is given."
 
-        if self.callback is not None:
-            assert self.format == "geojson", "Parameter `callback` only supported for geojson."
+        self._check_format_specific_parameters(["includedeleted"], ["csv", "geojson"])
+        self._check_format_specific_parameters(["callback", "jsonerror"], ["geojson"])
+        self._check_format_specific_parameters(["kmlcolorby", "kmlanimated"], ["kml"])
 
-        if self.jsonerror is not None:
-            assert self.format == "geojson", "Parameter `jsonerror` only supported for geojson."
-
-        if self.kmlcolorby is not None:
-            assert self.format == "kml", "Parameter `kmlcolorby` only supported for kml."
-
-        if self.kmlanimated is not None:
-            assert self.format == "kml", "Parameter `kmlanimated` only supported for kml."
+    def _check_format_specific_parameters(self, parameters, formats):
+        for name in parameters:
+            if getattr(self, name) is not None:
+                assert (
+                    self.format in formats
+                ), f"Parameter `{name}` only supported for {', '.join(formats)}."
 
     def __str__(self):
         out = self.__class__.__name__ + "("
