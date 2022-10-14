@@ -1,11 +1,12 @@
 """Classes and methods for representation of queries."""
+import logging
 import re
 from dataclasses import dataclass, asdict
 from typing import Optional
 
 from quaker.globals import ISO8601_REGEX
 
-ALLOWED_VALUES = {
+logger = logging.getLogger(__name__)
 
 }
 
