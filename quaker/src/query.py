@@ -2,17 +2,26 @@
 import logging
 import re
 from dataclasses import dataclass, asdict, field, fields
+from datetime import datetime as dt
 from typing import Union, get_origin, get_args
-
-from quaker.globals import ISO8601_REGEX
 
 logger = logging.getLogger(__name__)
 
+
+def is_valid_time(time: str):
+    valid = True
+    try:
+        dt.fromisocalendar(time)
+    except ValueError:
+        valid = False
+    return valid
+
+
 ALLOWED_VALUES = dict(
     format=lambda v: v in ["csv", "geojson", "kml", "quakeml", "text", "xml"],
-    endtime=lambda v: re.match(ISO8601_REGEX, v),
-    starttime=lambda v: re.match(ISO8601_REGEX, v),
-    updatedafter=lambda v: re.match(ISO8601_REGEX, v),
+    endtime=is_valid_time,
+    starttime=is_valid_time,
+    updatedafter=is_valid_time,
     minlatitude=lambda v: -90 <= v <= 90,
     minlongitude=lambda v: -360 <= v <= 360,
     maxlatitude=lambda v: -90 <= v <= 90,
@@ -168,7 +177,7 @@ class Query:  # pylint: disable=too-many-instance-attributes
     productcode: str = query_field
     reviewstatus: str = query_field
 
-    def __post_init__(self):
+    def __post_init__(self):  # pylint: disable=too-many-branches
 
         # Auto-typecast input values
         bad_values = {}
@@ -179,10 +188,12 @@ class Query:  # pylint: disable=too-many-instance-attributes
 
             # Handle generic subtypes, get first parameterised type
             if get_origin(val_type) is not None:
-                val_type = get_args(val_type)[0]
+                val_type = get_args(val_type)
 
             # Typecast values
             if value is not None and not isinstance(value, val_type):
+                if not callable(val_type):
+                    val_type = val_type[0]
                 setattr(self, name, val_type(value))
 
             # Ensure conditions on parameters are satisfied
@@ -222,8 +233,9 @@ class Query:  # pylint: disable=too-many-instance-attributes
             assert self.format == "kml", "Parameter `kmlanimated` only supported for kml."
 
     def __str__(self):
-        out = "QueryParams("
+        out = self.__class__.__name__ + "("
         for key, value in asdict(self).items():
-            out += "\n" + 4 * " " + f"{key}: {str(value)}"
+            if value is not None:
+                out += "\n" + 4 * " " + f"{key}: {str(value)}"
         out += "\n)"
         return out
