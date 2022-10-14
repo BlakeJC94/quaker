@@ -164,29 +164,57 @@ class Query:  # pylint: disable=too-many-instance-attributes
     reviewstatus: str = query_field
 
     def __post_init__(self):
-        for time in [self.starttime, self.endtime]:
-            try:
-                assert (
-                    time is None or isinstance(time, str) and re.match(ISO8601_REGEX, time)
-                ), "Invalid time provided"
-            except:
-                breakpoint()
 
-        lat_lngs = [
-            (self.minlatitude, self.minlongitude),
-            (self.maxlatitude, self.maxlongitude),
-            (self.latitude, self.longitude),
-        ]
-        for lat, lng in lat_lngs:
-            lat = (float(lat) + 90) % 180 - 90 if lat is not None else None
-            lng = (float(lng) + 360) % 720 - 360 if lng is not None else None
+        # Auto-typecast input values
+        bad_values = {}
+        for query_field in fields(self):
+            name = query_field.name
+            val_type = query_field.type
+            value = getattr(self, name)
 
-        assert self.maxradiuskm is None or 0 < self.maxradiuskm <= 20001.6, "Invalid `maxradiuskm`."
-        assert self.limit is None or 0 < self.limit <= 20000, "Invalid `limit`."
-        assert self.minmagnitude is None or self.minmagnitude >= 0, "Invalid `minmagnitude`."
-        assert self.maxmagnitude is None or self.maxmagnitude >= 0, "Invalid `minmagnitude`."
+            # Handle generic subtypes, get first parameterised type
+            if get_origin(val_type) is not None:
+                val_type = get_args(val_type)[0]
 
-        assert self.limit is None or self.limit > 0, "Invalid `limit`"
+            # Typecast values
+            if value is not None and not isinstance(value, val_type):
+                setattr(self, name, val_type(value))
+
+            # Ensure conditions on parameters are satisfied
+            if name in ALLOWED_VALUES and value is not None and not ALLOWED_VALUES[name](value):
+                bad_values[name] = value
+
+        if len(bad_values) > 0:
+            for name, value in bad_values.items():
+                logger.error(f"Invalid value for `{name}`, (got {value})")
+            raise AssertionError("Bad values given to query.")
+
+        assert (
+            self.maxradiuskm is None or self.maxradius is None
+        ), "Only one of `maxradiuskm` and `maxradius` allowed to be specified."
+
+        if self.includedeleted is not None:
+            supported_formats = ["csv", "geojson"]
+            assert (
+                self.format in supported_formats
+            ), f"Only formats {supported_formats} allow `includedeleted` to be specified."
+
+        if self.includesuperceded is not None:
+            assert (
+                self.eventid is not None
+            ), "Parameter `includesuperceded` only works when `eventid` is given."
+
+        if self.callback is not None:
+            assert self.format == "geojson", "Parameter `callback` only supported for geojson."
+
+        if self.jsonerror is not None:
+            assert self.format == "geojson", "Parameter `jsonerror` only supported for geojson."
+
+        if self.kmlcolorby is not None:
+            assert self.format == "kml", "Parameter `kmlcolorby` only supported for kml."
+
+        if self.kmlanimated is not None:
+            assert self.format == "kml", "Parameter `kmlanimated` only supported for kml."
 
     def __str__(self):
         out = "QueryParams("
