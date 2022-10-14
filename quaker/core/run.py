@@ -8,7 +8,6 @@ from requests import Request, Session
 
 from quaker.globals import (
     BASE_URL,
-    DEFAULT_QUERY_PARAMS,
     ISO8601_DT_FORMAT,
     MAX_ATTEMPTS,
     MAX_DEPTH,
@@ -98,7 +97,7 @@ def get_data(query: Query, session: Session) -> Request:
     for attempts in range(MAX_ATTEMPTS):
         download = session.get(
             BASE_URL,
-            params={**DEFAULT_QUERY_PARAMS, **asdict(query)},
+            params={**asdict(query)},
         )
         if download.status_code != RESPONSE_NOT_FOUND:
             return download

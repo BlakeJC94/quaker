@@ -11,4 +11,3 @@ RESPONSE_OK = 200
 MAX_ATTEMPTS = 3
 MAX_DEPTH = 10
 UPPER_LIMIT = 20000
-DEFAULT_QUERY_PARAMS = {"format": "csv", "orderby": "time"}
