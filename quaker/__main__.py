@@ -34,12 +34,12 @@ def get_query_docs() -> Tuple[str, Dict[str, Tuple[str, str, callable]]]:
         type_clb = eval(type_str)  # pylint: disable=eval-used
 
         metavar = "VAL"
-        name_no_3_char_prefix, name_no_5_char_prefix = name[3:], name[5:]
+        name_no_3_char_prefix = name[3:]
         if "latitude" in [name, name_no_3_char_prefix]:
             metavar = "LAT"
         elif "longitude" in [name, name_no_3_char_prefix]:
             metavar = "LNG"
-        elif "time" in [name, name_no_3_char_prefix, name_no_5_char_prefix]:
+        elif name in ["starttime", "endtime", "updatedafter"]:
             metavar = "TIME"
         elif "radiuskm" in [name, name_no_3_char_prefix]:
             metavar = "DIST"
