@@ -1,8 +1,8 @@
 """Classes and methods for representation of queries."""
 import logging
 import re
-from dataclasses import dataclass, asdict
-from typing import Optional
+from dataclasses import dataclass, asdict, field, fields
+from typing import Union, get_origin, get_args
 
 from quaker.globals import ISO8601_REGEX
 
@@ -41,7 +41,6 @@ ALLOWED_VALUES = dict(
 query_field = field(default=None)
 
 
-# TODO add remaining params
 # TODO add timezone handling
 @dataclass
 class Query:  # pylint: disable=too-many-instance-attributes
@@ -69,55 +68,54 @@ class Query:  # pylint: disable=too-many-instance-attributes
     """
 
     # Format
-    format: Optional[str] = None  # TODO
+    format: str = query_field
     # Time
-    endtime: Optional[str] = None
-    starttime: Optional[str] = None
-    updatedafter: Optional[str] = None # TODO
+    endtime: str = query_field
+    starttime: str = query_field
+    updatedafter: str = query_field
     # Location - rectangle
-    minlatitude: Optional[float] = None
-    minlongitude: Optional[float] = None
-    maxlatitude: Optional[float] = None
-    maxlongitude: Optional[float] = None
+    minlatitude: float = query_field
+    minlongitude: float = query_field
+    maxlatitude: float = query_field
+    maxlongitude: float = query_field
     # Location - circle
-    latitude: Optional[float] = None
-    longitude: Optional[float] = None
-    maxradiuskm: Optional[float] = None
+    latitude: float = query_field
+    longitude: float = query_field
+    maxradius: float = query_field
+    maxradiuskm: float = query_field
     # Other
-    catalog: Optional[str] = None  # TODO
-    contributor: Optional[str] = None  # TODO
-    eventid: Optional[str] = None  # TODO
-    includeallmagnitudes: Optional[bool] = None  # TODO
-    includeallorigins: Optional[bool] = None  # TODO
-    includearrivals: Optional[bool] = None  # TODO
-    includedeleted: Optional[bool] = None  # TODO
-    includesuperceded: Optional[bool] = None  # TODO
-    limit: Optional[int] = None
-    maxdepth: Optional[int] = None  # TODO
-    maxmagnitude: Optional[int] = None
-    mindepth: Optional[int] = None  # TODO
-    minmagnitude: Optional[int] = None
-    offset: Optional[int] = None  # TODO
-    orderby: Optional[str] = None  # TODO
+    catalog: str = query_field
+    contributor: str = query_field
+    eventid: str = query_field
+    includeallmagnitudes: bool = query_field
+    includeallorigins: bool = query_field
+    includedeleted: Union[bool, str] = query_field
+    includesuperceded: bool = query_field
+    limit: int = query_field
+    maxdepth: float = query_field
+    maxmagnitude: float = query_field
+    mindepth: float = query_field
+    minmagnitude: float = query_field
+    offset: int = query_field
+    orderby: str = query_field
     # Extensions
-    alertlevel: Optional[str] = None  # TODO
-    callback: Optional[str] = None  # TODO
-    eventtype: Optional[str] = None  # TODO
-    jsonerror: Optional[str] = None  # TODO
-    kmlanimated: Optional[str] = None  # TODO
-    kmlcolorby: Optional[str] = None  # TODO
-    maxcdi: Optional[str] = None  # TODO
-    maxgap: Optional[str] = None  # TODO
-    maxmmi: Optional[str] = None  # TODO
-    maxsig: Optional[str] = None  # TODO
-    mincdi: Optional[str] = None  # TODO
-    minfelt: Optional[int] = None  # TODO
-    mingap: Optional[float] = None  # TODO
-    minsig: Optional[int] = None  # TODO
-    nodata: Optional[int] = None  # TODO
-    productype: Optional[str] = None  # TODO
-    produccode: Optional[str] = None  # TODO
-    reviewstatus: Optional[str] = None  # TODO
+    alertlevel: str = query_field
+    callback: str = query_field
+    eventtype: str = query_field
+    jsonerror: bool = query_field
+    kmlanimated: bool = query_field
+    kmlcolorby: str = query_field
+    maxcdi: float = query_field
+    maxgap: float = query_field
+    maxmmi: float = query_field
+    maxsig: int = query_field
+    mincdi: str = query_field
+    minfelt: int = query_field
+    mingap: float = query_field
+    minsig: int = query_field
+    producttype: str = query_field
+    productcode: str = query_field
+    reviewstatus: str = query_field
 
     def __post_init__(self):
         for time in [self.starttime, self.endtime]:
