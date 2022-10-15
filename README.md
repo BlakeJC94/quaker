@@ -140,12 +140,8 @@ Using the python API is also fairly straight-forward:
 ## Future developments
 
 - [ ] Match split query by last `id` instead of last `time`
-- [ ] Fix issue where `__post_init__` method doesn't fire
-    - [ ] put datetime handling back into `Query`
-    - [ ] Handle timezones as well
-- [ ] Dash app to visualise clustered query results
-- [ ] Expose parameters for formats other than CSV
 - [ ] Testing suite
+- [ ] Dash app to visualise clustered query results
 - [ ] Publish to pypi?
 
 ## Contributing
