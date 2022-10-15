@@ -3,6 +3,7 @@ import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta
 from time import sleep
+from typing import Optional
 
 from requests import Request, Session
 
@@ -27,8 +28,8 @@ def run_query(
     query: Query,
     session: Session,
     output_file: str,
-    max_api_calls: int = MAX_DEPTH,
     write_header: bool = True,
+    _index: Optional[int] = None,
 ) -> None:
     """Recursive function to query the USGS API.
 
@@ -36,11 +37,11 @@ def run_query(
         query: Query dataclass object.
         session: Session class for connection.
         output_file: Path to destination file.
-        max_api_calls: Maximum number of calls to API.
         write_header: Flag controlling whether to write the header to the file.
     """
+    _index = 0 if _index is None else _index
     # Check recursion guard
-    if max_api_calls < 1:
+    if _index >= MAX_DEPTH:
         logger.warning("Exceeded maximum recursion depth.")
         return None
 
@@ -76,8 +77,9 @@ def run_query(
     remainder = Query(**{**asdict(query).copy(), "endtime": next_endtime})
 
     # (subtract one from recursion index on each recursive call to guard against infinite loop)
-    logger.info(f"Remaining recursions: {max_api_calls - 1}")
-    run_query(remainder, session, output_file, max_api_calls - 1, write_header=False)
+    _next_index = _index + 1
+    logger.info(f"Starting recursion: {_next_index}")
+    run_query(remainder, session, output_file, write_header=False, _index=_next_index)
     return None
 
 
