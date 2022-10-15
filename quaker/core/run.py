@@ -36,7 +36,6 @@ def run_query(
         query: Query dataclass object.
         session: Session class for connection.
         output_file: Path to destination file.
-        max_api_calls: Maximum number of calls to API.
         write_header: Flag controlling whether to write the header to the file.
     """
     # Check recursion guard
@@ -75,7 +74,7 @@ def run_query(
     remainder = Query(**{**asdict(query).copy(), "offset": next_offset})
 
     # (subtract one from recursion index on each recursive call to guard against infinite loop)
-    logger.info(f"Remaining recursions: {max_api_calls - 1}")
+    logger.debug(f"Remaining recursions: {MAX_DEPTH - (_index + 1)}")
     run_query(
         remainder,
         session,
