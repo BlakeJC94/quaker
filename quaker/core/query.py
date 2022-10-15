@@ -29,7 +29,7 @@ ALLOWED_VALUES = dict(
     longitude=lambda v: -180 <= v <= 180,
     maxradius=lambda v: 0 <= v <= 180,
     maxradiuskm=lambda v: 0 <= v <= 20001.6,
-    includedeleted=lambda v: isinstance(v, bool) or v == "only",
+    includedeleted=lambda v: v.strip().lower() in ["true", "false", "only"],
     limit=lambda v: 1 <= v <= 20000,
     maxdepth=lambda v: -100 <= v <= 1000,
     mindepth=lambda v: -100 <= v <= 1000,
@@ -89,7 +89,7 @@ class Query:  # pylint: disable=too-many-instance-attributes
         includeallmagnitudes: Specify if all magnitudes for the event should be included.
         includeallorigins: Specify if all origins for the event should be included.
         includedeleted: Specify if deleted products and events should be included. The value "only"
-            returns only deleted events.
+            returns only deleted events. Values "True" or "False" are typecast to bool.
         includesuperceded: Specify if superseded products should be included. This also includes
             all deleted products, and is mutually exclusive to the includedeleted parameter.
         limit: Limit the results to the specified number of events.
@@ -146,7 +146,7 @@ class Query:  # pylint: disable=too-many-instance-attributes
     eventid: str = field(default=None)
     includeallmagnitudes: bool = field(default=None)
     includeallorigins: bool = field(default=None)
-    includedeleted: Union[bool, str] = field(default=None)
+    includedeleted: str = field(default=None)
     includesuperceded: bool = field(default=None)
     limit: int = field(default=None)
     maxdepth: float = field(default=None)
@@ -210,6 +210,11 @@ class Query:  # pylint: disable=too-many-instance-attributes
             assert (
                 self.eventid is not None
             ), "Parameter `includesuperceded` only works when `eventid` is given."
+
+        if self.includedeleted is not None:
+            includedeleted_is_bool = (self.includedeleted.strip().lower()[0] in ['t', 'f'])
+            post_type = bool if includedeleted_is_bool else str
+            self.includedeleted = post_type(self.includedeleted)
 
         self._check_format_specific_parameters(["includedeleted"], ["csv", "geojson"])
         self._check_format_specific_parameters(["callback", "jsonerror"], ["geojson"])

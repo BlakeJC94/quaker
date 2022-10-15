@@ -1,5 +1,6 @@
 import argparse
 import logging
+from dataclasses import fields
 from typing import Tuple, Dict
 
 from . import (
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 def get_query_docs() -> Tuple[str, Dict[str, Dict[str, Tuple[str, str, callable]]]]:
     doc = Query.__doc__
     annotations = Query.__annotations__
+    types = {v.name: v.type for v in fields(Query)}
 
     _head_doc, _arg_doc = doc.split("Args:")
     _arg_doc = _arg_doc.replace("\n" + 12 * " ", " ")
@@ -35,23 +37,22 @@ def get_query_docs() -> Tuple[str, Dict[str, Dict[str, Tuple[str, str, callable]
             name = name.strip()
             desc = desc.strip().lower()
 
-            # TODO replace with fields(..)
-            type_str = str(annotations[name])
-            type_str = type_str.removeprefix("Optional[").removesuffix("]")
-            type_str = type_str.split(",")[0].strip().removesuffix(",")
-            type_str = type_str if type_str in ["float", "int"] else "str"
-            type_clb = eval(type_str)  # pylint: disable=eval-used
+            type_clb = types[name]
 
             metavar = "VAL"
-            name_no_3_char_prefix = name[3:]
-            if "latitude" in [name, name_no_3_char_prefix]:
-                metavar = "LAT"
-            elif "longitude" in [name, name_no_3_char_prefix]:
-                metavar = "LNG"
-            elif name in ["starttime", "endtime", "updatedafter"]:
-                metavar = "TIME"
-            elif "radiuskm" in [name, name_no_3_char_prefix]:
-                metavar = "DIST"
+            if type_clb == bool:
+                metavar = "BOOL"
+            elif type_clb == str:
+                if name in ["starttime", "endtime", "updatedafter"]:
+                    metavar = "TIME"
+            elif type_clb == float:
+                name_no_3_char_prefix = name[3:]
+                if "latitude" in [name, name_no_3_char_prefix]:
+                    metavar = "LAT"
+                elif "longitude" in [name, name_no_3_char_prefix]:
+                    metavar = "LNG"
+                elif "radiuskm" in [name, name_no_3_char_prefix]:
+                    metavar = "DIST"
 
             section_info[name] = (desc, metavar, type_clb)
 
@@ -96,6 +97,7 @@ def main():
     fields = {k: v for k, v in vars(input_args).items() if k in args_info}
     query = Query(**fields)
     if input_args.mode == "download":
+        breakpoint()
         download(output_file="/dev/stdout", query=query)
     else:
         logger.error("Only 'download' mode is supported for now")
