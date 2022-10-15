@@ -97,7 +97,6 @@ def main():
     fields = {k: v for k, v in vars(input_args).items() if k in args_info}
     query = Query(**fields)
     if input_args.mode == "download":
-        breakpoint()
         download(output_file="/dev/stdout", query=query)
     else:
         logger.error("Only 'download' mode is supported for now")
