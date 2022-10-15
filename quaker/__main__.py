@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 def get_query_docs() -> Tuple[str, Dict[str, Dict[str, Tuple[str, str, callable]]]]:
     doc = Query.__doc__
-    annotations = Query.__annotations__
     types = {v.name: v.type for v in fields(Query)}
 
     _head_doc, _arg_doc = doc.split("Args:")
@@ -94,8 +93,9 @@ def main():
 
     input_args = parser.parse_args()
 
-    fields = {k: v for k, v in vars(input_args).items() if k in args_info}
-    query = Query(**fields)
+    query_args = {k for _, section_info in args_info.items() for k in section_info}
+    query_input = {k: v for k, v in vars(input_args).items() if k in query_args}
+    query = Query(**query_input)
     if input_args.mode == "download":
         download(output_file="/dev/stdout", query=query)
     else:
