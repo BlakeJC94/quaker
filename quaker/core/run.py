@@ -27,8 +27,8 @@ def run_query(
     query: Query,
     session: Session,
     output_file: str,
-    max_api_calls: int = MAX_DEPTH,
     write_header: bool = True,
+    _index: int = 0,
 ) -> None:
     """Recursive function to query the USGS API.
 
@@ -40,7 +40,7 @@ def run_query(
         write_header: Flag controlling whether to write the header to the file.
     """
     # Check recursion guard
-    if max_api_calls < 1:
+    if _index >= MAX_DEPTH:
         logger.warning("Exceeded maximum recursion depth.")
         return None
 
@@ -71,13 +71,18 @@ def run_query(
     write_content(download_hat, output_file, write_header)
 
     # Create remainder query
-    next_endtime = get_last_time(download_hat) + timedelta(microseconds=1)
-    next_endtime = next_endtime.strftime(ISO8601_DT_FORMAT)
-    remainder = Query(**{**asdict(query).copy(), "endtime": next_endtime})
+    next_offset = 1 + UPPER_LIMIT * (_index + 1)
+    remainder = Query(**{**asdict(query).copy(), "offset": next_offset})
 
     # (subtract one from recursion index on each recursive call to guard against infinite loop)
     logger.info(f"Remaining recursions: {max_api_calls - 1}")
-    run_query(remainder, session, output_file, max_api_calls - 1, write_header=False)
+    run_query(
+        remainder,
+        session,
+        output_file,
+        write_header=False,
+        _index=_index + 1,
+    )
     return None
 
 
@@ -106,22 +111,3 @@ def get_data(query: Query, session: Session) -> Request:
 
     logger.error("No connection could be made.")
     return download
-
-
-def get_last_time(download: Request) -> str:
-    """Get final time value from a request.
-
-    Args:
-        download: Successful response from API.
-
-    Returns:
-        ISO8601 datetime string.
-    """
-    reversed_clipped_content = download.content[:1:-1]
-    reversed_last_row = reversed_clipped_content.split(b"\n")[1]
-    last_row = reversed_last_row[::-1]
-    last_row_first_col = last_row.split(b",")[0]
-    return datetime.strptime(
-        last_row_first_col.decode("utf-8"),
-        ISO8601_DT_FORMAT + "Z",
-    )

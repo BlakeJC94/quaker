@@ -32,7 +32,7 @@ def download(
 
         parent_dir, _ = path.split(output_file)
         if not path.exists(parent_dir):
-            logger.info(f"Creatin dir {parent_dir} doesnt exist, creating.")
+            logger.info(f"Creating dir {parent_dir} doesnt exist, creating.")
             makedirs(parent_dir, exist_ok=True)
 
     if not isinstance(query, Query):
