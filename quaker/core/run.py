@@ -54,7 +54,9 @@ def run_query(
         return None
     # Crash if there's an unexpected error
     if download.status_code not in [RESPONSE_OK, RESPONSE_BAD_REQUEST]:
-        raise RuntimeError(f"Unexpected response code on query: {download.status_code}")
+        msg = f"Unexpected response code on query: {download.status_code}"
+        logger.error(msg)
+        raise RuntimeError(msg)
 
     # If successful, add it to the memory stack and return
     if download.status_code == RESPONSE_OK:
@@ -66,7 +68,9 @@ def run_query(
     download_hat = get_data(query_hat, session)
     if download_hat.status_code != RESPONSE_OK:
         # Crash if the capped query unexpectedly fails
-        raise RuntimeError(f"Unexpected response code on split query: {download.status_code}")
+        msg = f"Unexpected response code on split query: {download.status_code}"
+        logger.error(msg)
+        raise RuntimeError(msg)
 
     # Add successful query to stack
     write_content(download_hat, output_file, write_header)
