@@ -57,6 +57,7 @@ class Query:  # pylint: disable=too-many-instance-attributes
     NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
 
     Args:
+        [Format]
         format: Specify the output format (one of "csv", "geojson", "kml", "quakeml", "text",
             or "xml").
 
