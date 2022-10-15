@@ -20,6 +20,12 @@ def write_content(download: Request, output_file: str, write_header: bool = True
     error_recived = None
     with open(output_file, mode, encoding="utf-8") as csvfile:
         try:
+            # DEBUG
+            lines = download.iter_lines(decode_unicode=True)
+            for _ in range(2):  # TODO investigate infinite loop further
+                *seps, _ = next(lines).split(',', 3)
+                logger.info(f"WRITING FILE: {[i for i in seps]}")
+
             lines = download.iter_lines(decode_unicode=True)
             if not write_header:
                 _ = next(lines)

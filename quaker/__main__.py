@@ -78,6 +78,14 @@ def main():
         default=default_mode,
         help=f"action to perform (default: {default_mode})",
     )
+    parser.add_argument(
+        "--output",
+        help="File to write to.",
+        metavar="FILE",
+        type=str,
+        required=False,
+        default="/dev/stdout",
+    )
 
     for section_name, section_info in args_info.items():
         group = parser.add_argument_group(section_name)
@@ -97,7 +105,8 @@ def main():
     query_input = {k: v for k, v in vars(input_args).items() if k in query_args}
     query = Query(**query_input)
     if input_args.mode == "download":
-        download(output_file="/dev/stdout", query=query)
+        output_file = input_args.output
+        download(output_file=output_file, query=query)
     else:
         logger.error("Only 'download' mode is supported for now")
         # logger.error("Invalid mode selected")

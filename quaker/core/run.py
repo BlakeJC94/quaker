@@ -39,6 +39,7 @@ def run_query(
         write_header: Flag controlling whether to write the header to the file.
     """
     # Check recursion guard
+    logger.info(f"START PROCESS {_index=}")
     if _index >= MAX_DEPTH:
         logger.warning("Exceeded maximum recursion depth.")
         return None
@@ -56,7 +57,9 @@ def run_query(
 
     # If successful, add it to the memory stack and return
     if download.status_code == RESPONSE_OK:
+        logger.info("WRITING END OF NODE TO FILE")
         write_content(download, output_file, write_header)
+        breakpoint()
         return None
 
     # Otherwise, split the query into a capped query and a remainder query
@@ -67,6 +70,7 @@ def run_query(
         raise RuntimeError(f"Unexpected response code on split query: {download.status_code}")
 
     # Add successful query to stack
+    logger.info("WRITING BRANCH TO FILE")
     write_content(download_hat, output_file, write_header)
 
     # Create remainder query
