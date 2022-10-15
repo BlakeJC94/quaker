@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def is_valid_time(time: str):
     valid = True
     try:
-        dt.fromisocalendar(time)
+        dt.fromisoformat(time)
     except ValueError:
         valid = False
     return valid
