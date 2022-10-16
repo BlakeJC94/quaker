@@ -76,15 +76,27 @@ def run_query(
     write_content(download_hat, output_file, write_header)
 
     # Create remainder query
-    next_endtime = get_last_time(download_hat) + timedelta(microseconds=1)
-    next_endtime = next_endtime.strftime(ISO8601_DT_FORMAT)
-    remainder = Query(**{**asdict(query).copy(), "endtime": next_endtime})
+    remainder = split_query(query, download_hat)
 
     # (subtract one from recursion index on each recursive call to guard against infinite loop)
     _next_index = _index + 1
     logger.info(f"Starting recursion: {_next_index}")
     run_query(remainder, session, output_file, write_header=False, _index=_next_index)
     return None
+
+
+def split_query(query, download_hat):
+    # TODO check `orderby` attribute
+    #   - if time or time-asc, get last time from download_hat
+    #     - if time, set last time as new endtime
+    #     - if time-asc, set last time as new starttime
+    #   - if magnitude or magnitude-asc, get last magnitude from download_hat
+    #     - if magnitude, set last magnitude as new maxmagnitude
+    #     - if magnitude-asc, set last magnitude as new minmagnitude
+    # TODO match on event id and trim duplicates
+    next_endtime = get_last_time(download_hat) + timedelta(microseconds=1)
+    next_endtime = next_endtime.strftime(ISO8601_DT_FORMAT)
+    return Query(**{**asdict(query).copy(), "endtime": next_endtime})
 
 
 def get_data(query: Query, session: Session) -> Request:
