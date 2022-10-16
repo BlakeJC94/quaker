@@ -93,10 +93,26 @@ def split_query(query, download_hat):
     #   - if magnitude or magnitude-asc, get last magnitude from download_hat
     #     - if magnitude, set last magnitude as new maxmagnitude
     #     - if magnitude-asc, set last magnitude as new minmagnitude
-    # TODO match on event id and trim duplicates
-    next_endtime = get_last_time(download_hat) + timedelta(microseconds=1)
-    next_endtime = next_endtime.strftime(ISO8601_DT_FORMAT)
-    return Query(**{**asdict(query).copy(), "endtime": next_endtime})
+
+    order, *_asc = query.orderby.split('-')
+    order_asc = len(_asc) > 0 and _asc[0] == 'asc'
+
+    if order == 'time':
+        next_prefixes = ['end', 'start']
+        next_param = get_last_time(download_hat)
+    elif order == "magnitude":
+        # NOTE: this may fail if looking over a large timespan and
+        # more than 20000 events have the same magnitude.
+        # Maybe I would raise an error in writer when this happens?
+        next_prefixes = ['max', 'min']
+        # TODO get last magnitude from download_hat
+        # next_param = ...
+        raise NotImplementedError()
+    else:
+        raise ValueError()
+
+    next_arg = next_prefixes[int(order_asc)] + order
+    return Query(**{**asdict(query).copy(), next_arg: next_param})
 
 
 def get_data(query: Query, session: Session) -> Request:
@@ -126,7 +142,8 @@ def get_data(query: Query, session: Session) -> Request:
     return download
 
 
-def get_last_time(download: Request) -> str:
+# TODO fix this for non-csv formats!
+def get_last_time(download: Request, order: str) -> str:
     """Get final time value from a request.
 
     Args:
@@ -138,8 +155,8 @@ def get_last_time(download: Request) -> str:
     reversed_clipped_content = download.content[:1:-1]
     reversed_last_row = reversed_clipped_content.split(b"\n")[1]
     last_row = reversed_last_row[::-1]
-    last_row_first_col = last_row.split(b",")[0]
-    return datetime.strptime(
-        last_row_first_col.decode("utf-8"),
-        ISO8601_DT_FORMAT + "Z",
-    )
+    if order == 'time':
+        return last_row.split(b",")[0]  # first col
+    if order == 'magnitude':
+        return last_row.split(b",")[4]  # fifth col
+    raise ValueError()

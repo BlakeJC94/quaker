@@ -22,6 +22,7 @@ def write_content(download: Request, output_file: str, write_header: bool = True
         try:
             lines = download.iter_lines(decode_unicode=True)
             if not write_header:
+                # TODO trim duplicate lines
                 _ = next(lines)
             csvfile.writelines(line + "\n" for line in lines)
         except KeyboardInterrupt:
