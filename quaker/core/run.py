@@ -142,7 +142,22 @@ def get_data(query: Query, session: Session) -> Request:
     return download
 
 
+
 # TODO fix this for non-csv formats!
+# csv is fairly easy
+#   - get last line, col 0: time, col 4: mag
+# geojson, parse as dict? json.loads? whole damn hings needs to be loaded it seems
+#   - get last line of file (foo)
+#   - bar = json.loads(']'.join(foo.split(']', 2)[:2]))
+#   - bar['properties']['time'] or bar['properties']['mag']
+# kml
+#   - Get 4th last line [-4]
+#   - xml.etree.ElementTree?
+# text
+#   - similar to csv, split on '|' instead of ','
+# xml/quakeml
+#   - Get 3rd last line [-3]
+#   - xml.etree.ElementTree?
 def get_last_time(download: Request, order: str) -> str:
     """Get final time value from a request.
 
