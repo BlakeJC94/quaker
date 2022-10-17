@@ -21,6 +21,7 @@ def write_content(
     Args:
         download: Returned response from request.
         output_file: Location of file to rite results to.
+        query: Metadata for request.
         write_header: Flag controlling whether to write the header to the file.
     """
     file_format = query.format or "csv"  # TODO update this default
@@ -32,7 +33,8 @@ def write_content(
             if file_format in ["csv" or "text"]:
                 write_text_lines(file, lines, write_header)
             elif file_format == "geojson":
-                raise NotImplementedError() # TODO
+                # raise NotImplementedError() # TODO
+                write_json_lines(file, lines, write_header)
             elif file_format == "kml":
                 raise NotImplementedError() # TODO
             elif file_format in ["xml", "quakeml"]:
@@ -48,7 +50,21 @@ def write_content(
     if error_recived is not None:  # Signal to process that keyboard interrupt was received.
         raise error_recived
 
-# TODO remove duplicates?
+def write_json_lines(file, lines, write_header):  # TODO type hints
+    if not write_header:
+        # TODO clip
+        # `{"type":"FeatureCollection","metadata":{"generated":1666040106000,"url":"https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&endtime=2022-09-02&starttime=2022-09-01","title":"USGS Earthquakes","status":200,"api":"1.13.6","count":386},"features":[`
+        # from first line
+        _ = next(lines)
+
+    # TODO Replace
+    # `],"bbox":[-178.8919,-57.9804,-3.19,179.54833333333,66.579,574.627]}`
+    # with `,\n` in file before writing
+    file.writelines(line + "\n" for line in lines)
+    # TODO
+
+
+# TODO remove duplicates? use a hash table?
 def write_text_lines(file, lines, write_header):  # TODO type hints
     if not write_header:
         _ = next(lines)
