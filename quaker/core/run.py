@@ -100,17 +100,20 @@ def split_query(query, download_hat):
 
     if order == 'time':
         next_prefixes = ['end', 'start']
-        next_param = get_last_time(download_hat)
     elif order == "magnitude":
         # NOTE: this may fail if looking over a large timespan and
         # more than 20000 events have the same magnitude.
         # Maybe I would raise an error in writer when this happens?
+        # TODO eliminate duplicates before/as writing? raise error if nothing to write
         next_prefixes = ['max', 'min']
         # TODO get last magnitude from download_hat
         # next_param = ...
         raise NotImplementedError()
     else:
         raise ValueError()
+
+    next_prefixes = ['end', 'start'] if order == 'time' else ['max', 'min']
+    next_param = get_last_param(download_hat, query.format, order)  # TODO fixme
 
     next_arg = next_prefixes[int(order_asc)] + order
     return Query(**{**asdict(query).copy(), next_arg: next_param})
@@ -159,7 +162,7 @@ def get_data(query: Query, session: Session) -> Request:
 # xml/quakeml
 #   - Get 3rd last line [-3]
 #   - xml.etree.ElementTree?
-def get_last_time(download: Request, order: str) -> str:
+def get_last_param(download: Request, file_format: str, order: str) -> str:
     """Get final time value from a request.
 
     Args:
@@ -168,11 +171,21 @@ def get_last_time(download: Request, order: str) -> str:
     Returns:
         ISO8601 datetime string.
     """
+    if file_format in ['kml', 'xml', 'quakeml']:
+        raise NotImplementedError()
+
+    last_param = None
+
     reversed_clipped_content = download.content[:1:-1]
     reversed_last_row = reversed_clipped_content.split(b"\n")[1]
     last_row = reversed_last_row[::-1]
-    if order == 'time':
-        return last_row.split(b",")[0]  # first col
-    if order == 'magnitude':
-        return last_row.split(b",")[4]  # fifth col
-    raise ValueError()
+
+    if file_format in ['csv', 'text']:
+        index = 0 if order == 'time' else 4
+        delim = b"," if file_format == 'csv' else b"|"
+        last_param = last_row.split(delim)[index]
+
+    if file_format == 'geojson':
+        raise ValueError()
+
+    return last_param
