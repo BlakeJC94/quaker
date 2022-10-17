@@ -39,8 +39,8 @@ def run_query(
         output_file: Path to destination file.
         write_header: Flag controlling whether to write the header to the file.
     """
-    _index = 0 if _index is None else _index
     # Check recursion guard
+    _index = 0 if _index is None else _index
     if _index >= MAX_DEPTH:
         logger.warning("Exceeded maximum recursion depth.")
         return None
@@ -52,6 +52,7 @@ def run_query(
     if download.status_code == RESPONSE_NO_CONTENT:
         logger.warning("No data found.")
         return None
+
     # Crash if there's an unexpected error
     if download.status_code not in [RESPONSE_OK, RESPONSE_BAD_REQUEST]:
         msg = f"Unexpected response code on query: {download.status_code}"
@@ -60,7 +61,7 @@ def run_query(
 
     # If successful, add it to the memory stack and return
     if download.status_code == RESPONSE_OK:
-        write_content(download, output_file, write_header)
+        write_content(download, output_file, query, write_header)
         return None
 
     # Otherwise, split the query into a capped query and a remainder query
@@ -73,7 +74,7 @@ def run_query(
         raise RuntimeError(msg)
 
     # Add successful query to stack
-    write_content(download_hat, output_file, write_header)
+    write_content(download_hat, output_file, query_hat, write_header)
 
     # Create remainder query
     remainder = split_query(query, download_hat)
