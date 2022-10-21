@@ -54,25 +54,20 @@ def write_content(
 
 def write_json_lines(file, lines, write_header, write_footer):  # TODO type hints
     if not write_header:
-        # TODO clip
-        # `{"type":"FeatureCollection","metadata":{"generated":1666040106000,"url":"https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&endtime=2022-09-02&starttime=2022-09-01","title":"USGS Earthquakes","status":200,"api":"1.13.6","count":386},"features":[`
-        # from first line
-        _ = next(lines)
+        first_line = next(lines)
+        _, first_record = first_line.split('[', 1)  # already ends with a comma
+        file.write(first_record + "\n")
 
     for line in lines:
-        if "bbox" not in line:
+        if "bbox" not in line or write_footer:
             file.write(line + "\n")
             continue
-        if not write_footer:
-            # TODO clip line
-            file.write(line + "\n")
 
-    if not write_footer:
-        # TODO Replace
-        # `],"bbox":[-178.8919,-57.9804,-3.19,179.54833333333,66.579,574.627]}`
-        # with `,\n` in file before writing
-        file.writelines(line + "\n" for line in lines)
-    # TODO
+        # clip the last line if write_footer is False
+        if not write_footer:
+            *record, _ = line.split(']', 2)
+            last_record = "]".join(line.split(']')[:2])  # doesnt end with a comma
+            file.write(last_record + ",\n")
 
 
 # TODO remove duplicates? use a hash table?
