@@ -61,7 +61,7 @@ def run_query(
 
     # If successful, add it to the memory stack and return
     if download.status_code == RESPONSE_OK:
-        write_content(download, output_file, query, write_header)
+        write_content(download, output_file, query, write_header, write_footer=True)
         return None
 
     # Otherwise, split the query into a capped query and a remainder query
@@ -73,8 +73,8 @@ def run_query(
         logger.error(msg)
         raise RuntimeError(msg)
 
-    # Add successful query to stack
-    write_content(download_hat, output_file, query_hat, write_header)
+    # Add successful sub-query to stack
+    write_content(download_hat, output_file, query_hat, write_header, write_footer=False)
 
     # Create remainder query
     remainder = split_query(query, download_hat)
