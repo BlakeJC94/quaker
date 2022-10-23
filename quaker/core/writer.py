@@ -26,7 +26,7 @@ def write_content(
         write_header: Flag controlling whether to write the header to the file.
         write_footer: Flag controlling whether to write the footer to the file.
     """
-    file_format = query.format or "csv"  # TODO update this default
+    file_format = query.format
     mode = "w" if not path.exists(output_file) else "a"
     error_recived = None
     with open(output_file, mode, encoding="utf-8") as file:

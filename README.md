@@ -13,7 +13,7 @@ $ pip install .
 
 ## Quickstart
 This package comes equiped with a batteries-included CLI interface for downloading the latest
-earthquake event data in CSV format from the USGS database.
+earthquake event data in CSV, GeoJSON, and plain text format from the USGS database.
 ```
 usage: quaker [-h] [--format VAL] [--endtime TIME] [--starttime TIME] [--updatedafter TIME] [--minlatitude LAT]
               [--minlongitude LNG] [--maxlatitude LAT] [--maxlongitude LNG] [--latitude LAT] [--longitude LNG]

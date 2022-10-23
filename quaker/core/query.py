@@ -48,8 +48,6 @@ ALLOWED_VALUES = dict(
 
 
 @dataclass
-# TODO add support for text
-# TODO add support for geojson
 # TODO add support for kml
 # TODO add support for xml and quakeml
 class Query:  # pylint: disable=too-many-instance-attributes
@@ -62,8 +60,8 @@ class Query:  # pylint: disable=too-many-instance-attributes
 
     Args:
         [Format]
-        format: Specify the output format (only "csv" supported for now. "geojson", "kml",
-            "quakeml", "text", and "xml" to be added in upcoming release).
+        format: Specify the output format (only "csv", "geojson", and "text" supported for now.
+            kml", "quakeml", and "xml" to be added in upcoming release).
 
         [Time]
         endtime: Limit to events on or before the specified end time.
@@ -209,7 +207,7 @@ class Query:  # pylint: disable=too-many-instance-attributes
         # TODO remove this artificial guard when better support is added
         if self.format is None:
             self.format = "csv"
-        elif self.format != "csv":
+        elif self.format not in ["csv", "text", "geojson"]:
             logger.warning(f"Format {self.format} not implemented yet, changing to 'csv'")
             self.format = "csv"
 

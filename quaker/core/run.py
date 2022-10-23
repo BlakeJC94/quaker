@@ -98,20 +98,6 @@ def split_query(query, download_hat):
     order, *_asc = query.orderby.split('-')
     order_asc = len(_asc) > 0 and _asc[0] == 'asc'
 
-    if order == 'time':
-        next_prefixes = ['end', 'start']
-    elif order == "magnitude":
-        # NOTE: this may fail if looking over a large timespan and
-        # more than 20000 events have the same magnitude.
-        # Maybe I would raise an error in writer when this happens?
-        # TODO eliminate duplicates before/as writing? raise error if nothing to write
-        next_prefixes = ['max', 'min']
-        # TODO get last magnitude from download_hat
-        # next_param = ...
-        raise NotImplementedError()
-    else:
-        raise ValueError()
-
     next_prefixes = ['end', 'start'] if order == 'time' else ['max', 'min']
     next_param = get_last_param(download_hat, query.format, order)  # TODO fixme
 
@@ -147,18 +133,10 @@ def get_data(query: Query, session: Session) -> Request:
 
 
 
-# TODO fix this for non-csv formats!
-# csv is fairly easy
-#   - get last line, col 0: time, col 4: mag
-# geojson, parse as dict? json.loads? whole damn hings needs to be loaded it seems
-#   - get last line of file (foo)
-#   - bar = json.loads(']'.join(foo.split(']', 2)[:2]))
-#   - bar['properties']['time'] or bar['properties']['mag']
+# TODO fix this for xml formats
 # kml
 #   - Get 4th last line [-4]
 #   - xml.etree.ElementTree?
-# text
-#   - similar to csv, split on '|' instead of ','
 # xml/quakeml
 #   - Get 3rd last line [-3]
 #   - xml.etree.ElementTree?
