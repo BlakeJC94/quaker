@@ -3,7 +3,7 @@ import logging
 import json
 from dataclasses import asdict
 from time import sleep
-from typing import Optional
+from typing import Optional, Set
 
 from requests import Request, Session
 
@@ -28,6 +28,7 @@ def run_query(
     query: Query,
     session: Session,
     output_file: str,
+    last_events: Optional[Set[str]] = None,
     write_header: bool = True,
     _index: Optional[int] = None,
 ) -> None:
@@ -61,7 +62,14 @@ def run_query(
 
     # If successful, add it to the memory stack and return
     if download.status_code == RESPONSE_OK:
-        write_content(download, output_file, query, write_header, write_footer=True)
+        last_events = write_content(
+            download,
+            output_file,
+            query,
+            last_events=last_events,
+            write_header=write_header,
+            write_footer=True,
+        )
         return None
 
     # Otherwise, split the query into a capped query and a remainder query
@@ -74,7 +82,14 @@ def run_query(
         raise RuntimeError(msg)
 
     # Add successful sub-query to stack
-    write_content(download_hat, output_file, query_hat, write_header, write_footer=False)
+    last_events = write_content(
+        download_hat,
+        output_file,
+        query_hat,
+        last_events=last_events,
+        write_header=write_header,
+        write_footer=False,
+    )
 
     # Create remainder query
     remainder = split_query(query, download_hat)
@@ -82,23 +97,22 @@ def run_query(
     # (subtract one from recursion index on each recursive call to guard against infinite loop)
     _next_index = _index + 1
     logger.info(f"Starting recursion: {_next_index}")
-    run_query(remainder, session, output_file, write_header=False, _index=_next_index)
+    run_query(
+        remainder,
+        session,
+        output_file,
+        last_events=last_events,
+        write_header=False,
+        _index=_next_index,
+    )
     return None
 
 
 def split_query(query, download_hat):
-    # TODO check `orderby` attribute
-    #   - if time or time-asc, get last time from download_hat
-    #     - if time, set last time as new endtime
-    #     - if time-asc, set last time as new starttime
-    #   - if magnitude or magnitude-asc, get last magnitude from download_hat
-    #     - if magnitude, set last magnitude as new maxmagnitude
-    #     - if magnitude-asc, set last magnitude as new minmagnitude
+    order, *_asc = query.orderby.split("-")
+    order_asc = len(_asc) > 0 and _asc[0] == "asc"
 
-    order, *_asc = query.orderby.split('-')
-    order_asc = len(_asc) > 0 and _asc[0] == 'asc'
-
-    next_prefixes = ['end', 'start'] if order == 'time' else ['max', 'min']
+    next_prefixes = ["end", "start"] if order == "time" else ["max", "min"]
     next_param = get_last_param(download_hat, query.format, order)  # TODO fixme
 
     next_arg = next_prefixes[int(order_asc)] + order
@@ -132,7 +146,6 @@ def get_data(query: Query, session: Session) -> Request:
     return download
 
 
-
 # TODO fix this for xml formats
 # kml
 #   - Get 4th last line [-4]
@@ -150,21 +163,21 @@ def get_last_param(download: Request, file_format: str, order: str) -> str:
         ISO8601 datetime string.
     """
     last_param = None
-    if file_format in ['kml', 'xml', 'quakeml']:
+    if file_format in ["kml", "xml", "quakeml"]:
         raise NotImplementedError()
 
     reversed_clipped_content = download.content[:1:-1]
     reversed_last_row = reversed_clipped_content.split(b"\n")[1]
     last_row = reversed_last_row[::-1]
 
-    if file_format in ['csv', 'text']:
-        index = 0 if order == 'time' else 4
-        delim = b"," if file_format == 'csv' else b"|"
+    if file_format in ["csv", "text"]:
+        index = 0 if order == "time" else 4
+        delim = b"," if file_format == "csv" else b"|"
         last_param = last_row.split(delim)[index]
 
-    if file_format == 'geojson':
-        index = 'time' if order == 'time' else 'mag'
-        last_record = json.loads(']'.join(last_row.split(']', 2)[:2]))
-        last_param = last_record['properties'][index]
+    if file_format == "geojson":
+        index = "time" if order == "time" else "mag"
+        last_record = json.loads("]".join(last_row.split("]", 2)[:2]))
+        last_param = last_record["properties"][index]
 
     return last_param
