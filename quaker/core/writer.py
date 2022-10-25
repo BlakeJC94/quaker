@@ -5,6 +5,7 @@ from typing import Optional, Set
 
 from requests import Request
 
+from quaker.core.cache import Cache
 from quaker.core.query import Query
 
 
@@ -15,7 +16,7 @@ def write_content(
     download: Request,
     output_file: str,
     query: Query,
-    last_events: Optional[Set[str]] = None,
+    last_events: Optional[Cache] = None,
     write_header: bool = True,
     write_footer: bool = True,
 ) -> Set[str]:
@@ -28,7 +29,8 @@ def write_content(
         write_header: Flag controlling whether to write the header to the file.
         write_footer: Flag controlling whether to write the footer to the file.
     """
-    last_events = {} if last_events is None else last_events
+    if last_events is None:
+        last_events = Cache([])
     error_recived = None
 
     writers = {

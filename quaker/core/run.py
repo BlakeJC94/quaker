@@ -19,6 +19,7 @@ from quaker.globals import (
     UPPER_LIMIT,
 )
 from .query import Query
+from .cache import Cache
 from .writer import write_content
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ def run_query(
     query: Query,
     session: Session,
     output_file: str,
-    last_events: Optional[Set[str]] = None,
+    last_events: Optional[Cache] = None,
     write_header: bool = True,
     _index: Optional[int] = None,
 ) -> None:
@@ -62,7 +63,7 @@ def run_query(
 
     # If successful, add it to the memory stack and return
     if download.status_code == RESPONSE_OK:
-        last_events = write_content(
+        _ = write_content(
             download,
             output_file,
             query,
@@ -70,7 +71,7 @@ def run_query(
             write_header=write_header,
             write_footer=True,
         )
-        return None
+        return
 
     # Otherwise, split the query into a capped query and a remainder query
     query_hat = Query(**{**asdict(query).copy(), "limit": UPPER_LIMIT})
