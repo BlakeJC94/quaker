@@ -29,9 +29,9 @@ def write_content(
         write_header: Flag controlling whether to write the header to the file.
         write_footer: Flag controlling whether to write the footer to the file.
     """
+    error_recived = None
     if last_events is None:
         last_events = Cache([])
-    error_recived = None
 
     writers = {
         "geojson": write_json_lines,
