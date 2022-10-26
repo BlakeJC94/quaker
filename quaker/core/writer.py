@@ -1,12 +1,13 @@
 """Functions for writing data to disk."""
 import logging
 from os import path
-from typing import Optional, Set
+from typing import Optional, Tuple
 
 from requests import Request
 
 from quaker.core.cache import Cache
 from quaker.core.query import Query
+from quaker.globals import UPPER_LIMIT
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ def write_content(
     """
     error_recived = None
     if last_events is None:
-        last_events = Cache([])
+        last_events = Cache([], maxlen=UPPER_LIMIT)
 
     writers = {
         "geojson": write_json_lines,
@@ -45,7 +46,7 @@ def write_content(
     file_format = query.format
     write = writers[file_format]
     if write is None:
-        raise NotImplementedError() # TODO
+        raise NotImplementedError()
 
     mode = "w" if not path.exists(output_file) else "a"
     with open(output_file, mode, encoding="utf-8") as file:
@@ -67,12 +68,19 @@ def write_content(
 
     return last_events
 
+
 # TODO use last_events
-def write_json_lines(file, lines, last_events, write_header, write_footer) -> int:  # TODO type hints
+def write_json_lines(
+    file,
+    lines,
+    last_events,
+    write_header,
+    write_footer,
+) -> Tuple[int, Cache]:  # TODO type hints
     lines_written = 0
     if not write_header:
         first_line = next(lines)
-        _, first_record = first_line.split('[', 1)  # already ends with a comma
+        _, first_record = first_line.split("[", 1)  # already ends with a comma
         file.write(first_record + "\n")
 
     for line in lines:
@@ -83,24 +91,35 @@ def write_json_lines(file, lines, last_events, write_header, write_footer) -> in
 
         # clip the last line if write_footer is False
         if not write_footer:
-            *record, _ = line.split(']', 2)
-            last_record = "]".join(line.split(']')[:2])  # doesnt end with a comma
+            *record, _ = line.split("]", 2)
+            last_record = "]".join(line.split("]")[:2])  # doesnt end with a comma
             file.write(last_record + ",\n")
 
     return lines_written, last_events
 
 
-# TODO use last_events
-# TODO remove duplicates? use a hash table?
-def write_text_lines(file, lines, last_events, write_header) -> int:  # TODO type hints
+def write_text_lines(
+    file,
+    lines,
+    last_events,
+    write_header,
+) -> Tuple[int, Cache]:  # TODO type hints
     lines_written = 0
+
     if not write_header:
         _ = next(lines)
 
     for line in lines:
+        event_id = None
+        if not line.startswith('time'):
+            event_id = line.replace(',', '|').split('|')[11]
+
+        if event_id is not None and event_id in last_events:
+            continue
+
         file.write(line + "\n")
+
         lines_written += 1
+        last_events.append(event_id)
 
-    file.writelines(line + "\n" for line in lines)
     return lines_written, last_events
-
