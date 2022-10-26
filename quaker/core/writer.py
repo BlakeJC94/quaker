@@ -1,7 +1,7 @@
 """Functions for writing data to disk."""
 import logging
 from os import path
-from typing import Optional, Tuple
+from typing import Iterable, Optional, Tuple, TextIO
 
 from requests import Request
 
@@ -69,20 +69,19 @@ def write_content(
     return last_events
 
 
-# TODO use last_events
 def write_json_lines(
-    file,
-    lines,
-    last_events,
-    write_header,
-    write_footer,
-) -> Tuple[int, Cache]:  # TODO type hints
+    file: TextIO,
+    lines: Iterable[str],
+    last_events: Cache,
+    write_header: bool,
+    write_footer: bool,
+) -> Tuple[int, Cache]:
     # TODO: rfc, use header_written and footer_written flags and simplify to one loop
     lines_written = 0
     if not write_header:
         first_line = next(lines)
         _, first_record = first_line.split("[", 1)
-        event_id = first_record.split(':')[-1].split('"')[1]
+        event_id = first_record.split(":")[-1].split('"')[1]
         # NOTE: first record ends with a comma if multiple results,
         # no comma if one result
         if event_id not in last_events:
@@ -92,7 +91,7 @@ def write_json_lines(
 
     for line in lines:
         # TODO get event ID
-        event_id = line.split(':')[-1].split('"')[1]
+        event_id = line.split(":")[-1].split('"')[1]
         if "bbox" not in line or write_footer and event_id not in last_events:
             # TODO clip footer if last event is in cache
             file.write(line + "\n")
@@ -105,7 +104,7 @@ def write_json_lines(
             # *record, _ = line.split("]", 2)  # TODO remove this
             # NOTE: Last record always ends without a comma
             last_record = "]".join(line.split("]")[:2])
-            event_id = line.split(':')[-1].split('"')[1]
+            event_id = line.split(":")[-1].split('"')[1]
             if event_id not in last_events:
                 file.write(last_record + "\n")
                 lines_written += 1
@@ -115,13 +114,13 @@ def write_json_lines(
 
 
 def write_text_lines(
-    file,
-    lines,
-    last_events,
-    write_header,
-    write_footer,
-) -> Tuple[int, Cache]:  # TODO type hints
-    del write_footer
+    file: TextIO,
+    lines: Iterable[str],
+    last_events: Cache,
+    write_header: bool,
+    _write_footer: bool,
+) -> Tuple[int, Cache]:
+    del _write_footer
     lines_written = 0
 
     if not write_header:
