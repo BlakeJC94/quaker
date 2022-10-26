@@ -16,6 +16,11 @@ class Cache:
         self.stash.append(value)
         self.registry.append(value)
 
+    def pop(self):
+        value = self.stash.pop()
+        self.registry.pop(value)
+        return value
+
     def __contains__(self, value):
         return value in self.registry
 
