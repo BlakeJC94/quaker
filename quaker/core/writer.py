@@ -76,7 +76,6 @@ def write_json_lines(
     write_header: bool,
     write_footer: bool,
 ) -> Tuple[int, Cache]:
-    # TODO: rfc, use header_written and footer_written flags and simplify to one loop
     lines_written = 0
     if not write_header:
         first_line = next(lines)
@@ -123,19 +122,16 @@ def write_text_lines(
     del _write_footer
     lines_written = 0
 
-    if not write_header:
-        _ = next(lines)
+    first_line = next(lines)
+    if write_header:
+        file.write(first_line + "\n")
 
     for line in lines:
-        event_id = None
-        if not line.startswith('time'):
-            event_id = line.replace(',', '|').split('|')[11]
-
-        if event_id is not None and event_id in last_events:
+        event_id = line.replace(',', '|').split('|')[11]
+        if event_id in last_events:
             continue
 
         file.write(line + "\n")
-
         lines_written += 1
         last_events.append(event_id)
 
