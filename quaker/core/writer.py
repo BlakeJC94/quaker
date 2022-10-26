@@ -69,6 +69,8 @@ def write_content(
     return last_events
 
 
+# TODO: check what happens if there's only one result
+# TODO: check what happens if there's no results
 def write_json_lines(
     file: TextIO,
     lines: Iterable[str],
@@ -77,37 +79,33 @@ def write_json_lines(
     write_footer: bool,
 ) -> Tuple[int, Cache]:
     lines_written = 0
-    if not write_header:
-        first_line = next(lines)
-        _, first_record = first_line.split("[", 1)
-        event_id = first_record.split(":")[-1].split('"')[1]
-        # NOTE: first record ends with a comma if multiple results,
-        # no comma if one result
-        if event_id not in last_events:
-            file.write(first_record + "\n")
-            lines_written += 1
-            last_events.append(event_id)
 
+    header_written = False
+    header, footer = None, None
     for line in lines:
-        # TODO get event ID
         event_id = line.split(":")[-1].split('"')[1]
-        if "bbox" not in line or write_footer and event_id not in last_events:
-            # TODO clip footer if last event is in cache
-            file.write(line + "\n")
+        if "FeatureCollection" in line:
+            header, line = line.split("[", 1)
+            if header is not None and write_header:
+                file.write(header)
+                header_written = True
+
+        if "bbox" in line:
+            *line, footer = line.split("]", 2)
+            line, footer = "]".join(line), "]," + footer
+
+        line = line.removesuffix(",")
+        line = "\n," + line if not header_written else line
+
+        if event_id not in last_events:
+            file.write(line)
             lines_written += 1
             last_events.append(event_id)
-            continue
+            if header_written:
+                header_written = False
 
-        # clip the last line if write_footer is False
-        if not write_footer:
-            # *record, _ = line.split("]", 2)  # TODO remove this
-            # NOTE: Last record always ends without a comma
-            last_record = "]".join(line.split("]")[:2])
-            event_id = line.split(":")[-1].split('"')[1]
-            if event_id not in last_events:
-                file.write(last_record + "\n")
-                lines_written += 1
-                last_events.append(event_id)
+        if footer is not None and write_footer:
+            file.write(footer)
 
     return lines_written, last_events
 
@@ -127,7 +125,7 @@ def write_text_lines(
         file.write(first_line + "\n")
 
     for line in lines:
-        event_id = line.replace(',', '|').split('|')[11]
+        event_id = line.replace(",", "|").split("|")[11]
         if event_id in last_events:
             continue
 
