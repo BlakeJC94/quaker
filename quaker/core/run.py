@@ -1,6 +1,8 @@
 """Function for recursively querying USGS earthquake API"""
 import logging
-import json
+import re
+from datetime import datetime
+from pytz import UTC
 from dataclasses import asdict
 from time import sleep
 from typing import Optional, Set
@@ -110,7 +112,8 @@ def run_query(
 
 
 def split_query(query, download_hat):
-    order, *_asc = query.orderby.split("-")
+    orderby = query.orderby or "time"
+    order, *_asc = orderby.split("-")
     order_asc = len(_asc) > 0 and _asc[0] == "asc"
 
     next_prefixes = ["end", "start"] if order == "time" else ["max", "min"]
@@ -167,8 +170,8 @@ def get_last_param(download: Request, file_format: str, order: str) -> str:
     if file_format in ["kml", "xml", "quakeml"]:
         raise NotImplementedError()
 
-    reversed_clipped_content = download.content[:1:-1]
-    reversed_last_row = reversed_clipped_content.split(b"\n")[1]
+    reversed_clipped_content = download.content[::-1].removeprefix(b'\n')
+    reversed_last_row = reversed_clipped_content.split(b"\n")[0]
     last_row = reversed_last_row[::-1]
 
     if file_format in ["csv", "text"]:
@@ -178,7 +181,8 @@ def get_last_param(download: Request, file_format: str, order: str) -> str:
 
     if file_format == "geojson":
         index = "time" if order == "time" else "mag"
-        last_record = json.loads("]".join(last_row.split("]", 2)[:2]))
-        last_param = last_record["properties"][index]
+        last_param = str(re.search(f"\"{index}\":([^,]+)", last_row.decode("utf-8"))[1])
+        if index == 'time':
+            last_param = datetime.fromtimestamp(int(last_param) * 1e-3, tz=UTC).isoformat()
 
     return last_param
