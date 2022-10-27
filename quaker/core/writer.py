@@ -1,5 +1,6 @@
 """Functions for writing data to disk."""
 import logging
+import re
 from os import path
 from typing import Iterable, Optional, Tuple, TextIO
 
@@ -20,7 +21,7 @@ def write_content(
     last_events: Optional[Cache] = None,
     write_header: bool = True,
     write_footer: bool = True,
-) -> Set[str]:
+) -> Cache:
     """Write content from a http request.
 
     Args:
@@ -80,32 +81,32 @@ def write_json_lines(
 ) -> Tuple[int, Cache]:
     lines_written = 0
 
-    header_written = False
     header, footer = None, None
     for line in lines:
-        event_id = line.split(":")[-1].split('"')[1]
+        event_id = re.search(r"\"id\":\"([\w\d]+)\"", line)[1]
         if "FeatureCollection" in line:
             header, line = line.split("[", 1)
-            if header is not None and write_header:
-                file.write(header)
-                header_written = True
+            header = header + '['
 
         if "bbox" in line:
             *line, footer = line.split("]", 2)
-            line, footer = "]".join(line), "]," + footer
+            line, footer = "]".join(line), "]" + footer
+
+        if header is not None and write_header:
+            file.write(header)
+            header = None
 
         line = line.removesuffix(",")
-        line = "\n," + line if not header_written else line
+        line = line if footer is not None and write_footer else line + ',\n'
 
         if event_id not in last_events:
             file.write(line)
             lines_written += 1
             last_events.append(event_id)
-            if header_written:
-                header_written = False
 
         if footer is not None and write_footer:
-            file.write(footer)
+            file.write(footer + '\n')
+            footer = None
 
     return lines_written, last_events
 
