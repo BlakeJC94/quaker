@@ -11,14 +11,14 @@ class Cache:
 
     def append(self, value):
         if self.maxlen and len(self.stash) == self.maxlen:
-            self.registry.pop(self.stash.popleft())
+            self.registry.remove(self.stash.popleft())
 
         self.stash.append(value)
-        self.registry.append(value)
+        self.registry.add(value)
 
     def pop(self):
         value = self.stash.pop()
-        self.registry.pop(value)
+        self.registry.remove(value)
         return value
 
     def __contains__(self, value):
