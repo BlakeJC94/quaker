@@ -1,5 +1,7 @@
 import argparse
 import logging
+from dataclasses import fields
+from typing import Tuple, Dict
 
 from . import (
     __version__,
@@ -11,24 +13,60 @@ from . import (
 logger = logging.getLogger(__name__)
 
 
-def main():
+def get_query_docs() -> Tuple[str, Dict[str, Dict[str, Tuple[str, str, callable]]]]:
+    doc = Query.__doc__
+    types = {v.name: v.type for v in fields(Query)}
 
-    # TODO move this into a Query method
-    docs = Query.__doc__
-    head, arg_doc = docs.split("Args:")
-    arg_doc = arg_doc.replace("\n" + 12 * " ", " ")
-    extra_info = "\n".join(head.splitlines()[1:])
+    _head_doc, _arg_doc = doc.split("Args:")
+    _arg_doc = _arg_doc.replace("\n" + 12 * " ", " ")
+    query_info = "\n".join(_head_doc.splitlines()[1:])
 
-    arg_doc_dict = {}
-    for entry in arg_doc.split("\n" + 4 * " "):
-        if ":" not in entry:
+    args_info = {}
+    for section in _arg_doc.split("\n" + 8 * " " + "["):
+        if len(section) == 0:
             continue
-        name, desc = entry.split(":", 1)
-        arg_doc_dict[name.strip()] = desc.strip().lower()
 
-    main_doc = "Access USGS Earthquake dataset" + extra_info
+        section_head, section_body = section.split('\n', 1)
+        section_name = section_head.split(']')[0]
+
+        section_info = {}
+        for entry in section_body.split("\n" + 4 * " "):
+            if ":" not in entry:
+                continue
+            name, desc = entry.split(":", 1)
+            name = name.strip()
+            desc = desc.strip().lower()
+
+            type_clb = types[name]
+
+            metavar = "VAL"
+            if type_clb == bool:
+                metavar = "BOOL"
+            elif type_clb == str:
+                if name in ["starttime", "endtime", "updatedafter"]:
+                    metavar = "TIME"
+            elif type_clb == float:
+                name_no_3_char_prefix = name[3:]
+                if "latitude" in [name, name_no_3_char_prefix]:
+                    metavar = "LAT"
+                elif "longitude" in [name, name_no_3_char_prefix]:
+                    metavar = "LNG"
+                elif "radiuskm" in [name, name_no_3_char_prefix]:
+                    metavar = "DIST"
+
+            section_info[name] = (desc, metavar, type_clb)
+
+        args_info[section_name] = section_info
+
+    return query_info, args_info
+
+
+def main():
+    """Entrypoint for CLI script"""
+
+    query_info, args_info = get_query_docs()
     parser = argparse.ArgumentParser(
-        description=main_doc,
+        description="Access USGS Earthquake dataset" + query_info,
         add_help=True,
     )
 
@@ -43,48 +81,30 @@ def main():
         help=f"action to perform (default: '{default_mode}', options: {', '.join(modes)})",
     )
 
-    query_annotations = Query.__annotations__
-    for k, v in query_annotations.items():
+    for section_name, section_info in args_info.items():
+        group = parser.add_argument_group(section_name)
+        for name, (desc, metavar, type_clb) in section_info.items():
+            group.add_argument(
+                "--" + name,
+                help=desc,
+                metavar=metavar,
+                type=type_clb,
+                required=False,
+                default=None,
+            )
 
-        # Get the first type in square brackets, requires Optional[..]!
-        type_str = str(v).replace(",", "[").split("[")[1][:-1].strip()
-        type_clb = str
-        if type_clb in ["str", "float", "int"]:
-            type_clb = eval(type_str)  # pylint: disable=eval-used
+    input_args = parser.parse_args()
 
-        metavar = "VAL"
-        k_no_3_char_prefix, k_no_5_char_prefix = k[3:], k[5:]
-        if "latitude" in [k, k_no_3_char_prefix]:
-            metavar = "LAT"
-        if "longitude" in [k, k_no_3_char_prefix]:
-            metavar = "LNG"
-        if "time" in [k, k_no_3_char_prefix, k_no_5_char_prefix]:
-            metavar = "TIME"
-        if "radiuskm" in [k, k_no_3_char_prefix]:
-            metavar = "DIST"
-
-        parser.add_argument(
-            "--" + k,
-            help=arg_doc_dict[k],
-            metavar=metavar,
-            type=type_clb,
-            required=False,
-            default=None,
-        )
-
-    args = vars(parser.parse_args())
-    mode = args.pop("mode", None)
-    if mode not in modes:
-        logger.error("Invalid mode {mode} specified (allowed values: {modes})")
-        return 1
-
-    fields = {k: v for k, v in args.items() if k in query_annotations}
-    query = Query(**fields)
-
-    if mode == "download":
+    query_args = {k for _, section_info in args_info.items() for k in section_info}
+    query_input = {k: v for k, v in vars(input_args).items() if k in query_args}
+    query = Query(**query_input)
+    if input_args.mode == "download":
         download(output_file="/dev/stdout", query=query)
-    if mode == "dashboard":
+    elif input_args.mode == "dashboard":
         dashboard()
+    else:
+        logger.error("Invalid mode selected")
+        return 1
 
     return 0
 

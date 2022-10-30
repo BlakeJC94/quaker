@@ -1,4 +1,4 @@
-"""Script to open a session and stream CSV data."""
+"""Function to open a session and stream data."""
 import logging
 from os import path, makedirs
 from typing import Optional
@@ -15,7 +15,7 @@ def download(
     query: Optional[Query] = None,
     **kwargs,
 ) -> None:
-    """Main function to download data to a CSV file.
+    """Main function to download data to a file.
 
     Also supports querying data via kwargs. See `help(quaker.Query)` for a list of the parameters
     that can be configured.
@@ -47,7 +47,7 @@ def download(
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
-            logger.error(f"Unknown error recieved ({error}), safely closing session.")
+            logger.error(f"Unknown error recieved ({repr(error)}), safely closing session.")
             error_recived = error
 
     if error_recived is not None:

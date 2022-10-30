@@ -12,51 +12,100 @@ $ pip install .
 ```
 
 ## Quickstart
-This package comes equiped with a batteries-included CLI interface for downloading the latest
-earthquake event data in CSV format from the USGS database.
+This package comes equipped with a batteries-included CLI interface for downloading the latest
+earthquake event data in CSV, GeoJSON, and plain text format from the USGS database.
 ```
-usage: quaker [-h] [--endtime TIME] [--starttime TIME] [--minlatitude LAT]
-              [--minlongitude LNG] [--maxlatitude LAT] [--maxlongitude LNG]
-              [--latitude LAT] [--longitude LNG] [--maxradiuskm DIST]
-              [--minmagnitude VAL] [--maxmagnitude VAL] [--limit VAL]
+usage: quaker [-h] [--format VAL] [--endtime TIME] [--starttime TIME] [--updatedafter TIME] [--minlatitude LAT]
+              [--minlongitude LNG] [--maxlatitude LAT] [--maxlongitude LNG] [--latitude LAT] [--longitude LNG]
+              [--maxradius VAL] [--maxradiuskm DIST] [--catalog VAL] [--contributor VAL] [--eventid VAL]
+              [--includeallmagnitudes BOOL] [--includeallorigins BOOL] [--includedeleted VAL]
+              [--includesuperceded BOOL] [--limit VAL] [--maxdepth VAL] [--maxmagnitude VAL] [--mindepth VAL]
+              [--minmagnitude VAL] [--offset VAL] [--orderby VAL] [--alertlevel VAL] [--callback VAL]
+              [--eventtype VAL] [--jsonerror BOOL] [--kmlanimated BOOL] [--kmlcolorby VAL] [--maxcdi VAL]
+              [--maxgap VAL] [--maxmmi VAL] [--maxsig VAL] [--mincdi VAL] [--minfelt VAL] [--mingap VAL]
+              [--minsig VAL] [--producttype VAL] [--productcode VAL] [--reviewstatus VAL]
               [mode]
 
-Access USGS Earthquake dataset API Docs:
-https://earthquake.usgs.gov/fdsnws/event/1/ NOTE: All times use ISO8601
-Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed. NOTE: Minimum/maximum
-longitude values may cross the date line at 180 or -180
+Access USGS Earthquake dataset API Docs: https://earthquake.usgs.gov/fdsnws/event/1/ NOTE: All times use
+ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed. NOTE: Minimum/maximum longitude values may
+cross the date line at 180 or -180
 
 positional arguments:
-  mode                action to perform (default: download)
+  mode                  action to perform (default: download)
 
 optional arguments:
-  -h, --help          show this help message and exit
-  --endtime TIME      limit to events on or before the specified end time
-  --starttime TIME    limit to events on or after the specified start time
-  --minlatitude LAT   limit to events with a latitude larger than the
-                      specified minimum
-  --minlongitude LNG  limit to events with a longitude larger than the
-                      specified minimum
-  --maxlatitude LAT   limit to events with a latitude smaller than the
-                      specified maximum
-  --maxlongitude LNG  limit to events with a longitude smaller than the
-                      specified maximum
-  --latitude LAT      specify the latitude to be used for a radius search
-  --longitude LNG     specify the longitude to be used for a radius search
-  --maxradiuskm DIST  limit to events within the specified maximum number of
-                      kilometers from the geographic point defined by the
-                      latitude and longitude parameters
-  --minmagnitude VAL  limit to events with a magnitude larger than the
-                      specified minimum
-  --maxmagnitude VAL  limit to events with a magnitude smaller than the
-                      specified maximum
-  --limit VAL         limit the results to the specified number of events
+  -h, --help            show this help message and exit
+
+Format:
+  --format VAL          specify the output format (one of "csv", "geojson", "kml", "quakeml", "text", or
+                        "xml").
+
+Time:
+  --endtime TIME        limit to events on or before the specified end time.
+  --starttime TIME      limit to events on or after the specified start time.
+  --updatedafter TIME   limit to events updated after the specified time.
+
+Location - rectangle:
+  --minlatitude LAT     limit to events with a latitude larger than the specified minimum [-90, 90].
+  --minlongitude LNG    limit to events with a longitude larger than the specified minimum [-360, 360].
+  --maxlatitude LAT     limit to events with a latitude smaller than the specified maximum [-90, 90].
+  --maxlongitude LNG    limit to events with a longitude smaller than the specified maximum [-360, 360].
+
+Location - circle:
+  --latitude LAT        specify the latitude to be used for a radius search [-90, 90].
+  --longitude LNG       specify the longitude to be used for a radius search [-180, 180].
+  --maxradius VAL       limit to events within the specified maximum number of degrees from the geographic
+                        point defined by the latitude and longitude parameters [0, 180].
+  --maxradiuskm DIST    limit to events within the specified maximum number of kilometers from the geographic
+                        point defined by the latitude and longitude parameters [0, 20001.6].
+
+Other:
+  --catalog VAL         limit to events from a specified catalog.
+  --contributor VAL     limit to events contributed by a specified contributor.
+  --eventid VAL         select a specific event by id; event identifiers are data center specific.
+  --includeallmagnitudes BOOL
+                        specify if all magnitudes for the event should be included.
+  --includeallorigins BOOL
+                        specify if all origins for the event should be included.
+  --includedeleted VAL  specify if deleted products and events should be included. the value "only" returns
+                        only deleted events. values "true" or "false" are typecast to bool.
+  --includesuperceded BOOL
+                        specify if superseded products should be included. this also includes all deleted
+                        products, and is mutually exclusive to the includedeleted parameter.
+  --limit VAL           limit the results to the specified number of events.
+  --maxdepth VAL        limit to events with depth less than the specified maximum.
+  --maxmagnitude VAL    limit to events with a magnitude smaller than the specified maximum.
+  --mindepth VAL        limit to events with depth more than the specified minimum.
+  --minmagnitude VAL    limit to events with a magnitude larger than the specified minimum.
+  --offset VAL          return results starting at the event count specified, starting at 1.
+  --orderby VAL         order the results (one of "time", "time-asc", "magnitude", or "magnitude-asc").
+
+Extensions:
+  --alertlevel VAL      limit to events with a specific pager alert level (one of "green", "yellow", "orange",
+                        or "red").
+  --callback VAL        convert geojson output to a jsonp response using this callback.
+  --eventtype VAL       limit to events of a specific type
+  --jsonerror BOOL      request json(p) formatted output even on api error results. (only for geojson format)
+  --kmlanimated BOOL    whether to include timestamp in generated kml, for google earth animation support.
+  --kmlcolorby VAL      how earthquakes are colored (one of "age", "depth").
+  --maxcdi VAL          maximum value for maximum community determined intensity reported by dyfi [0, 12].
+  --maxgap VAL          limit to events with no more than this azimuthal gap [0, 360].
+  --maxmmi VAL          maximum value for maximum modified mercalli intensity reported by shakemap [0, 12].
+  --maxsig VAL          limit to events with no more than this significance.
+  --mincdi VAL          minimum value for maximum community determined intensity reported by dyfi [0, 12].
+  --minfelt VAL         limit to events with this many dyfi responses.
+  --mingap VAL          limit to events with no less than this azimuthal gap [0, 360].
+  --minsig VAL          limit to events with no less than this significance.
+  --producttype VAL     limit to events that have this type of product associated.
+  --productcode VAL     return the event that is associated with the productcode.
+  --reviewstatus VAL    limit to events with a specific review status (one of "all", "automatic", or
+                        "reviewed").
 ```
 
 Run `quaker download` and specify the parameters as keyword arguments and pipe the output to any
 location:
 ```bash
-$ quaker download --starttime 2022-08-01 --endtime 2022-09-01 > earthquake_data.csv
+$ quaker download --format csv --starttime 2022-08-01 --endtime 2022-09-01 > earthquake_data.csv
 ```
 
 For more details on the available query parameters, use `quaker --help` or view the
@@ -70,12 +119,14 @@ Using the python API is also fairly straight-forward:
 >>> download(events_from_last_30_days, "./path/to/example/output_1.csv")
 # Large queries can also be handled
 >>> events_from_last_5_months = Query(
+...     format="csv",
 ...     starttime="2022-05-01",
 ...     endtime="2022-10-01",
 ... )
 >>> download(events_from_last_5_months, "./path/to/example/output_2.csv")
 # You can filter results by location using the API
 >>> fields = {
+...     "format": "csv",
 ...     "starttime": "2022-08-01",
 ...     "endtime": "2022-09-01",
 ...     "latitude": 35.652832,
@@ -90,14 +141,10 @@ Using the python API is also fairly straight-forward:
 
 ## Future developments
 
-- [ ] Match split query by last `id` instead of last `time`
-- [ ] Fix issue where `__post_init__` method doesn't fire
-    - [ ] put datetime handling back into `Query`
-    - [ ] Handle timezones as well
-- [ ] Dash app to visualise clustered query results
-- [ ] Expose parameters for formats other than CSV
+- [ ] Support for XML
+- [ ] Support for KML
 - [ ] Testing suite
-- [ ] Publish to pypi?
+- [ ] Dash app to visualise clustered query results
 
 ## Contributing
 This is a small personal project, but pull requests are most welcome!
