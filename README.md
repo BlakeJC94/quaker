@@ -12,7 +12,7 @@ $ pip install .
 ```
 
 ## Quickstart
-This package comes equiped with a batteries-included CLI interface for downloading the latest
+This package comes equipped with a batteries-included CLI interface for downloading the latest
 earthquake event data in CSV, GeoJSON, and plain text format from the USGS database.
 ```
 usage: quaker [-h] [--format VAL] [--endtime TIME] [--starttime TIME] [--updatedafter TIME] [--minlatitude LAT]
@@ -105,7 +105,7 @@ Extensions:
 Run `quaker download` and specify the parameters as keyword arguments and pipe the output to any
 location:
 ```bash
-$ quaker download --starttime 2022-08-01 --endtime 2022-09-01 > earthquake_data.csv
+$ quaker download --format csv --starttime 2022-08-01 --endtime 2022-09-01 > earthquake_data.csv
 ```
 
 For more details on the available query parameters, use `quaker --help` or view the
@@ -119,12 +119,14 @@ Using the python API is also fairly straight-forward:
 >>> download(events_from_last_30_days, "./path/to/example/output_1.csv")
 # Large queries can also be handled
 >>> events_from_last_5_months = Query(
+...     format="csv",
 ...     starttime="2022-05-01",
 ...     endtime="2022-10-01",
 ... )
 >>> download(events_from_last_5_months, "./path/to/example/output_2.csv")
 # You can filter results by location using the API
 >>> fields = {
+...     "format": "csv",
 ...     "starttime": "2022-08-01",
 ...     "endtime": "2022-09-01",
 ...     "latitude": 35.652832,
@@ -139,10 +141,10 @@ Using the python API is also fairly straight-forward:
 
 ## Future developments
 
-- [ ] Match split query by last `id` instead of last `time`
+- [ ] Support for XML
+- [ ] Support for KML
 - [ ] Testing suite
 - [ ] Dash app to visualise clustered query results
-- [ ] Publish to pypi?
 
 ## Contributing
 This is a small personal project, but pull requests are most welcome!

@@ -17,7 +17,7 @@ def is_valid_time(time: str):
 
 
 ALLOWED_VALUES = dict(
-    format=lambda v: v in ["csv", "geojson", "kml", "quakeml", "text", "xml"],
+    format=lambda v: v in ["csv", "geojson", "text"],  # TODO
     endtime=is_valid_time,
     starttime=is_valid_time,
     updatedafter=is_valid_time,
@@ -178,6 +178,13 @@ class Query:  # pylint: disable=too-many-instance-attributes
 
     def __post_init__(self):
 
+        # TODO remove this artificial guard when better support is added
+        if self.format is None:
+            self.format = "csv"
+        elif self.format not in ["csv", "text", "geojson"]:
+            logger.warning(f"Format {self.format} not implemented yet, changing to 'csv'")
+            self.format = "csv"
+
         # Auto-typecast input values
         bad_values = {}
         for query_field in fields(self):
@@ -203,13 +210,6 @@ class Query:  # pylint: disable=too-many-instance-attributes
             for name, value in bad_values.items():
                 logger.error(f"Invalid value for `{name}`, (got {value})")
             raise AssertionError("Bad values given to query.")
-
-        # TODO remove this artificial guard when better support is added
-        if self.format is None:
-            self.format = "csv"
-        elif self.format not in ["csv", "text", "geojson"]:
-            logger.warning(f"Format {self.format} not implemented yet, changing to 'csv'")
-            self.format = "csv"
 
         assert (
             self.maxradiuskm is None or self.maxradius is None
