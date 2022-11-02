@@ -161,7 +161,7 @@ This is a small personal project, but pull requests are most welcome!
 Virtual environment handling by `pyenv` is preferred:
 ```bash
 # in the project directory
-$ pyenv virtualenv 3.9.7 quaker
+$ pyenv virtualenv 0.8.0 quaker
 $ pyenv local quaker
 $ pip install -e .
 ```

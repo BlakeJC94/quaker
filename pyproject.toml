@@ -138,7 +138,7 @@ min-public-methods = 0
 
 
 [tool.bumpver]
-current_version = "0.7.0"
+current_version = "0.8.0"
 version_pattern = "MAJOR.MINOR.PATCH[PYTAGNUM]"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
