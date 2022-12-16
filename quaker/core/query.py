@@ -66,8 +66,7 @@ class _BaseQuery(ABC):
         field_value = getattr(self, field_name)
         if field_value is not None and field_value not in allowed_values:
             raise ValueError(
-                f"Invalid {field_name} ({field_value}), "
-                f"must be one of {allowed_values}."
+                f"Invalid {field_name} ({field_value}), " f"must be one of {allowed_values}."
             )
 
 
@@ -256,13 +255,9 @@ class _QueryExtensions(_BaseQuery):
 
     def __post_init__(self):
         super().__post_init__()
-        self.check_field_allowed_values(
-            "alertlevel", ["green", "yellow", "orange", "red"]
-        )
+        self.check_field_allowed_values("alertlevel", ["green", "yellow", "orange", "red"])
         self.check_field_allowed_values("kmlcolorby", ["age", "depth"])
-        self.check_field_allowed_values(
-            "reviewstatus", ["all", "automatic", "reviewed"]
-        )
+        self.check_field_allowed_values("reviewstatus", ["all", "automatic", "reviewed"])
 
         self.check_fields_bounded(["mingap", "maxgap"], 0, 360)
         self.check_fields_bounded(["mincdi", "maxcdi"], 0, 12)
@@ -280,12 +275,14 @@ class _QueryFormat(_BaseQuery):
         format: Specify the output format (only "csv", "geojson", and "text" supported for now.
             kml", "quakeml", and "xml" to be added in upcoming release).
     """
+
     format: Optional[str] = None
 
     def __post_init__(self):
         super().__post_init__()
         # TODO Add 'xml', 'quakeml', 'kml'
         self.check_field_allowed_values("format", ["csv", "geojson", "text"])
+
 
 @dataclass
 class Query(
@@ -315,12 +312,14 @@ class Query(
     @classmethod
     def get_parent_classes(cls):
         return [
-            class_name for class_name in getmro(cls)
+            class_name
+            for class_name in getmro(cls)
             if class_name not in [Query, _BaseQuery, ABC, object]
         ]
 
+
 def _assemble_docs(query_class):
-    doc = "\n\n".join([getdoc(query_class),"Args:"])
+    doc = "\n\n".join([getdoc(query_class), "Args:"])
     for class_name in query_class.get_parent_classes():
         class_doc = getdoc(class_name)
         _, args_doc = class_doc.split("Args:", 1)
@@ -328,7 +327,6 @@ def _assemble_docs(query_class):
 
     return doc
 
+
 # TODO Is there a neater way of doing this within the class?
 Query.__doc__ = _assemble_docs(Query)
-
-
