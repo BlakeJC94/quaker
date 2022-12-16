@@ -319,7 +319,7 @@ class Query(
             if class_name not in [Query, _BaseQuery, ABC, object]
         ]
 
-def assemble_docs(query_class):
+def _assemble_docs(query_class):
     doc = "\n\n".join([getdoc(query_class),"Args:"])
     for class_name in query_class.get_parent_classes():
         class_doc = getdoc(class_name)
@@ -329,6 +329,6 @@ def assemble_docs(query_class):
     return doc
 
 # TODO Is there a neater way of doing this within the class?
-Query.__doc__ = assemble_docs(Query)
+Query.__doc__ = _assemble_docs(Query)
 
 
