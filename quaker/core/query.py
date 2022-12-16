@@ -312,19 +312,23 @@ class Query(
         out += "\n)"
         return out
 
-def assemble_docs(query_class):
-    assert query_class is not None
-    doc = "\n\n".join([getdoc(query_class),"Args:"])
+    @classmethod
+    def get_parent_classes(cls):
+        return [
+            class_name for class_name in getmro(cls)
+            if class_name not in [Query, _BaseQuery, ABC, object]
+        ]
 
-    for class_name in getmro(query_class):
-        if class_name in  [Query, _BaseQuery, ABC, object]:
-            continue
+def assemble_docs(query_class):
+    doc = "\n\n".join([getdoc(query_class),"Args:"])
+    for class_name in query_class.get_parent_classes():
         class_doc = getdoc(class_name)
         _, args_doc = class_doc.split("Args:", 1)
         doc = "\n".join([doc, args_doc])
 
     return doc
 
+# TODO Is there a neater way of doing this within the class?
 Query.__doc__ = assemble_docs(Query)
 
 
