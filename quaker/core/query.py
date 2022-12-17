@@ -1,37 +1,65 @@
 """Classes and methods for representation of queries."""
-from abc import ABC
-from dataclasses import dataclass, fields, asdict
+from dataclasses import dataclass, fields, asdict, field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
-from typing import Optional, get_args
+from typing import Callable, Optional, get_args, Any, List, Dict
 
 
-@dataclass
-class _BaseQuery(ABC):
-    """Base dataclass used to resolve multiple init and post-init calls in classes that inherit
-    from multiple dataclasses.
+class _FieldHelper:
+    _fields: Dict[str, Any] = {}
+    _field_docs: Dict[str, str] = {}
+    _field_types: Dict[str, Callable] = {}
 
-    Each component parent dataclass should inherit from this class. If component needs a
-    __post_init__, it should call super().__post_init__ to ensure that the calls are chained.
-    """
+    @classmethod
+    @property
+    def fields(cls):
+        if len(cls._fields) > 0:
+            return cls._fields
+        cls._fields = {f.name: f for f in fields(cls)}
+        return cls._fields
 
-    def __post_init__(self):
-        """Auto-typecast fields as their appropriate types."""
-        for param in fields(self):
-            param_value = getattr(self, param.name)
-            if param_value is None:
-                continue
-            param_type = self.get_param_type(param.name)
-            if not isinstance(param_value, param_type):
-                setattr(self, param.name, param_type(param_value))
+    @classmethod
+    @property
+    def field_docs(cls):
+        if len(cls._field_docs) > 0:
+            return cls._field_docs
 
-    def get_param_type(self, name):
-        param = next(i for i in fields(self) if i.name == name)
-        if callable(param.type) and not hasattr(param.type, "__args__"):
-            return param.type
+        _, doc = cls.__doc__.split("Args:", 1)
+        doc = doc.strip().replace("\n" + " " * 12, ' ')  # TODO replace this with regex
 
-        param_types = get_args(param.type)
-        return next(t for t in param_types if t is not None and callable(t))
+        field_docs = {}
+        field_names = list(cls.fields.keys())
+        for line in doc.split("\n"):
+            print(line)
+            for name in field_names:
+                if name + ":" in line:
+                    field_names.remove(name)
+                    _, field_doc = line.split(":", 1)
+                    field_docs[name] = field_doc.strip()
+                    break
+
+        cls._field_docs = field_docs
+        return cls._field_docs
+
+    @classmethod
+    @property
+    def field_types(cls):
+        if len(cls._field_types) > 0:
+            return cls._field_types
+
+        field_types = {}
+        for name, f in cls.fields.items():
+            if callable(f.type) and not hasattr(f.type, "__args__"):
+                f_type = f.type
+            else:
+                f_types = get_args(f.type)
+                f_type = next(t for t in f_types if t is not None and callable(t))
+            field_types[name] = f_type
+
+        cls._field_types = field_types
+        return cls._field_types
+
+class _FieldChecker:
 
     def check_fields_ordered(self, min_field_name, max_field_name):
         min_field_value = getattr(self, min_field_name)
@@ -68,6 +96,33 @@ class _BaseQuery(ABC):
             raise ValueError(
                 f"Invalid {field_name} ({field_value}), " f"must be one of {allowed_values}."
             )
+
+
+
+@dataclass
+class _BaseQuery(_FieldHelper, _FieldChecker):
+    """Base dataclass used to resolve multiple init and post-init calls in classes that inherit
+    from multiple dataclasses.
+
+    Each component parent dataclass should inherit from this class. If component needs a
+    __post_init__, it should call super().__post_init__ to ensure that the calls are chained.
+    """
+
+    def __post_init__(self):
+        """Auto-typecast fields as their appropriate types."""
+        for field_name in self.fields:
+            value = getattr(self, field_name)
+            if value is None:
+                continue
+            field_type = self.field_types.get(field_name)
+            if not isinstance(value, field_type) and callable(field_type):
+                setattr(self, field_name, field_type(value))
+
+    @classmethod
+    @property
+    def name(cls) -> str:
+        # TODO Change `LocationCircle` to `Location - circle` with regex
+        return cls.__name__.removeprefix("_Query")
 
 
 @dataclass
@@ -293,13 +348,26 @@ class Query(
     _QueryOther,
     _QueryExtensions,
 ):
-    """Class for managing inputs for queries
+    """Class for managing inputs for queries (**documentation dynamically generated below**)."""
 
-    API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
+    @classmethod
+    @property
+    def doc_head(cls):
+        return """API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
 
-    NOTE: All times use ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed.
-    NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
-    """
+        NOTE: All times use ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed.
+        NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
+        """
+
+    @classmethod
+    @property
+    def __doc__(cls):
+        doc = "\n\n".join(["Class for managing inputs for queries.", cls.doc_head, "Args:"])
+        for class_name in cls.component_classes:
+            class_doc = getdoc(class_name)
+            _, args_doc = class_doc.split("Args:", 1)
+            doc = "\n".join([doc, args_doc])
+        return doc
 
     def __str__(self):
         out = self.__class__.__name__ + "("
@@ -310,23 +378,10 @@ class Query(
         return out
 
     @classmethod
-    def get_parent_classes(cls):
+    @property
+    def component_classes(cls) -> List[Any]:
         return [
             class_name
             for class_name in getmro(cls)
-            if class_name not in [Query, _BaseQuery, ABC, object]
+            if class_name not in [cls, _BaseQuery, object, _FieldHelper, _FieldChecker]
         ]
-
-
-def _assemble_docs(query_class):
-    doc = "\n\n".join([getdoc(query_class), "Args:"])
-    for class_name in query_class.get_parent_classes():
-        class_doc = getdoc(class_name)
-        _, args_doc = class_doc.split("Args:", 1)
-        doc = "\n".join([doc, args_doc])
-
-    return doc
-
-
-# TODO Is there a neater way of doing this within the class?
-Query.__doc__ = _assemble_docs(Query)
