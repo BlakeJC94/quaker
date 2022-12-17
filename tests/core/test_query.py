@@ -12,7 +12,7 @@ from quaker.core import Query
 def assert_query_type_and_value(query, param_name, value):
     param_value = getattr(query, param_name)
     assert param_value == value, f"{param_name = }, {value = }"
-    assert isinstance(param_value, query.get_param_type(param_name))
+    assert isinstance(param_value, query.field_types[param_name])
 
 
 @dataclass
@@ -23,14 +23,11 @@ class MockQuery:
         type_args = get_args(
             next((f for f in fields(self) if f.name == "mock_field")).type
         )
-        self.return_type = next(i for i in type_args if callable(i) and i is not None)
+        self._set_return_type(next(i for i in type_args if callable(i) and i is not None))
 
     def _set_return_type(self, return_type):
         self.return_type = return_type
-
-    def get_param_type(self, _):
-        return self.return_type
-
+        self.field_types = dict(mock_field=self.return_type)
 
 class TestAssertQueryTypeAndValue:
     value = 123
