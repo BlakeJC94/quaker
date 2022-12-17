@@ -107,6 +107,19 @@ class TestQueryValidInputs:
         for field in fields(query):
             assert getattr(query, field.name) is None
 
+    def test_asdict(self):
+        query_input = dict(
+            starttime=self.starttime,
+            endtime=self.endtime,
+            updatedafter=self.updatedafter,
+            minlatitude=self.minlatitude,
+            minlongitude=self.minlongitude,
+            maxlatitude=self.maxlatitude,
+            maxlongitude=self.maxlongitude,
+        )
+        query = Query(**query_input)
+        assert {k: v for k, v in asdict(query).items() if v is not None} == query_input
+
     @pytest.mark.parametrize(
         "field_names",
         [
