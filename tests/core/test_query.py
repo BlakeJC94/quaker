@@ -1,5 +1,6 @@
 from abc import ABC
-from dataclasses import dataclass, fields
+from unittest.mock import patch
+from dataclasses import dataclass, fields, asdict, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
 from itertools import product
@@ -7,7 +8,8 @@ from typing import Optional, get_args
 
 import pytest
 
-from quaker.core import Query
+from quaker.core.query import Query, _BaseQuery
+
 
 def assert_query_type_and_value(query, param_name, value):
     param_value = getattr(query, param_name)
@@ -16,18 +18,24 @@ def assert_query_type_and_value(query, param_name, value):
 
 
 @dataclass
-class MockQuery:
+class MockQuery(_BaseQuery):
+    """A mock query object for testing.
+
+    Args:
+        mock_field: A mock field.
+    """
+
     mock_field: Optional[int] = None
 
     def __post_init__(self):
-        type_args = get_args(
-            next((f for f in fields(self) if f.name == "mock_field")).type
-        )
+        super().__post_init__()
+        type_args = get_args(next((f for f in fields(self) if f.name == "mock_field")).type)
         self._set_return_type(next(i for i in type_args if callable(i) and i is not None))
 
     def _set_return_type(self, return_type):
         self.return_type = return_type
         self.field_types = dict(mock_field=self.return_type)
+
 
 class TestAssertQueryTypeAndValue:
     value = 123
@@ -49,6 +57,33 @@ class TestAssertQueryTypeAndValue:
         mock_query = MockQuery(mock_field=self.value)
         with pytest.raises(AssertionError):
             assert_query_type_and_value(mock_query, "mock_field", 2 * self.value + 1)
+
+
+# TODO test multiple fields
+class TestBaseQuery:
+    def test_post_init(self):
+        with patch("quaker.core.query._BaseQuery.__post_init__") as mock_post_init:
+            query = Query()
+            mock_post_init.assert_called()
+
+    def test_fields(self):
+        query = MockQuery()
+        query_fields = query.fields
+        assert list(query_fields.keys()) == ["mock_field"]
+        assert isinstance(query_fields["mock_field"], Field)
+
+    # TODO test multiline docs
+    def test_field_docs(self):
+        query = MockQuery()
+        field_docs = query.field_docs
+        assert list(field_docs.keys()) == ["mock_field"]
+        assert field_docs["mock_field"] == "A mock field."
+
+    def test_field_types(self):
+        query = MockQuery()
+        field_types = query.field_types
+        assert list(field_types.keys()) == ["mock_field"]
+        assert field_types["mock_field"] == int
 
 
 class TestQueryValidInputs:
@@ -283,4 +318,3 @@ class TestQueryValidInputs:
         ]:
             with pytest.raises(ValueError):
                 _ = Query(**{attr1: 6, attr2: 5})
-
