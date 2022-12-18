@@ -6,14 +6,14 @@ from typing import Callable, Optional, get_args, Any, List, Dict
 
 
 class _FieldHelper:
-    _fields: Dict[str, Field] = {}
-    _field_docs: Dict[str, str] = {}
-    _field_types: Dict[str, Callable] = {}
+    _fields: Optional[Dict[str, Field]] = None
+    _field_docs: Optional[Dict[str, str]] = None
+    _field_types: Optional[Dict[str, Callable]] = None
 
     @classmethod
     @property
     def fields(cls):
-        if len(cls._fields) > 0:
+        if cls._fields:
             return cls._fields
         cls._fields = {f.name: f for f in fields(cls)}
         return cls._fields
@@ -21,7 +21,7 @@ class _FieldHelper:
     @classmethod
     @property
     def field_docs(cls):
-        if len(cls._field_docs) > 0:
+        if cls._field_docs:
             return cls._field_docs
 
         _, doc = cls.__doc__.split("Args:", 1)
@@ -44,7 +44,7 @@ class _FieldHelper:
     @classmethod
     @property
     def field_types(cls):
-        if len(cls._field_types) > 0:
+        if cls._field_types:
             return cls._field_types
 
         field_types = {}
