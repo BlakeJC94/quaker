@@ -1,12 +1,12 @@
 """Classes and methods for representation of queries."""
-from dataclasses import dataclass, fields, asdict, field
+from dataclasses import dataclass, fields, asdict, field, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
 from typing import Callable, Optional, get_args, Any, List, Dict
 
 
 class _FieldHelper:
-    _fields: Dict[str, Any] = {}
+    _fields: Dict[str, Field] = {}
     _field_docs: Dict[str, str] = {}
     _field_types: Dict[str, Callable] = {}
 
