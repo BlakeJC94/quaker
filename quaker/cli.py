@@ -21,12 +21,14 @@ METAVARS = {
 }
 
 
-def run() -> int:
-    input_args = parse_args()
-
-    # Apply query args
-    query = Query(**{k: v for k, v in vars(input_args).items() if k in Query.get_args()})
-    if input_args.mode == "download":
+def run(cli_input: Optional[List[str]] = None) -> int:
+    parser = get_parser()
+    query_input = parser.parse_args(cli_input)
+    if all(var is None for _, var in vars(query_input).items()):
+        parser.parse_args(["-h"])
+    # pylint: disable=unsupported-membership-test
+    query = Query(**{k: v for k, v in vars(query_input).items() if k in Query.fields})
+    if query_input.mode == "download":
         download(output_file="/dev/stdout", query=query)
     else:
         logger.error("Only 'download' mode is supported for now")
