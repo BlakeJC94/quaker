@@ -16,6 +16,7 @@ def assert_query_type_and_value(query, param_name, value):
     assert param_value == value, f"{param_name = }, {value = }"
     assert isinstance(param_value, query.field_types[param_name])
 
+MOCK_QUERY_FIELD_TYPE = int
 
 @dataclass
 class MockQuery(_BaseQuery):
@@ -23,14 +24,16 @@ class MockQuery(_BaseQuery):
 
     Args:
         mock_field: A mock field.
+        another_mock_field: Another mock field
+            with a multiline docstring.
     """
 
-    mock_field: Optional[int] = None
+    mock_field: Optional[MOCK_QUERY_FIELD_TYPE] = None
+    another_mock_field: Optional[MOCK_QUERY_FIELD_TYPE] = None
 
     def __post_init__(self):
         super().__post_init__()
-        type_args = get_args(next((f for f in fields(self) if f.name == "mock_field")).type)
-        self._set_return_type(next(i for i in type_args if callable(i) and i is not None))
+        self._set_return_type(MOCK_QUERY_FIELD_TYPE)
 
     def _set_return_type(self, return_type):
         self.return_type = return_type
@@ -69,21 +72,28 @@ class TestBaseQuery:
     def test_fields(self):
         query = MockQuery()
         query_fields = query.fields
-        assert list(query_fields.keys()) == ["mock_field"]
-        assert isinstance(query_fields["mock_field"], Field)
+        assert list(query_fields.keys()) == ["mock_field", "another_mock_field"]
+        for k in query_fields:
+            assert isinstance(query_fields.get(k), Field)
 
     # TODO test multiline docs
     def test_field_docs(self):
         query = MockQuery()
         field_docs = query.field_docs
-        assert list(field_docs.keys()) == ["mock_field"]
-        assert field_docs["mock_field"] == "A mock field."
+        expected_items = [
+            ("mock_field", "A mock field"),
+            ("another_mock_field", "Another mock field with a multiline docstring."),
+        ]
+        for (k1, v1), (k2, v2) in zip(field_docs.items(), expected_items):
+            assert k1 == k2
+            assert v1 == v2
 
     def test_field_types(self):
         query = MockQuery()
         field_types = query.field_types
         assert list(field_types.keys()) == ["mock_field"]
-        assert field_types["mock_field"] == int
+        for k in field_types:
+            assert field_types.get(k) == int
 
 
 class TestQueryValidInputs:
