@@ -37,7 +37,7 @@ def run(cli_input: Optional[List[str]] = None) -> int:
     return 0
 
 
-def parse_args() -> argparse.Namespace:
+def get_parser() -> argparse.ArgumentParser:
     cli_doc_head = "Access USGS Earthquake dataset."
     cli_doc = "\n\n".join([cli_doc_head, Query.doc_head])
     parser = argparse.ArgumentParser(
@@ -46,13 +46,11 @@ def parse_args() -> argparse.Namespace:
     )
 
     # Allow one optional positional arg to select mode
-    default_mode = "download"
     parser.add_argument(
         "mode",
         nargs="?",
         type=str,
-        default=default_mode,
-        help=f"action to perform (default: {default_mode})",
+        help=f"action to perform.",
     )
 
     for component_class in list(Query.component_classes):
@@ -75,13 +73,9 @@ def parse_args() -> argparse.Namespace:
                     str(field_type.__name__).upper(),
                 )
 
-            try:
-                group.add_argument(
-                    "--" + field_name,
-                    **add_arg_kwargs,
-                )
-            except Exception as e:
-                breakpoint()
-                raise e
+            group.add_argument(
+                "--" + field_name,
+                **add_arg_kwargs,
+            )
 
-    return parser.parse_args()
+    return parser
