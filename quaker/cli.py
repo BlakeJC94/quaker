@@ -1,5 +1,6 @@
 import argparse
 import logging
+from typing import Optional, List
 
 from . import (
     __version__,

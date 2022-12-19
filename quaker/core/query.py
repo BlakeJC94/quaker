@@ -6,13 +6,14 @@ from typing import Callable, Optional, get_args, Any, List, Dict
 
 
 class _FieldHelper:
+    """Mixin for generating metadata for a dataclass."""
     _fields: Optional[Dict[str, Field]] = None
     _field_docs: Optional[Dict[str, str]] = None
     _field_types: Optional[Dict[str, Callable]] = None
 
     @classmethod
     @property
-    def fields(cls):
+    def fields(cls) -> Dict[str, Field]:
         if cls._fields:
             return cls._fields
         cls._fields = {f.name: f for f in fields(cls)}
