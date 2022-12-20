@@ -329,8 +329,54 @@ class _QueryFormat(_BaseQuery):
         self.check_field_allowed_values("format", ["csv", "geojson", "text"])
 
 
+class _CompositeFieldDocumenter(ABC):
+    @classmethod
+    @abstractproperty
+    def doc_head(cls):
+        return ""
+
+    @classmethod
+    @abstractproperty
+    def doc_body(cls):
+        return ""
+
+    @classmethod
+    def generate_doc(cls):
+        doc = "\n\n".join(
+            [
+                cls.doc_head.removesuffix("\n"),
+                cls.doc_body.removesuffix("\n"),
+                "Args:",
+            ]
+        )
+        for class_name in cls.component_classes:
+            class_doc = getdoc(class_name)
+            _, args_doc = class_doc.split("Args:", 1)
+            doc = "\n".join([doc, args_doc])
+        return doc
+
+    @classmethod
+    @property
+    def component_classes(cls) -> List[Any]:
+        return [
+            class_name
+            for class_name in getmro(cls)
+            if class_name
+            not in [
+                cls,
+                _BaseQuery,
+                ABC,
+                object,
+                _FieldHelper,
+                _FieldChecker,
+                _CompositeFieldDocumenter,
+            ]
+        ]
+
+
 @dataclass
 class Query(
+    _CompositeFieldDocumenter,
     _QueryFormat,
     _QueryTime,
     _QueryLocationRectangle,
@@ -342,36 +388,19 @@ class Query(
 
     @classmethod
     @property
+    def __doc__(cls):
+        return cls.generate_doc()
+
+    @classmethod
+    @property
     def doc_head(cls):
+        return """Class for managing inputs for queries."""
+
+    @classmethod
+    @property
+    def doc_body(cls):
         return """API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
 
         NOTE: All times use ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed.
         NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
         """
-
-    @classmethod
-    @property
-    def __doc__(cls):
-        doc = "\n\n".join(["Class for managing inputs for queries.", cls.doc_head, "Args:"])
-        for class_name in cls.component_classes:
-            class_doc = getdoc(class_name)
-            _, args_doc = class_doc.split("Args:", 1)
-            doc = "\n".join([doc, args_doc])
-        return doc
-
-    def __str__(self):
-        out = self.__class__.__name__ + "("
-        for key, value in asdict(self).items():
-            if value is not None:
-                out += "\n" + 4 * " " + f"{key}: {str(value)}"
-        out += "\n)"
-        return out
-
-    @classmethod
-    @property
-    def component_classes(cls) -> List[Any]:
-        return [
-            class_name
-            for class_name in getmro(cls)
-            if class_name not in [cls, _BaseQuery, object, _FieldHelper, _FieldChecker]
-        ]
