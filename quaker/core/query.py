@@ -1,4 +1,5 @@
 """Classes and methods for representation of queries."""
+import re
 from dataclasses import dataclass, fields, asdict, field, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
@@ -8,24 +9,14 @@ from typing import Callable, Optional, get_args, Any, List, Dict
 class _FieldHelper:
     """Mixin for generating metadata for a dataclass."""
 
-    _fields: Optional[Dict[str, Field]] = None
-    _field_docs: Optional[Dict[str, str]] = None
-    _field_types: Optional[Dict[str, Callable]] = None
-
     @classmethod
     @property
     def fields(cls) -> Dict[str, Field]:
-        if cls._fields:
-            return cls._fields
-        cls._fields = {f.name: f for f in fields(cls)}
-        return cls._fields
+        return {f.name: f for f in fields(cls)}
 
     @classmethod
     @property
     def field_docs(cls):
-        if cls._field_docs:
-            return cls._field_docs
-
         _, doc = cls.__doc__.split("Args:", 1)
         doc = doc.strip().replace("\n" + " " * 12, " ")  # TODO replace this with regex
 
@@ -40,15 +31,11 @@ class _FieldHelper:
                     field_docs[name] = field_doc.strip()
                     break
 
-        cls._field_docs = field_docs
-        return cls._field_docs
+        return field_docs
 
     @classmethod
     @property
     def field_types(cls):
-        if cls._field_types:
-            return cls._field_types
-
         field_types = {}
         for name, f in cls.fields.items():
             if callable(f.type) and not hasattr(f.type, "__args__"):
@@ -58,8 +45,7 @@ class _FieldHelper:
                 f_type = next(t for t in f_types if t is not None and callable(t))
             field_types[name] = f_type
 
-        cls._field_types = field_types
-        return cls._field_types
+        return field_types
 
 
 class _FieldChecker:
@@ -123,7 +109,10 @@ class _BaseQuery(_FieldHelper, _FieldChecker):
     @property
     def name(cls) -> str:
         # TODO Change `LocationCircle` to `Location - circle` with regex
-        return cls.__name__.removeprefix("_Query")
+        name = cls.__name__.removeprefix("_").removeprefix("Query")
+        name = re.sub(r"(\w)([A-Z])", r"\1 - \2", name, count=1)
+        name = re.sub(r"(\w)([A-Z])", r"\1 \2", name)
+        return name.lower()
 
 
 @dataclass
