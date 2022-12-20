@@ -3,6 +3,7 @@ from collections import deque
 
 class Cache:
     """Container class with a deque and a set for fast append/pop/lookup operations"""
+
     def __init__(self, *args, **kwargs):
         self.stash = deque(*args, **kwargs)
 

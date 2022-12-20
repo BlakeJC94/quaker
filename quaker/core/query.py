@@ -7,6 +7,7 @@ from typing import Callable, Optional, get_args, Any, List, Dict
 
 class _FieldHelper:
     """Mixin for generating metadata for a dataclass."""
+
     _fields: Optional[Dict[str, Field]] = None
     _field_docs: Optional[Dict[str, str]] = None
     _field_types: Optional[Dict[str, Callable]] = None
@@ -26,7 +27,7 @@ class _FieldHelper:
             return cls._field_docs
 
         _, doc = cls.__doc__.split("Args:", 1)
-        doc = doc.strip().replace("\n" + " " * 12, ' ')  # TODO replace this with regex
+        doc = doc.strip().replace("\n" + " " * 12, " ")  # TODO replace this with regex
 
         field_docs = {}
         field_names = list(cls.fields.keys())
@@ -60,8 +61,8 @@ class _FieldHelper:
         cls._field_types = field_types
         return cls._field_types
 
-class _FieldChecker:
 
+class _FieldChecker:
     def check_fields_ordered(self, min_field_name, max_field_name):
         min_field_value = getattr(self, min_field_name)
         max_field_value = getattr(self, max_field_name)
@@ -97,7 +98,6 @@ class _FieldChecker:
             raise ValueError(
                 f"Invalid {field_name} ({field_value}), " f"must be one of {allowed_values}."
             )
-
 
 
 @dataclass

@@ -16,7 +16,9 @@ def assert_query_type_and_value(query, param_name, value):
     assert param_value == value, f"{param_name = }, {value = }"
     assert isinstance(param_value, query.field_types[param_name])
 
+
 MOCK_QUERY_FIELD_TYPE = int
+
 
 @dataclass
 class MockQuery(_BaseQuery):
