@@ -1,6 +1,7 @@
 """Classes and methods for representation of queries."""
+from abc import ABC, abstractproperty
 import re
-from dataclasses import dataclass, fields, asdict, field, Field
+from dataclasses import dataclass, fields, asdict, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
 from typing import Callable, Optional, get_args, Any, List, Dict
@@ -48,6 +49,7 @@ class _FieldHelper:
         return field_types
 
 
+# TODO test
 class _FieldChecker:
     def check_fields_ordered(self, min_field_name, max_field_name):
         min_field_value = getattr(self, min_field_name)
@@ -108,11 +110,19 @@ class _BaseQuery(_FieldHelper, _FieldChecker):
     @classmethod
     @property
     def name(cls) -> str:
-        # TODO Change `LocationCircle` to `Location - circle` with regex
         name = cls.__name__.removeprefix("_").removeprefix("Query")
-        name = re.sub(r"(\w)([A-Z])", r"\1 - \2", name, count=1)
         name = re.sub(r"(\w)([A-Z])", r"\1 \2", name)
-        return name.lower()
+        name_components = name.split(" ")
+        name = name_components[0] + " (" + " ".join(name_components[1:]) + ")"
+        return name.lower().removesuffix(" ()")
+
+    def __str__(self):
+        out = self.__class__.__name__ + "("
+        for key, value in asdict(self).items():
+            if value is not None:
+                out += "\n" + 4 * " " + f"{key}: {str(value)}"
+        out += "\n)"
+        return out
 
 
 @dataclass

@@ -51,11 +51,11 @@ def get_parser() -> argparse.ArgumentParser:
         "mode",
         nargs="?",
         type=str,
-        help=f"action to perform.",
+        help="action to perform.",
     )
 
     for component_class in list(Query.component_classes):
-        group = parser.add_argument_group(component_class.name)
+        group = parser.add_argument_group(component_class.name + " arguments")
 
         for field_name, field_doc in component_class.field_docs.items():
 
