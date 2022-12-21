@@ -64,10 +64,10 @@ class _FieldChecker:
             field_value = getattr(self, field_name)
             if field_value is not None:
                 assert (
-                    min_value is None or min_value < field_value
+                    min_value is None or min_value <= field_value
                 ), f"{field_name} is less than {min_value}."
                 assert (
-                    min_value is None or field_value < max_value
+                    max_value is None or field_value <= max_value
                 ), f"{field_name} is greater than {max_value}."
 
     def assert_fields_mutually_exclusive(self, field_names):

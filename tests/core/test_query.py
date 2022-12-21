@@ -91,7 +91,8 @@ class TestAssertQueryTypeAndValue:
     value = 123
 
     def test_successful_call(self):
-        """assert_query_type_and_value should get attr 'param_name' from query and check the type."""
+        """assert_query_type_and_value should get attr 'param_name' from query and check the type.
+        """
         mock_query = _QueryComponentMock(mock_field=self.value)
         assert_query_type_and_value(mock_query, "mock_field", self.value)
 
@@ -108,19 +109,77 @@ class TestAssertQueryTypeAndValue:
         with pytest.raises(AssertionError):
             assert_query_type_and_value(mock_query, "mock_field", 2 * self.value + 1)
 
-    def test_check_fields_ordered(self):
+    def test_assert_fields_ordered(self):
         query = _QueryComponentMock(
             mock_field=4,
             another_mock_field=7,
         )
-        # Nothing should happen if true
-        query.check_fields_ordered("mock_field", "another_mock_field")
-        # ValueError should occur if false
-        with pytest.raises(ValueError):
-            query.check_fields_ordered(
+        query.assert_fields_ordered("mock_field", "another_mock_field")
+
+    def test_raise_assert_fields_ordered(self):
+        query = _QueryComponentMock(
+            mock_field=4,
+            another_mock_field=7,
+        )
+        with pytest.raises(AssertionError):
+            query.assert_fields_ordered(
                 "another_mock_field",
                 "mock_field",
             )
+
+    def test_assert_fields_bounded(self):
+        query = _QueryComponentMock(
+            mock_field=4,
+        )
+        min_value, max_value = 3, 5
+        query.assert_fields_bounded(["mock_field"], min_value, max_value)
+        query.assert_fields_bounded(["another_mock_field"], min_value, max_value)
+        query.assert_fields_bounded(["mock_field", "another_mock_field"], min_value, max_value)
+
+    @pytest.mark.parametrize(
+        "min_value, max_value",
+        [
+            (5, 6),
+            (5, None),
+            (1, 2),
+            (None, 2),
+        ],
+    )
+    def test_raise_assert_fields_bounded(self, min_value, max_value):
+        query = _QueryComponentMock(
+            mock_field=4,
+        )
+        with pytest.raises(AssertionError):
+            query.assert_fields_bounded(["another_mock_field", "mock_field"], min_value, max_value)
+
+    def test_assert_fields_mutually_exclusive(self):
+        query = _QueryComponentMock(
+            mock_field=4,
+        )
+        query.assert_fields_mutually_exclusive(['mock_field', 'another_mock_field'])
+
+    def test_raise_assert_fields_mutually_exclusive(self):
+        query = _QueryComponentMock(
+            mock_field=4,
+            another_mock_field=7,
+        )
+        with pytest.raises(AssertionError):
+            query.assert_fields_mutually_exclusive(['mock_field', 'another_mock_field'])
+
+    def test_assert_field_allowed_values(self):
+        query = _QueryComponentMock(
+            mock_field=4,
+        )
+        query.assert_field_allowed_values('mock_field', [4])
+
+    def test_raise_assert_field_allowed_values(self):
+        query = _QueryComponentMock(
+            mock_field=4,
+            another_mock_field=7,
+        )
+        with pytest.raises(AssertionError):
+            query.assert_field_allowed_values('mock_field', [5])
+
 
 class TestBaseQuery:
     def test_docs(self):
@@ -358,7 +417,7 @@ class TestQuery:
             query = Query(**{attribute: value})
             assert getattr(query, attribute) == value
 
-        with pytest.raises(ValueError):
+        with pytest.raises(AssertionError):
             _ = Query(**{attribute: "foo"})
 
     @pytest.mark.parametrize("invalid_time", ["foo", "01-01-2020"])
@@ -384,12 +443,12 @@ class TestQuery:
     def test_raise_out_of_bounds(self, field_names, invalid_values):
         """ValueError should be raised if a bad time input is given."""
         for attribute, invalid_value in product(field_names, invalid_values):
-            with pytest.raises(ValueError):
+            with pytest.raises(AssertionError):
                 _ = Query(**{attribute: invalid_value})
 
     def test_raise_query_both_radius_params(self):
         """ValueError shoud be raised if attempting to pass in maxradius and maxradiuskm."""
-        with pytest.raises(ValueError):
+        with pytest.raises(AssertionError):
             _ = Query(maxradius=10, maxradiuskm=20)
 
     def test_raise_query_invalid_latitudes_longitudes(self):
@@ -399,5 +458,5 @@ class TestQuery:
             ("minmagnitude", "maxmagnitude"),
             ("mindepth", "maxdepth"),
         ]:
-            with pytest.raises(ValueError):
+            with pytest.raises(AssertionError):
                 _ = Query(**{attr1: 6, attr2: 5})
