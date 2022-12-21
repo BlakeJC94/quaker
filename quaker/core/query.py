@@ -4,7 +4,7 @@ import re
 from dataclasses import dataclass, fields, asdict, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
-from typing import Callable, Optional, get_args, Any, List, Dict
+from typing import Optional, get_args, Any, List, Dict
 
 
 class _FieldHelper:
@@ -339,19 +339,20 @@ class _QueryFormat(_BaseQuery):
         self.check_field_allowed_values("format", ["csv", "geojson", "text"])
 
 
+# TODO usage docs
 class _CompositeFieldDocumenter(ABC):
     @classmethod
     @abstractproperty
-    def doc_head(cls):
+    def doc_head(cls) -> str:
         return ""
 
     @classmethod
     @abstractproperty
-    def doc_body(cls):
+    def doc_body(cls) -> str:
         return ""
 
     @classmethod
-    def generate_doc(cls):
+    def generate_doc(cls) -> str:
         doc = "\n\n".join(
             [
                 cls.doc_head.removesuffix("\n"),

@@ -8,7 +8,13 @@ from typing import Optional, get_args
 
 import pytest
 
-from quaker.core.query import Query, _BaseQuery
+from quaker.core.query import (
+    Query,
+    _BaseQuery,
+    _FieldHelper,
+    _FieldChecker,
+    _CompositeFieldDocumenter,
+)
 
 
 def assert_query_type_and_value(query, param_name, value):
@@ -21,8 +27,8 @@ MOCK_QUERY_FIELD_TYPE = int
 
 
 @dataclass
-class MockQuery(_BaseQuery):
-    """A mock query object for testing.
+class _QueryComponentMock(_BaseQuery):
+    """A mock dataclass object for testing `_BaseQuery`.
 
     Args:
         mock_field: A mock field.
@@ -42,63 +48,111 @@ class MockQuery(_BaseQuery):
         self.field_types = dict(mock_field=self.return_type)
 
 
+@dataclass
+class MockQuery(_CompositeFieldDocumenter, _QueryComponentMock):
+    """A mock dataclass object for testing MRO of `_BaseQuery`."""
+
+    @classmethod
+    @property
+    def __doc__(cls) -> str:
+        return cls.generate_doc()
+
+    @classmethod
+    @property
+    def doc_head(cls) -> str:
+        return """DOC HEAD"""
+
+    @classmethod
+    @property
+    def doc_body(cls) -> str:
+        return """DOC BODY"""
+
+    def __post_init__(self):
+        super().__post_init__()
+        self._mock_query_post_init_called = True
+
+    @classmethod
+    @property
+    def _expected_doc(cls) -> str:
+        doc = "\n\n".join(
+            [
+                cls.doc_head.removesuffix("\n"),
+                cls.doc_body.removesuffix("\n"),
+                "Args:",
+            ]
+        )
+        class_doc = getdoc(_QueryComponentMock)
+        _, args_doc = class_doc.split("Args:", 1)
+        doc = "\n".join([doc, args_doc])
+        return doc
+
+
 class TestAssertQueryTypeAndValue:
     value = 123
 
     def test_successful_call(self):
         """assert_query_type_and_value should get attr 'param_name' from query and check the type."""
-        mock_query = MockQuery(mock_field=self.value)
+        mock_query = _QueryComponentMock(mock_field=self.value)
         assert_query_type_and_value(mock_query, "mock_field", self.value)
 
     def test_raise_value_equal_type_unequal(self):
 
-        mock_query = MockQuery(mock_field=self.value)
+        mock_query = _QueryComponentMock(mock_field=self.value)
         mock_query._set_return_type(float)
 
         with pytest.raises(AssertionError):
             assert_query_type_and_value(mock_query, "mock_field", self.value)
 
     def test_raise_value_unequal(self):
-        mock_query = MockQuery(mock_field=self.value)
+        mock_query = _QueryComponentMock(mock_field=self.value)
         with pytest.raises(AssertionError):
             assert_query_type_and_value(mock_query, "mock_field", 2 * self.value + 1)
 
 
-# TODO test multiple fields
 class TestBaseQuery:
+    def test_docs(self):
+        query = MockQuery()
+        # pylint: disable=protected-access
+        assert getdoc(query) == query._expected_doc
+
+    def test_name(self):
+        query = _QueryComponentMock()
+        assert query.name == "component (mock)"
+
     def test_post_init(self):
         with patch("quaker.core.query._BaseQuery.__post_init__") as mock_post_init:
-            query = Query()
+            query = MockQuery()
             mock_post_init.assert_called()
+            assert query._mock_query_post_init_called
 
     def test_fields(self):
-        query = MockQuery()
+        query = _QueryComponentMock()
         query_fields = query.fields
         assert list(query_fields.keys()) == ["mock_field", "another_mock_field"]
         for k in query_fields:
             assert isinstance(query_fields.get(k), Field)
 
-    # TODO test multiline docs
     def test_field_docs(self):
-        query = MockQuery()
+        query = _QueryComponentMock()
         field_docs = query.field_docs
         expected_items = [
-            ("mock_field", "A mock field"),
+            ("mock_field", "A mock field."),
             ("another_mock_field", "Another mock field with a multiline docstring."),
         ]
+        # pylint: disable=invalid-name,invalid-name,invalid-name,invalid-name
         for (k1, v1), (k2, v2) in zip(field_docs.items(), expected_items):
             assert k1 == k2
             assert v1 == v2
 
     def test_field_types(self):
-        query = MockQuery()
+        query = _QueryComponentMock()
         field_types = query.field_types
         assert list(field_types.keys()) == ["mock_field"]
         for k in field_types:
             assert field_types.get(k) == int
 
 
-class TestQueryValidInputs:
+class TestQuery:
     format = "csv"
 
     starttime = "2022-08-01"
@@ -256,6 +310,10 @@ class TestQueryValidInputs:
         query = Query(**{name: getattr(self, name) for name in field_names})
         for name in field_names:
             assert_query_type_and_value(query, name, getattr(self, name))
+
+        with patch("quaker.core.query._BaseQuery.__post_init__") as mock_post_init:
+            query = Query(**{name: getattr(self, name) for name in field_names})
+            mock_post_init.assert_called()
 
     @pytest.mark.parametrize(
         "valid_time",
