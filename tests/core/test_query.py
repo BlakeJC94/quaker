@@ -17,10 +17,10 @@ from quaker.core.query import (
 )
 
 
-def assert_query_type_and_value(query, param_name, value):
-    param_value = getattr(query, param_name)
-    assert param_value == value, f"{param_name = }, {value = }"
-    assert isinstance(param_value, query.field_types[param_name])
+def assert_query_type_and_value(query, field_name, value):
+    field_value = getattr(query, field_name)
+    assert field_value == value, f"{field_name = }, {value = }"
+    assert isinstance(field_value, query.field_types[field_name])
 
 
 MOCK_QUERY_FIELD_TYPE = int
@@ -91,7 +91,7 @@ class TestAssertQueryTypeAndValue:
     value = 123
 
     def test_successful_call(self):
-        """assert_query_type_and_value should get attr 'param_name' from query and check the type.
+        """assert_query_type_and_value should get attr 'field_name' from query and check the type.
         """
         mock_query = _QueryComponentMock(mock_field=self.value)
         assert_query_type_and_value(mock_query, "mock_field", self.value)
@@ -377,7 +377,7 @@ class TestQuery:
             ],
         ],
     )
-    def test_params(self, field_names):
+    def test_fields(self, field_names):
         """Ensure inputs are valid."""
         query = Query(**{name: getattr(self, name) for name in field_names})
         for name in field_names:
@@ -446,7 +446,7 @@ class TestQuery:
             with pytest.raises(AssertionError):
                 _ = Query(**{attribute: invalid_value})
 
-    def test_raise_query_both_radius_params(self):
+    def test_raise_query_both_radius_fields(self):
         """ValueError shoud be raised if attempting to pass in maxradius and maxradiuskm."""
         with pytest.raises(AssertionError):
             _ = Query(maxradius=10, maxradiuskm=20)
