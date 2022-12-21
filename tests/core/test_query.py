@@ -108,6 +108,19 @@ class TestAssertQueryTypeAndValue:
         with pytest.raises(AssertionError):
             assert_query_type_and_value(mock_query, "mock_field", 2 * self.value + 1)
 
+    def test_check_fields_ordered(self):
+        query = _QueryComponentMock(
+            mock_field=4,
+            another_mock_field=7,
+        )
+        # Nothing should happen if true
+        query.check_fields_ordered("mock_field", "another_mock_field")
+        # ValueError should occur if false
+        with pytest.raises(ValueError):
+            query.check_fields_ordered(
+                "another_mock_field",
+                "mock_field",
+            )
 
 class TestBaseQuery:
     def test_docs(self):

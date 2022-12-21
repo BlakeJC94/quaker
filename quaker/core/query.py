@@ -49,43 +49,38 @@ class _FieldHelper:
         return field_types
 
 
-# TODO test
 class _FieldChecker:
-    def check_fields_ordered(self, min_field_name, max_field_name):
+    def assert_fields_ordered(self, min_field_name, max_field_name):
         min_field_value = getattr(self, min_field_name)
         max_field_value = getattr(self, max_field_name)
-        if (
-            all(v is not None for v in [min_field_value, max_field_value])
-            and min_field_value > max_field_value
-        ):
-            raise ValueError(
+        if min_field_value is not None and max_field_value is not None:
+            assert min_field_value < max_field_value, (
                 f"{min_field_name} ({min_field_value}) is larger than "
                 f"{max_field_name} ({max_field_value})."
             )
 
-    def check_fields_bounded(self, field_names, min_value=None, max_value=None):
+    def assert_fields_bounded(self, field_names, min_value=None, max_value=None):
         for field_name in field_names:
             field_value = getattr(self, field_name)
             if field_value is not None:
-                if min_value is not None and field_value < min_value:
-                    raise ValueError(f"{field_name} is less than {min_value}.")
+                assert (
+                    min_value is None or min_value < field_value
+                ), f"{field_name} is less than {min_value}."
+                assert (
+                    min_value is None or field_value < max_value
+                ), f"{field_name} is greater than {max_value}."
 
-                if max_value is not None and field_value > max_value:
-                    raise ValueError(f"{field_name} is greater than {max_value}.")
-
-    def check_fields_mutually_exclusive(self, field_names):
+    def assert_fields_mutually_exclusive(self, field_names):
         n_values_not_none = sum(
             int(getattr(self, field_name) is not None) for field_name in field_names
         )
-        if n_values_not_none > 1:
-            raise ValueError(f"Only one of {field_names} can be accepted.")
+        assert n_values_not_none <= 1, f"Only one of {field_names} can be accepted."
 
-    def check_field_allowed_values(self, field_name, allowed_values):
+    def assert_field_allowed_values(self, field_name, allowed_values):
         field_value = getattr(self, field_name)
-        if field_value is not None and field_value not in allowed_values:
-            raise ValueError(
-                f"Invalid {field_name} ({field_value}), " f"must be one of {allowed_values}."
-            )
+        assert field_value is None or field_value in allowed_values, (
+            f"Invalid {field_name} ({field_value}), " f"must be one of {allowed_values}."
+        )
 
 
 @dataclass
@@ -175,10 +170,10 @@ class _QueryLocationRectangle(_BaseQuery):
 
     def __post_init__(self):
         super().__post_init__()
-        self.check_fields_bounded(["minlatitude", "maxlatitude"], -90, 90)
-        self.check_fields_bounded(["minlongitude", "maxlongitude"], -360, 360)
-        self.check_fields_ordered("minlatitude", "maxlatitude")
-        self.check_fields_ordered("minlongitude", "maxlongitude")
+        self.assert_fields_bounded(["minlatitude", "maxlatitude"], -90, 90)
+        self.assert_fields_bounded(["minlongitude", "maxlongitude"], -360, 360)
+        self.assert_fields_ordered("minlatitude", "maxlatitude")
+        self.assert_fields_ordered("minlongitude", "maxlongitude")
 
 
 @dataclass
@@ -202,11 +197,11 @@ class _QueryLocationCircle(_BaseQuery):
 
     def __post_init__(self):
         super().__post_init__()
-        self.check_fields_mutually_exclusive(["maxradius", "maxradiuskm"])
-        self.check_fields_bounded(["maxradius"], 0, 180)
-        self.check_fields_bounded(["maxradiuskm"], 0, 20001.6)
-        self.check_fields_bounded(["latitude"], -90, 90)
-        self.check_fields_bounded(["longitude"], -180, 180)
+        self.assert_fields_mutually_exclusive(["maxradius", "maxradiuskm"])
+        self.assert_fields_bounded(["maxradius"], 0, 180)
+        self.assert_fields_bounded(["maxradiuskm"], 0, 20001.6)
+        self.assert_fields_bounded(["latitude"], -90, 90)
+        self.assert_fields_bounded(["longitude"], -180, 180)
 
 
 @dataclass
@@ -250,15 +245,15 @@ class _QueryOther(_BaseQuery):
 
     def __post_init__(self):
         super().__post_init__()
-        self.check_fields_mutually_exclusive(["includedeleted", "includesuperceded"])
-        self.check_field_allowed_values(
+        self.assert_fields_mutually_exclusive(["includedeleted", "includesuperceded"])
+        self.assert_field_allowed_values(
             "orderby", ["time", "time-asc", "magnitude", "magnitude-asc"]
         )
-        self.check_field_allowed_values("includedeleted", ["true", "false", "only"])
-        self.check_fields_ordered("minmagnitude", "maxmagnitude")
-        self.check_fields_ordered("mindepth", "maxdepth")
-        self.check_fields_bounded(["minmagnitude", "maxmagnitude"], 0, 12)
-        self.check_fields_bounded(["offset"], 1, None)
+        self.assert_field_allowed_values("includedeleted", ["true", "false", "only"])
+        self.assert_fields_ordered("minmagnitude", "maxmagnitude")
+        self.assert_fields_ordered("mindepth", "maxdepth")
+        self.assert_fields_bounded(["minmagnitude", "maxmagnitude"], 0, 12)
+        self.assert_fields_bounded(["offset"], 1, None)
 
 
 @dataclass
@@ -310,15 +305,15 @@ class _QueryExtensions(_BaseQuery):
 
     def __post_init__(self):
         super().__post_init__()
-        self.check_field_allowed_values("alertlevel", ["green", "yellow", "orange", "red"])
-        self.check_field_allowed_values("kmlcolorby", ["age", "depth"])
-        self.check_field_allowed_values("reviewstatus", ["all", "automatic", "reviewed"])
+        self.assert_field_allowed_values("alertlevel", ["green", "yellow", "orange", "red"])
+        self.assert_field_allowed_values("kmlcolorby", ["age", "depth"])
+        self.assert_field_allowed_values("reviewstatus", ["all", "automatic", "reviewed"])
 
-        self.check_fields_bounded(["mingap", "maxgap"], 0, 360)
-        self.check_fields_bounded(["mincdi", "maxcdi"], 0, 12)
+        self.assert_fields_bounded(["mingap", "maxgap"], 0, 360)
+        self.assert_fields_bounded(["mincdi", "maxcdi"], 0, 12)
 
-        self.check_fields_ordered("mingap", "maxgap")
-        self.check_fields_ordered("mincdi", "maxcdi")
+        self.assert_fields_ordered("mingap", "maxgap")
+        self.assert_fields_ordered("mincdi", "maxcdi")
 
 
 @dataclass
@@ -336,7 +331,7 @@ class _QueryFormat(_BaseQuery):
     def __post_init__(self):
         super().__post_init__()
         # TODO Add 'xml', 'quakeml', 'kml'
-        self.check_field_allowed_values("format", ["csv", "geojson", "text"])
+        self.assert_field_allowed_values("format", ["csv", "geojson", "text"])
 
 
 # TODO usage docs
