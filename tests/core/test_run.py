@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 from requests import Session
 
+from quaker.globals import BASE_URL
 from quaker.core import run_query, Query
 
 
@@ -80,14 +81,19 @@ class TestRunQuery:
     # TODO mock session.get to return a Request with STATUS_OKAY code
     # TODO mocked request should have content resembling lines of bites that are comma sepreated
     # TODO assert session.get called once
-    @mock.patch.object(Session, "get", autospec=True)
-    def test_single_page_query(self, mock_session_get):
-        mock_session_get.side_effect = []
-        output_file = ...  # tmpfile
+    def test_single_page_query(self, requests_mock, session_mocker, tmp_path):
+        # TODO one response, less than MAX_RESULTS
+        requests_mock.get(BASE_URL, status_code=200, text='foo\nbar\nbaz')
+        output_file = tmp_path / "test_single_page.csv"
         query = Query(format="csv")
         with Session() as session:
+            breakpoint()
             run_query(query, session, output_file)
 
-        mock_session_get.assert_called_once()
+        # TODO assert file content is good
+        ## mock_session_get.assert_called_once()
+        # TODO use requests_mock.history for asserts?
+        # TODO implment a callbakc response to spit out a specified number of lines
+        # TODO also check out https://requests-mock.readthedocs.io/en/latest/response.html#response-lists
 
     ...
