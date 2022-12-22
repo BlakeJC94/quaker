@@ -1,4 +1,5 @@
 from unittest import mock
+from dataclasses import asdict
 from typing import Union
 from pathlib import Path
 
