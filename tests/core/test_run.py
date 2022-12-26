@@ -74,33 +74,37 @@ class TestMockRequest:
         )
 
 
-# TODO Ensure single page query works
 # TODO Ensure multi page query works
 # TODO Rename run_query to execute
 class TestRunQuery:
-    # TODO mock file write
-    # TODO mock session.get to return a Request with STATUS_OKAY code
-    # TODO mocked request should have content resembling lines of bites that are comma sepreated
-    # TODO assert session.get called once
+    @staticmethod
+    def assert_files_equal(filepath_1, filepath_2):
+        with (
+            open(filepath_1, "r", encoding="utf-8") as file1,
+            open(filepath_2, "r", encoding="utf-8") as file2,
+        ):
+            assert file1.read() == file2.read()
+
+    @staticmethod
+    def load_mock_request(requests_mock, status_code, fixture_path):
+        with open(fixture_path, "r", encoding="utf-8") as f:
+            requests_mock.get(BASE_URL, status_code=status_code, text=f.read())
+
     def test_single_page_query(self, requests_mock, tmp_path):
-        # TODO one response, less than MAX_RESULTS
-
+        """one response, less than MAX_RESULTS"""
         fixture_path = "./tests/fixtures/foo.csv"
-        with open(fixture_path, "r") as f:
-            requests_mock.get(BASE_URL, status_code=200, text=f.read())
-
         output_file = tmp_path / "test_single_page.csv"
         query = Query(format="csv")
+
+        self.load_mock_request(requests_mock, RESPONSE_OK, fixture_path)
+
         with Session() as session:
-            breakpoint()
             run_query(query, session, output_file)
 
-        # Assert file content is good
-        with open(output_file, "r") as f, open(fixture_path, "r") as ff:
-            assert f.read() == ff.read()
+        self.assert_files_equal(output_file, fixture_path)
 
         assert len(requests_mock.request_history) == 1
         assert str(requests_mock.request_history[0]) == (
             f"GET {BASE_URL}?"
-            + "&".join([f"{k}={v}" for k, v in query.dict().items() if v is not None])
+            + "&".join([f"{k}={v}" for k, v in query.dict().items()])
         )
