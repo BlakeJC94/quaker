@@ -82,19 +82,26 @@ class TestRunQuery:
     # TODO mock session.get to return a Request with STATUS_OKAY code
     # TODO mocked request should have content resembling lines of bites that are comma sepreated
     # TODO assert session.get called once
-    def test_single_page_query(self, requests_mock, session_mocker, tmp_path):
+    def test_single_page_query(self, requests_mock, tmp_path):
         # TODO one response, less than MAX_RESULTS
-        requests_mock.get(BASE_URL, status_code=200, text='foo\nbar\nbaz')
+
+        fixture_path = "./tests/fixtures/foo.csv"
+        with open(fixture_path, "r") as f:
+            requests_mock.get(BASE_URL, status_code=200, text=f.read())
+
         output_file = tmp_path / "test_single_page.csv"
         query = Query(format="csv")
         with Session() as session:
             breakpoint()
             run_query(query, session, output_file)
 
-        # TODO assert file content is good
-        ## mock_session_get.assert_called_once()
-        # TODO use requests_mock.history for asserts?
-        # TODO implment a callbakc response to spit out a specified number of lines
-        # TODO also check out https://requests-mock.readthedocs.io/en/latest/response.html#response-lists
+        # Assert file content is good
+        with open(output_file, "r") as f, open(fixture_path, "r") as ff:
+            assert f.read() == ff.read()
+
+        assert len(requests_mock.request_history) == 1
+        assert str(requests_mock.request_history[0]) == (
+            f"GET {BASE_URL}?" + "&".join([f"{k}={v}" for k, v in asdict(query).items() if v is not None])
+        )
 
     ...
