@@ -90,7 +90,7 @@ class TestRunQuery:
             requests_mock.get(BASE_URL, status_code=status_code, text=f.read())
 
     def test_single_page_query(self, requests_mock, tmp_path):
-        """one response, less than MAX_RESULTS"""
+        """Query with less than MAX_RESULTS"""
         fixture_path = "./tests/fixtures/foo.csv"
         output_file = tmp_path / "test_single_page.csv"
         query = Query(format="csv")
@@ -100,6 +100,31 @@ class TestRunQuery:
         with Session() as session:
             run_query(query, session, output_file)
 
+        self.assert_files_equal(output_file, fixture_path)
+
+        assert len(requests_mock.request_history) == 1
+        assert str(requests_mock.request_history[0]) == (
+            f"GET {BASE_URL}?"
+            + "&".join([f"{k}={v}" for k, v in query.dict().items()])
+        )
+
+    def test_multi_page_query(self, requests_mock, tmp_path):
+        """Query with more than MAX_RESULTS"""
+        fixture_path = "./tests/fixtures/foo.csv"
+        output_file = tmp_path / "test_multi_page.csv"
+        query = Query(format="csv")
+
+        self.load_mock_request(requests_mock, RESPONSE_BAD_REQUEST, fixture_path)
+        self.load_mock_request(requests_mock, RESPONSE_OK, fixture_path)
+        self.load_mock_request(requests_mock, RESPONSE_OK, fixture_path)
+        # TODO verify sequence of gets
+        # https://requests-mock.readthedocs.io/en/latest/matching.html
+        breakpoint()
+
+        with Session() as session:
+            run_query(query, session, output_file)
+
+        breakpoint()
         self.assert_files_equal(output_file, fixture_path)
 
         assert len(requests_mock.request_history) == 1
