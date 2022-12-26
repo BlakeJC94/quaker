@@ -101,7 +101,6 @@ class TestRunQuery:
 
         assert len(requests_mock.request_history) == 1
         assert str(requests_mock.request_history[0]) == (
-            f"GET {BASE_URL}?" + "&".join([f"{k}={v}" for k, v in asdict(query).items() if v is not None])
+            f"GET {BASE_URL}?"
+            + "&".join([f"{k}={v}" for k, v in query.dict().items() if v is not None])
         )
-
-    ...

@@ -410,3 +410,14 @@ class Query(
         NOTE: All times use ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed.
         NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
         """
+
+    def dict(self, include_nones: bool = False) -> Dict[str, Any]:
+        """Convert the query object into a dictionary.
+
+        Args:
+            include_nones: Whether to include keys that have `None` value.
+        """
+        query_dict = asdict(self)
+        if include_nones:
+            return query_dict
+        return {k: v for k, v in query_dict.items() if v is not None}
