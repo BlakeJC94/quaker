@@ -1,12 +1,11 @@
 from unittest import mock
-from dataclasses import asdict
 from typing import Union
 from pathlib import Path
 
 import pytest
 from requests import Session
 
-from quaker.globals import BASE_URL
+from quaker.globals import BASE_URL, RESPONSE_OK
 from quaker.core import run_query, Query
 
 

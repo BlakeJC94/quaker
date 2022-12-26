@@ -1,0 +1,6 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2022-08-01T23:52:57.170Z,51.7876666666667,-178.837333333333,10.94,0.45,ml,5,160,,0.22,av,av91652636,2022-08-03T16:11:04.310Z,"Andreanof Islands, Aleutian Islands, Alaska",earthquake,1.34,0.93,0.297409484367972,5,reviewed,av,av
+2022-08-01T23:49:54.742Z,38.1641,-117.8972,11.3,0.7,ml,14,157.4,0.055,0.1654,nn,nn00843963,2022-08-02T00:20:48.513Z,"31 km SE of Mina, Nevada",earthquake,,1.4,0.34,4,reviewed,nn,nn
+2022-08-01T23:48:51.579Z,49.8182,-178.3262,25.5,2.2,ml,,,,0.59,ak,ak0229sngag5,2022-09-15T21:10:32.793Z,"257 km SSW of Adak, Alaska",earthquake,,1.6,,,reviewed,ak,ak
+2022-08-01T23:48:44.410Z,38.7871666,-122.7801666,3.27,0.6,md,21,85,0.008529,0.03,nc,nc73762850,2022-08-02T00:53:25.109Z,"2km WNW of The Geysers, CA",earthquake,0.28,0.62,0.15,4,automatic,nc,nc
+2022-08-01T23:47:54.990Z,38.8258324,-122.7648315,1.61,0.7,md,9,128,0.0061,0.06,nc,nc73762845,2022-08-02T00:43:15.054Z,"4km W of Cobb, CA",earthquake,0.5,0.68,0.15,2,automatic,nc,nc
