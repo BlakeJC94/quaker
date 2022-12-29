@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from requests import Session
 
-from quaker.globals import BASE_URL, RESPONSE_OK
+from quaker.globals import BASE_URL, RESPONSE_BAD_REQUEST, RESPONSE_OK
 from quaker.core import run_query, Query
 
 
@@ -85,9 +85,23 @@ class TestRunQuery:
             assert file1.read() == file2.read()
 
     @staticmethod
-    def load_mock_request(requests_mock, status_code, fixture_path):
+    def create_mock_request(status_code, fixture_path):
+        if fixture_path is None:
+            return dict(status_code=status_code)
         with open(fixture_path, "r", encoding="utf-8") as f:
-            requests_mock.get(BASE_URL, status_code=status_code, text=f.read())
+            return dict(text=f.read(), status_code=status_code)
+
+    def load_mock_requests(self, requests_mock, fixture_data):
+        assert isinstance(fixture_data, list)
+        assert len(fixture_data) > 0
+        assert len(fixture_data[0]) == 2
+        requests = [self.create_mock_request(st, fp) for st, fp in fixture_data]
+        requests_mock.get(BASE_URL, requests)
+        return requests_mock
+
+    @staticmethod
+    def parse_expected_query(query):
+        return f"GET {BASE_URL}?" + "&".join([f"{k}={v}" for k, v in query.dict().items()])
 
     def test_single_page_query(self, requests_mock, tmp_path):
         """Query with less than MAX_RESULTS"""
@@ -95,18 +109,20 @@ class TestRunQuery:
         output_file = tmp_path / "test_single_page.csv"
         query = Query(format="csv")
 
-        self.load_mock_request(requests_mock, RESPONSE_OK, fixture_path)
+        requests_mock = self.load_mock_requests(
+            requests_mock,
+            fixture_data=[(RESPONSE_OK, fixture_path)],
+        )
 
         with Session() as session:
             run_query(query, session, output_file)
 
+        # TODO replace this with assert mock calls
         self.assert_files_equal(output_file, fixture_path)
 
-        assert len(requests_mock.request_history) == 1
-        assert str(requests_mock.request_history[0]) == (
-            f"GET {BASE_URL}?"
-            + "&".join([f"{k}={v}" for k, v in query.dict().items()])
-        )
+        history = requests_mock.request_history
+        assert len(history) == 1
+        self.assert_requests_base_url(history)
 
     def test_multi_page_query(self, requests_mock, tmp_path):
         """Query with more than MAX_RESULTS"""
@@ -114,21 +130,34 @@ class TestRunQuery:
         output_file = tmp_path / "test_multi_page.csv"
         query = Query(format="csv")
 
-        self.load_mock_request(requests_mock, RESPONSE_BAD_REQUEST, fixture_path)
-        self.load_mock_request(requests_mock, RESPONSE_OK, fixture_path)
-        self.load_mock_request(requests_mock, RESPONSE_OK, fixture_path)
-        # TODO verify sequence of gets
-        # https://requests-mock.readthedocs.io/en/latest/matching.html
-        breakpoint()
+        self.load_mock_requests(
+            requests_mock,
+            fixture_data=[
+                (RESPONSE_BAD_REQUEST, None),
+                (RESPONSE_OK, "./tests/fixtures/foo1.csv"),
+                (RESPONSE_BAD_REQUEST, None),
+                (RESPONSE_OK, "./tests/fixtures/foo2.csv"),
+                (RESPONSE_OK, "./tests/fixtures/foo3.csv"),
+            ],
+        )
 
         with Session() as session:
             run_query(query, session, output_file)
 
-        breakpoint()
+        # TODO replace this with assert mock calls
         self.assert_files_equal(output_file, fixture_path)
 
-        assert len(requests_mock.request_history) == 1
-        assert str(requests_mock.request_history[0]) == (
-            f"GET {BASE_URL}?"
-            + "&".join([f"{k}={v}" for k, v in query.dict().items()])
-        )
+        history = requests_mock.request_history
+        self.assert_requests_base_url(history)
+        assert len(history) == 5
+        assert 'limit' in history[1].qs
+        assert 'endtime' in history[2].qs
+        assert 'limit' in history[3].qs
+        assert 'endtime' in history[3].qs
+        assert 'endtime' in history[4].qs
+
+    @staticmethod
+    def assert_requests_base_url(requests):
+        for request in requests:
+            url = "".join([request.scheme, "://", request.hostname, request.path])
+            assert url == BASE_URL
