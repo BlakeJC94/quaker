@@ -1,10 +1,13 @@
 """Classes and methods for representation of queries."""
+import logging
 from abc import ABC, abstractproperty
 import re
 from dataclasses import dataclass, fields, asdict, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
 from typing import Optional, get_args, Any, List, Dict
+
+logger = logging.getLogger(__name__)
 
 
 class _FieldHelper:
