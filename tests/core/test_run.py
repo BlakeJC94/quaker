@@ -150,11 +150,11 @@ class TestRunQuery:
         history = requests_mock.request_history
         self.assert_requests_base_url(history)
         assert len(history) == 5
-        assert 'limit' in history[1].qs
-        assert 'endtime' in history[2].qs
-        assert 'limit' in history[3].qs
-        assert 'endtime' in history[3].qs
-        assert 'endtime' in history[4].qs
+        assert "limit" in history[1].qs
+        assert "endtime" in history[2].qs
+        assert "limit" in history[3].qs
+        assert "endtime" in history[3].qs
+        assert "endtime" in history[4].qs
 
     @staticmethod
     def assert_requests_base_url(requests):

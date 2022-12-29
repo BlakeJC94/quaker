@@ -91,8 +91,7 @@ class TestAssertQueryTypeAndValue:
     value = 123
 
     def test_successful_call(self):
-        """assert_query_type_and_value should get attr 'field_name' from query and check the type.
-        """
+        """assert_query_type_and_value should get attr 'field_name' from query and check the type."""
         mock_query = _QueryComponentMock(mock_field=self.value)
         assert_query_type_and_value(mock_query, "mock_field", self.value)
 
@@ -156,7 +155,7 @@ class TestAssertQueryTypeAndValue:
         query = _QueryComponentMock(
             mock_field=4,
         )
-        query.assert_fields_mutually_exclusive(['mock_field', 'another_mock_field'])
+        query.assert_fields_mutually_exclusive(["mock_field", "another_mock_field"])
 
     def test_raise_assert_fields_mutually_exclusive(self):
         query = _QueryComponentMock(
@@ -164,13 +163,13 @@ class TestAssertQueryTypeAndValue:
             another_mock_field=7,
         )
         with pytest.raises(AssertionError):
-            query.assert_fields_mutually_exclusive(['mock_field', 'another_mock_field'])
+            query.assert_fields_mutually_exclusive(["mock_field", "another_mock_field"])
 
     def test_assert_field_allowed_values(self):
         query = _QueryComponentMock(
             mock_field=4,
         )
-        query.assert_field_allowed_values('mock_field', [4])
+        query.assert_field_allowed_values("mock_field", [4])
 
     def test_raise_assert_field_allowed_values(self):
         query = _QueryComponentMock(
@@ -178,7 +177,7 @@ class TestAssertQueryTypeAndValue:
             another_mock_field=7,
         )
         with pytest.raises(AssertionError):
-            query.assert_field_allowed_values('mock_field', [5])
+            query.assert_field_allowed_values("mock_field", [5])
 
 
 class TestBaseQuery:

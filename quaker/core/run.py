@@ -177,7 +177,7 @@ def get_last_param(download: Request, file_format: str, order: str) -> str:
     if file_format in ["csv", "text"]:
         index = 0 if order == "time" else 4
         delim = b"," if file_format == "csv" else b"|"
-        last_param = last_row.split(delim)[index].decode().removesuffix('Z')
+        last_param = last_row.split(delim)[index].decode().removesuffix("Z")
 
     if file_format == "geojson":
         index = "time" if order == "time" else "mag"
