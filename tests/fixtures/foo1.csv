@@ -1,0 +1,6 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2022-12-29T03:10:09.190Z,34.9723333,-118.5925,15.21,1.17,ml,13,180,0.08686,0.23,ci,ci40150951,2022-12-29T03:13:40.653Z,"22km N of Neenach, CA",earthquake,1.03,1.31,0.098,11,automatic,ci,ci
+2022-12-29T03:07:49.650Z,36.5661659,-121.1563339,8.19,1.63,md,12,118,0.02404,0.08,nc,nc73826216,2022-12-29T03:09:27.134Z,"4km NNW of Pinnacles, CA",earthquake,0.41,0.75,0.13,12,automatic,nc,nc
+2022-12-29T03:03:40.978Z,64.9334,-148.9679,16.2,0.8,ml,,,,0.45,ak,ak022godw0dj,2022-12-29T03:13:54.120Z,"30 km SE of Minto, Alaska",earthquake,,0.7,,,automatic,ak,ak
+2022-12-29T02:41:39.770Z,34.9138333,-119.5675,7.8,0.88,ml,12,99,0.09209,0.18,ci,ci40150943,2022-12-29T02:45:13.042Z,"22km SW of Maricopa, CA",earthquake,0.48,1.52,0.145,6,automatic,ci,ci
+2022-12-29T02:17:03.610Z,19.179666519165,-155.503494262695,32.8300018310547,2.0999999,md,26,230,,0.119999997,hv,hv73285952,2022-12-29T02:22:33.730Z,"3 km SW of P?hala, Hawaii",earthquake,0.77,0.970000029,2.33999991,4,automatic,hv,hv
