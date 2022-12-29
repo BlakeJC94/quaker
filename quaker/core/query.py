@@ -24,7 +24,6 @@ class _FieldHelper:
         field_docs = {}
         field_names = list(cls.fields.keys())
         for line in doc.split("\n"):
-            print(line)
             for name in field_names:
                 if name + ":" in line:
                     field_names.remove(name)
@@ -146,7 +145,7 @@ class _QueryTime(_BaseQuery):
             try:
                 dt.fromisoformat(time_value)
             except Exception as exc:
-                raise ValueError(f"Invalid time given for {time_value}") from exc
+                raise ValueError(f"Invalid time given (received {time_value})") from exc
 
 
 @dataclass
