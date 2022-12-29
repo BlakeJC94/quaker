@@ -170,19 +170,19 @@ def get_last_param(download: Request, file_format: str, order: str) -> str:
     if file_format in ["kml", "xml", "quakeml"]:
         raise NotImplementedError()
 
-    reversed_clipped_content = download.content[::-1].removeprefix(b'\n')
+    reversed_clipped_content = download.content[::-1].removeprefix(b"\n")
     reversed_last_row = reversed_clipped_content.split(b"\n")[0]
     last_row = reversed_last_row[::-1]
 
     if file_format in ["csv", "text"]:
         index = 0 if order == "time" else 4
         delim = b"," if file_format == "csv" else b"|"
-        last_param = last_row.split(delim)[index]
+        last_param = last_row.split(delim)[index].decode().removesuffix("Z")
 
     if file_format == "geojson":
         index = "time" if order == "time" else "mag"
-        last_param = str(re.search(f"\"{index}\":([^,]+)", last_row.decode("utf-8"))[1])
-        if index == 'time':
+        last_param = str(re.search(f'"{index}":([^,]+)', last_row.decode("utf-8"))[1])
+        if index == "time":
             last_param = datetime.fromtimestamp(int(last_param) * 1e-3, tz=UTC).isoformat()
 
     return last_param

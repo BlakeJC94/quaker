@@ -1,81 +1,185 @@
 """Classes and methods for representation of queries."""
-import logging
-from dataclasses import dataclass, asdict, field, fields
+from abc import ABC, abstractproperty
+import re
+from dataclasses import dataclass, fields, asdict, Field
 from datetime import datetime as dt
-from typing import Union, get_origin, get_args
-
-logger = logging.getLogger(__name__)
-
-
-def is_valid_time(time: str):
-    valid = True
-    try:
-        dt.fromisoformat(time)
-    except ValueError:
-        valid = False
-    return valid
+from inspect import getdoc, getmro
+from typing import Optional, get_args, Any, List, Dict
 
 
-ALLOWED_VALUES = dict(
-    format=lambda v: v in ["csv", "geojson", "text"],  # TODO
-    endtime=is_valid_time,
-    starttime=is_valid_time,
-    updatedafter=is_valid_time,
-    minlatitude=lambda v: -90 <= v <= 90,
-    minlongitude=lambda v: -360 <= v <= 360,
-    maxlatitude=lambda v: -90 <= v <= 90,
-    maxlongitude=lambda v: -360 <= v <= 360,
-    latitude=lambda v: -90 <= v <= 90,
-    longitude=lambda v: -180 <= v <= 180,
-    maxradius=lambda v: 0 <= v <= 180,
-    maxradiuskm=lambda v: 0 <= v <= 20001.6,
-    includedeleted=lambda v: v.strip().lower() in ["true", "false", "only"],
-    limit=lambda v: 1 <= v <= 20000,
-    maxdepth=lambda v: -100 <= v <= 1000,
-    mindepth=lambda v: -100 <= v <= 1000,
-    offest=lambda v: v >= 1,
-    orderby=lambda v: v in ["time", "time-asc", "magnitude", "magnitude-asc"],
-    alertlevel=lambda v: v in ["green", "yellow", "orange", "red"],
-    kmlcolorby=lambda v: v in ["age", "depth"],
-    maxcdi=lambda v: 0 <= v <= 12,
-    maxgap=lambda v: 0 <= v <= 360,
-    maxmmi=lambda v: 0 <= v <= 12,
-    mincdi=lambda v: 0 <= v <= 12,
-    minfelt=lambda v: v >= 1,
-    mingap=lambda v: 0 <= v <= 360,
-    reviewstatus=lambda v: v in ["all", "automatic", "reviewed"],
-)
+class _FieldHelper:
+    """Mixin for generating metadata for a dataclass."""
+
+    @classmethod
+    @property
+    def fields(cls) -> Dict[str, Field]:
+        return {f.name: f for f in fields(cls)}
+
+    @classmethod
+    @property
+    def field_docs(cls):
+        _, doc = cls.__doc__.split("Args:", 1)
+        doc = doc.strip().replace("\n" + " " * 12, " ")  # TODO replace this with regex
+
+        field_docs = {}
+        field_names = list(cls.fields.keys())
+        for line in doc.split("\n"):
+            for name in field_names:
+                if name + ":" in line:
+                    field_names.remove(name)
+                    _, field_doc = line.split(":", 1)
+                    field_docs[name] = field_doc.strip()
+                    break
+
+        return field_docs
+
+    @classmethod
+    @property
+    def field_types(cls):
+        field_types = {}
+        for name, f in cls.fields.items():
+            if callable(f.type) and not hasattr(f.type, "__args__"):
+                f_type = f.type
+            else:
+                f_types = get_args(f.type)
+                f_type = next(t for t in f_types if t is not None and callable(t))
+            field_types[name] = f_type
+
+        return field_types
+
+
+class _FieldChecker:
+    def assert_fields_ordered(self, min_field_name, max_field_name):
+        min_field_value = getattr(self, min_field_name)
+        max_field_value = getattr(self, max_field_name)
+        if min_field_value is not None and max_field_value is not None:
+            assert min_field_value < max_field_value, (
+                f"{min_field_name} ({min_field_value}) is larger than "
+                f"{max_field_name} ({max_field_value})."
+            )
+
+    def assert_fields_bounded(self, field_names, min_value=None, max_value=None):
+        for field_name in field_names:
+            field_value = getattr(self, field_name)
+            if field_value is not None:
+                assert (
+                    min_value is None or min_value <= field_value
+                ), f"{field_name} is less than {min_value}."
+                assert (
+                    max_value is None or field_value <= max_value
+                ), f"{field_name} is greater than {max_value}."
+
+    def assert_fields_mutually_exclusive(self, field_names):
+        n_values_not_none = sum(
+            int(getattr(self, field_name) is not None) for field_name in field_names
+        )
+        assert n_values_not_none <= 1, f"Only one of {field_names} can be accepted."
+
+    def assert_field_allowed_values(self, field_name, allowed_values):
+        field_value = getattr(self, field_name)
+        assert field_value is None or field_value in allowed_values, (
+            f"Invalid {field_name} ({field_value}), " f"must be one of {allowed_values}."
+        )
 
 
 @dataclass
-# TODO add support for kml
-# TODO add support for xml and quakeml
-class Query:  # pylint: disable=too-many-instance-attributes
-    """Class for managing inputs for queries
+class _BaseQuery(_FieldHelper, _FieldChecker):
+    """Base dataclass used to resolve multiple init and post-init calls in classes that inherit
+    from multiple dataclasses.
 
-    API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
+    Each component parent dataclass should inherit from this class. If component needs a
+    __post_init__, it should call super().__post_init__ to ensure that the calls are chained.
+    """
 
-    NOTE: All times use ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed.
-    NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
+    def __post_init__(self):
+        """Auto-typecast fields as their appropriate types."""
+        for field_name in self.fields:
+            value = getattr(self, field_name)
+            if value is None:
+                continue
+            field_type = self.field_types.get(field_name)
+            if not isinstance(value, field_type) and callable(field_type):
+                setattr(self, field_name, field_type(value))
+
+    @classmethod
+    @property
+    def name(cls) -> str:
+        name = cls.__name__.removeprefix("_").removeprefix("Query")
+        name = re.sub(r"(\w)([A-Z])", r"\1 \2", name)
+        name_components = name.split(" ")
+        name = name_components[0] + " (" + " ".join(name_components[1:]) + ")"
+        return name.lower().removesuffix(" ()")
+
+    def __str__(self):
+        out = self.__class__.__name__ + "("
+        for key, value in asdict(self).items():
+            if value is not None:
+                out += "\n" + 4 * " " + f"{key}: {str(value)}"
+        out += "\n)"
+        return out
+
+
+@dataclass
+class _QueryTime(_BaseQuery):
+    """Query parameters.
 
     Args:
-        [Format]
-        format: Specify the output format (only "csv", "geojson", and "text" supported for now.
-            kml", "quakeml", and "xml" to be added in upcoming release).
-
         [Time]
         endtime: Limit to events on or before the specified end time.
         starttime: Limit to events on or after the specified start time.
         updatedafter: Limit to events updated after the specified time.
+    """
 
+    starttime: Optional[str] = None
+    endtime: Optional[str] = None
+    updatedafter: Optional[str] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        for time_field in ["starttime", "endtime", "updatedafter"]:
+            self.check_time_field_is_valid(time_field)
+
+    def check_time_field_is_valid(self, field_name):
+        time_value = getattr(self, field_name)
+        if time_value is not None:
+            try:
+                dt.fromisoformat(time_value)
+            except Exception as exc:
+                raise ValueError(f"Invalid time given (received {time_value})") from exc
+
+
+@dataclass
+class _QueryLocationRectangle(_BaseQuery):
+    """Query parameters for rectangle location.
+
+    Args:
         [Location - rectangle]
-        minlatitude: Limit to events with a latitude larger than the specified minimum [-90, 90].
+        minlatitude: Limit to events with a latitude larger than the specified minimum [-90, 90).
         minlongitude: Limit to events with a longitude larger than the specified minimum [-360,
-            360].
-        maxlatitude: Limit to events with a latitude smaller than the specified maximum [-90, 90].
+            360).
+        maxlatitude: Limit to events with a latitude smaller than the specified maximum [-90, 90).
         maxlongitude: Limit to events with a longitude smaller than the specified maximum [-360,
-            360].
+            360).
+    """
 
+    minlatitude: Optional[float] = None
+    minlongitude: Optional[float] = None
+    maxlatitude: Optional[float] = None
+    maxlongitude: Optional[float] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.assert_fields_bounded(["minlatitude", "maxlatitude"], -90, 90)
+        self.assert_fields_bounded(["minlongitude", "maxlongitude"], -360, 360)
+        self.assert_fields_ordered("minlatitude", "maxlatitude")
+        self.assert_fields_ordered("minlongitude", "maxlongitude")
+
+
+@dataclass
+class _QueryLocationCircle(_BaseQuery):
+    """Query parameters for location (circle).
+
+    Args:
         [Location - circle]
         latitude: Specify the latitude to be used for a radius search [-90, 90].
         longitude: Specify the longitude to be used for a radius search [-180, 180].
@@ -83,7 +187,27 @@ class Query:  # pylint: disable=too-many-instance-attributes
             geographic point defined by the latitude and longitude parameters [0, 180].
         maxradiuskm: Limit to events within the specified maximum number of kilometers from the
             geographic point defined by the latitude and longitude parameters [0, 20001.6].
+    """
 
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    maxradius: Optional[float] = None
+    maxradiuskm: Optional[float] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.assert_fields_mutually_exclusive(["maxradius", "maxradiuskm"])
+        self.assert_fields_bounded(["maxradius"], 0, 180)
+        self.assert_fields_bounded(["maxradiuskm"], 0, 20001.6)
+        self.assert_fields_bounded(["latitude"], -90, 90)
+        self.assert_fields_bounded(["longitude"], -180, 180)
+
+
+@dataclass
+class _QueryOther(_BaseQuery):
+    """Query parameters for other.
+
+    Args:
         [Other]
         catalog: Limit to events from a specified catalog.
         contributor: Limit to events contributed by a specified contributor.
@@ -101,7 +225,41 @@ class Query:  # pylint: disable=too-many-instance-attributes
         minmagnitude: Limit to events with a magnitude larger than the specified minimum.
         offset: Return results starting at the event count specified, starting at 1.
         orderby: Order the results (one of "time", "time-asc", "magnitude", or "magnitude-asc").
+    """
 
+    catalog: Optional[str] = None
+    contributor: Optional[str] = None
+    eventid: Optional[str] = None
+    includeallmagnitudes: Optional[bool] = None
+    includeallorigins: Optional[bool] = None
+    includedeleted: Optional[str] = None
+    includesuperceded: Optional[bool] = None
+    limit: Optional[int] = None
+    maxdepth: Optional[float] = None
+    maxmagnitude: Optional[float] = None
+    mindepth: Optional[float] = None
+    minmagnitude: Optional[float] = None
+    offset: Optional[int] = None
+    orderby: Optional[str] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.assert_fields_mutually_exclusive(["includedeleted", "includesuperceded"])
+        self.assert_field_allowed_values(
+            "orderby", ["time", "time-asc", "magnitude", "magnitude-asc"]
+        )
+        self.assert_field_allowed_values("includedeleted", ["true", "false", "only"])
+        self.assert_fields_ordered("minmagnitude", "maxmagnitude")
+        self.assert_fields_ordered("mindepth", "maxdepth")
+        self.assert_fields_bounded(["minmagnitude", "maxmagnitude"], 0, 12)
+        self.assert_fields_bounded(["offset"], 1, None)
+
+
+@dataclass
+class _QueryExtensions(_BaseQuery):
+    """Query parameters for other.
+
+    Args:
         [Extensions]
         alertlevel: Limit to events with a specific PAGER alert level (one of "green", "yellow",
             "orange", or "red").
@@ -126,120 +284,139 @@ class Query:  # pylint: disable=too-many-instance-attributes
             "automatic", or "reviewed").
     """
 
-    # Format
-    format: str = field(default=None)
-    # Time
-    endtime: str = field(default=None)
-    starttime: str = field(default=None)
-    updatedafter: str = field(default=None)
-    # Location - rectangle
-    minlatitude: float = field(default=None)
-    minlongitude: float = field(default=None)
-    maxlatitude: float = field(default=None)
-    maxlongitude: float = field(default=None)
-    # Location - circle
-    latitude: float = field(default=None)
-    longitude: float = field(default=None)
-    maxradius: float = field(default=None)
-    maxradiuskm: float = field(default=None)
-    # Other
-    catalog: str = field(default=None)
-    contributor: str = field(default=None)
-    eventid: str = field(default=None)
-    includeallmagnitudes: bool = field(default=None)
-    includeallorigins: bool = field(default=None)
-    includedeleted: str = field(default=None)
-    includesuperceded: bool = field(default=None)
-    limit: int = field(default=None)
-    maxdepth: float = field(default=None)
-    maxmagnitude: float = field(default=None)
-    mindepth: float = field(default=None)
-    minmagnitude: float = field(default=None)
-    offset: int = field(default=None)
-    orderby: str = field(default=None)
-    # Extensions
-    alertlevel: str = field(default=None)
-    callback: str = field(default=None)
-    eventtype: str = field(default=None)
-    jsonerror: bool = field(default=None)
-    kmlanimated: bool = field(default=None)
-    kmlcolorby: str = field(default=None)
-    maxcdi: float = field(default=None)
-    maxgap: float = field(default=None)
-    maxmmi: float = field(default=None)
-    maxsig: int = field(default=None)
-    mincdi: str = field(default=None)
-    minfelt: int = field(default=None)
-    mingap: float = field(default=None)
-    minsig: int = field(default=None)
-    producttype: str = field(default=None)
-    productcode: str = field(default=None)
-    reviewstatus: str = field(default=None)
+    alertlevel: Optional[str] = None
+    callback: Optional[str] = None
+    eventtype: Optional[str] = None
+    jsonerror: Optional[bool] = None
+    kmlanimated: Optional[bool] = None
+    kmlcolorby: Optional[str] = None
+    maxcdi: Optional[float] = None
+    maxgap: Optional[float] = None
+    maxmmi: Optional[float] = None
+    maxsig: Optional[int] = None
+    mincdi: Optional[float] = None
+    minfelt: Optional[int] = None
+    mingap: Optional[float] = None
+    minsig: Optional[int] = None
+    producttype: Optional[str] = None
+    productcode: Optional[str] = None
+    reviewstatus: Optional[str] = None
 
     def __post_init__(self):
+        super().__post_init__()
+        self.assert_field_allowed_values("alertlevel", ["green", "yellow", "orange", "red"])
+        self.assert_field_allowed_values("kmlcolorby", ["age", "depth"])
+        self.assert_field_allowed_values("reviewstatus", ["all", "automatic", "reviewed"])
 
-        # TODO remove this artificial guard when better support is added
-        if self.format is None:
-            self.format = "csv"
-        elif self.format not in ["csv", "text", "geojson"]:
-            logger.warning(f"Format {self.format} not implemented yet, changing to 'csv'")
-            self.format = "csv"
+        self.assert_fields_bounded(["mingap", "maxgap"], 0, 360)
+        self.assert_fields_bounded(["mincdi", "maxcdi"], 0, 12)
 
-        # Auto-typecast input values
-        bad_values = {}
-        for query_field in fields(self):
-            name = query_field.name
-            val_type = query_field.type
-            value = getattr(self, name)
+        self.assert_fields_ordered("mingap", "maxgap")
+        self.assert_fields_ordered("mincdi", "maxcdi")
 
-            # Handle generic subtypes, get first parameterised type
-            if get_origin(val_type) is not None:
-                val_type = get_args(val_type)
 
-            # Typecast values
-            if value is not None and not isinstance(value, val_type):
-                if not callable(val_type):
-                    val_type = val_type[0]
-                setattr(self, name, val_type(value))
+@dataclass
+class _QueryFormat(_BaseQuery):
+    """Class for managing inputs for queries
 
-            # Ensure conditions on parameters are satisfied
-            if name in ALLOWED_VALUES and value is not None and not ALLOWED_VALUES[name](value):
-                bad_values[name] = value
+    Args:
+        [Format]
+        format: Specify the output format (only "csv", "geojson", and "text" supported for now.
+            kml", "quakeml", and "xml" to be added in upcoming release).
+    """
 
-        if len(bad_values) > 0:
-            for name, value in bad_values.items():
-                logger.error(f"Invalid value for `{name}`, (got {value})")
-            raise AssertionError("Bad values given to query.")
+    format: Optional[str] = None
 
-        assert (
-            self.maxradiuskm is None or self.maxradius is None
-        ), "Only one of `maxradiuskm` and `maxradius` allowed to be specified."
+    def __post_init__(self):
+        super().__post_init__()
+        # TODO Add 'xml', 'quakeml', 'kml'
+        self.assert_field_allowed_values("format", ["csv", "geojson", "text"])
 
-        if self.includesuperceded is not None:
-            assert (
-                self.eventid is not None
-            ), "Parameter `includesuperceded` only works when `eventid` is given."
 
-        if self.includedeleted is not None:
-            includedeleted_is_bool = (self.includedeleted.strip().lower()[0] in ['t', 'f'])
-            post_type = bool if includedeleted_is_bool else str
-            self.includedeleted = post_type(self.includedeleted)
+# TODO usage docs
+class _CompositeFieldDocumenter(ABC):
+    @classmethod
+    @abstractproperty
+    def doc_head(cls) -> str:
+        return ""
 
-        self._check_format_specific_parameters(["includedeleted"], ["csv", "geojson"])
-        self._check_format_specific_parameters(["callback", "jsonerror"], ["geojson"])
-        self._check_format_specific_parameters(["kmlcolorby", "kmlanimated"], ["kml"])
+    @classmethod
+    @abstractproperty
+    def doc_body(cls) -> str:
+        return ""
 
-    def _check_format_specific_parameters(self, parameters, formats):
-        for name in parameters:
-            if getattr(self, name) is not None:
-                assert (
-                    self.format in formats
-                ), f"Parameter `{name}` only supported for {', '.join(formats)}."
+    @classmethod
+    def generate_doc(cls) -> str:
+        doc = "\n\n".join(
+            [
+                cls.doc_head.removesuffix("\n"),
+                cls.doc_body.removesuffix("\n"),
+                "Args:",
+            ]
+        )
+        for class_name in cls.component_classes:
+            class_doc = getdoc(class_name)
+            _, args_doc = class_doc.split("Args:", 1)
+            doc = "\n".join([doc, args_doc])
+        return doc
 
-    def __str__(self):
-        out = self.__class__.__name__ + "("
-        for key, value in asdict(self).items():
-            if value is not None:
-                out += "\n" + 4 * " " + f"{key}: {str(value)}"
-        out += "\n)"
-        return out
+    @classmethod
+    @property
+    def component_classes(cls) -> List[Any]:
+        return [
+            class_name
+            for class_name in getmro(cls)
+            if class_name
+            not in [
+                cls,
+                _BaseQuery,
+                ABC,
+                object,
+                _FieldHelper,
+                _FieldChecker,
+                _CompositeFieldDocumenter,
+            ]
+        ]
+
+
+@dataclass
+class Query(
+    _CompositeFieldDocumenter,
+    _QueryFormat,
+    _QueryTime,
+    _QueryLocationRectangle,
+    _QueryLocationCircle,
+    _QueryOther,
+    _QueryExtensions,
+):
+    """Class for managing inputs for queries (**documentation dynamically generated below**)."""
+
+    @classmethod
+    @property
+    def __doc__(cls):
+        return cls.generate_doc()
+
+    @classmethod
+    @property
+    def doc_head(cls):
+        return """Class for managing inputs for queries."""
+
+    @classmethod
+    @property
+    def doc_body(cls):
+        return """API Docs: https://earthquake.usgs.gov/fdsnws/event/1/
+
+        NOTE: All times use ISO8601 Date/Time format (yyyy-mm-ddThh:mm:ss). UTC is assumed.
+        NOTE: Minimum/maximum longitude values may cross the date line at 180 or -180
+        """
+
+    def dict(self, include_nones: bool = False) -> Dict[str, Any]:
+        """Convert the query object into a dictionary.
+
+        Args:
+            include_nones: Whether to include keys that have `None` value.
+        """
+        query_dict = asdict(self)
+        if include_nones:
+            return query_dict
+        return {k: v for k, v in query_dict.items() if v is not None}

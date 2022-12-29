@@ -1,0 +1,6 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2022-12-29T01:51:00.700Z,38.7936668,-122.7663345,1.54,1.06,md,16,71,0.008663,0.01,nc,nc73826201,2022-12-29T02:30:11.780Z,"2km NNW of The Geysers, CA",earthquake,0.21,0.42,0.26,16,automatic,nc,nc
+2022-12-29T01:46:48.330Z,18.0535,-67.113,20.44,2.31,md,15,174,0.04691,0.12,pr,pr71389493,2022-12-29T02:04:47.000Z,"3 km S of Monte Grande, Puerto Rico",earthquake,0.5,0.45,0.11067431682593,7,reviewed,pr,pr
+2022-12-29T01:32:21.950Z,38.7551651,-122.731163,0.78,0.8,md,9,143,0.008092,0.03,nc,nc73826196,2022-12-29T02:18:11.715Z,"3km SE of The Geysers, CA",earthquake,0.35,0.48,0.3,8,automatic,nc,nc
+2022-12-29T01:25:03.750Z,38.8310013,-122.8693314,3.15,0.75,md,7,116,0.008999,0.01,nc,nc73826186,2022-12-29T01:54:12.569Z,"12km WNW of The Geysers, CA",earthquake,0.46,0.95,0.29,8,automatic,nc,nc
+2022-12-29T01:24:20.540Z,38.8230019,-122.7983322,1.4,0.3,md,7,109,0.00918,0.01,nc,nc73826181,2022-12-29T01:42:14.503Z,"6km NW of The Geysers, CA",earthquake,0.57,1.27,0.15,7,automatic,nc,nc

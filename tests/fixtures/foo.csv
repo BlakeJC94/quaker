@@ -1,0 +1,16 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2022-12-29T03:10:09.190Z,34.9723333,-118.5925,15.21,1.17,ml,13,180,0.08686,0.23,ci,ci40150951,2022-12-29T03:13:40.653Z,"22km N of Neenach, CA",earthquake,1.03,1.31,0.098,11,automatic,ci,ci
+2022-12-29T03:07:49.650Z,36.5661659,-121.1563339,8.19,1.63,md,12,118,0.02404,0.08,nc,nc73826216,2022-12-29T03:09:27.134Z,"4km NNW of Pinnacles, CA",earthquake,0.41,0.75,0.13,12,automatic,nc,nc
+2022-12-29T03:03:40.978Z,64.9334,-148.9679,16.2,0.8,ml,,,,0.45,ak,ak022godw0dj,2022-12-29T03:13:54.120Z,"30 km SE of Minto, Alaska",earthquake,,0.7,,,automatic,ak,ak
+2022-12-29T02:41:39.770Z,34.9138333,-119.5675,7.8,0.88,ml,12,99,0.09209,0.18,ci,ci40150943,2022-12-29T02:45:13.042Z,"22km SW of Maricopa, CA",earthquake,0.48,1.52,0.145,6,automatic,ci,ci
+2022-12-29T02:17:03.610Z,19.179666519165,-155.503494262695,32.8300018310547,2.0999999,md,26,230,,0.119999997,hv,hv73285952,2022-12-29T02:22:33.730Z,"3 km SW of P?hala, Hawaii",earthquake,0.77,0.970000029,2.33999991,4,automatic,hv,hv
+2022-12-29T02:16:25.700Z,35.2953333,-118.4981667,3.69,1.19,ml,16,58,0.06342,0.19,ci,ci40150935,2022-12-29T02:20:01.646Z,"19km NNW of Tehachapi, CA",earthquake,0.32,0.9,0.172,11,automatic,ci,ci
+2022-12-29T02:11:19.880Z,36.5753326,-121.1531677,7.11,0.98,md,8,122,0.0262,0.03,nc,nc73826211,2022-12-29T03:04:11.988Z,"5km N of Pinnacles, CA",earthquake,0.61,0.78,0.28,6,automatic,nc,nc
+2022-12-29T02:01:41.460Z,19.2220001220703,-155.389663696289,31.3899993896484,2.4,ml,45,151,,0.159999996,hv,hv73285937,2022-12-29T02:07:13.110Z,"9 km ENE of P?hala, Hawaii",earthquake,0.66,0.810000002,2.9,17,automatic,hv,hv
+2022-12-29T02:01:00.860Z,17.95,-66.9675,10.56,2.22,md,6,212,0.07554,0.08,pr,pr71389498,2022-12-29T02:13:14.880Z,"6 km WSW of Guánica, Puerto Rico",earthquake,0.48,0.79,0.0314611286393356,4,reviewed,pr,pr
+2022-12-29T01:51:59.127Z,61.2274,-150.7181,14,1.6,ml,,,,0.74,ak,ak022goczgy0,2022-12-29T01:54:54.880Z,"21 km ENE of Beluga, Alaska",earthquake,,0.2,,,automatic,ak,ak
+2022-12-29T01:51:00.700Z,38.7936668,-122.7663345,1.54,1.06,md,16,71,0.008663,0.01,nc,nc73826201,2022-12-29T02:30:11.780Z,"2km NNW of The Geysers, CA",earthquake,0.21,0.42,0.26,16,automatic,nc,nc
+2022-12-29T01:46:48.330Z,18.0535,-67.113,20.44,2.31,md,15,174,0.04691,0.12,pr,pr71389493,2022-12-29T02:04:47.000Z,"3 km S of Monte Grande, Puerto Rico",earthquake,0.5,0.45,0.11067431682593,7,reviewed,pr,pr
+2022-12-29T01:32:21.950Z,38.7551651,-122.731163,0.78,0.8,md,9,143,0.008092,0.03,nc,nc73826196,2022-12-29T02:18:11.715Z,"3km SE of The Geysers, CA",earthquake,0.35,0.48,0.3,8,automatic,nc,nc
+2022-12-29T01:25:03.750Z,38.8310013,-122.8693314,3.15,0.75,md,7,116,0.008999,0.01,nc,nc73826186,2022-12-29T01:54:12.569Z,"12km WNW of The Geysers, CA",earthquake,0.46,0.95,0.29,8,automatic,nc,nc
+2022-12-29T01:24:20.540Z,38.8230019,-122.7983322,1.4,0.3,md,7,109,0.00918,0.01,nc,nc73826181,2022-12-29T01:42:14.503Z,"6km NW of The Geysers, CA",earthquake,0.57,1.27,0.15,7,automatic,nc,nc

@@ -8,7 +8,7 @@ from quaker.core import Cache
 class TestCache:
     @fixture
     def cache_input(self):
-        return ['aaa', 'bbb', 'ccc']
+        return ["aaa", "bbb", "ccc"]
 
     def test_cache_init(self, cache_input):
         cache = Cache(cache_input)
@@ -17,14 +17,14 @@ class TestCache:
 
     def test_cache_append(self, cache_input):
         cache = Cache(cache_input)
-        new_item = 'ddd'
+        new_item = "ddd"
         cache.append(new_item)
         assert new_item in cache
 
     def test_cache_append_maxlen(self, cache_input):
         maxlen = 3
         cache = Cache(cache_input, maxlen)
-        new_item = 'ddd'
+        new_item = "ddd"
         cache.append(new_item)
         assert new_item in cache
         assert not cache_input[0] in cache
@@ -42,6 +42,3 @@ class TestCache:
         removed = cache.pop()
         assert not removed in cache
         assert removed == cache_input[-1]
-
-
-

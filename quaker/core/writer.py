@@ -86,7 +86,7 @@ def write_json_lines(
         event_id = re.search(r"\"id\":\"([\w\d]+)\"", line)[1]
         if "FeatureCollection" in line:
             header, line = line.split("[", 1)
-            header = header + '['
+            header = header + "["
 
         if "bbox" in line:
             *line, footer = line.split("]", 2)
@@ -97,7 +97,7 @@ def write_json_lines(
             header = None
 
         line = line.removesuffix(",")
-        line = line if footer is not None and write_footer else line + ',\n'
+        line = line if footer is not None and write_footer else line + ",\n"
 
         if event_id not in last_events:
             file.write(line)
@@ -105,7 +105,7 @@ def write_json_lines(
             last_events.append(event_id)
 
         if footer is not None and write_footer:
-            file.write(footer + '\n')
+            file.write(footer + "\n")
             footer = None
 
     return lines_written, last_events
