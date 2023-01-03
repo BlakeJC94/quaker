@@ -2,7 +2,9 @@
 import logging
 import re
 from os import path
-from typing import Iterable, Optional, Tuple, TextIO
+from pathlib import Path
+from typing import Iterable, Optional, Tuple, TextIO, Union
+from abc import ABC, abstractmethod
 
 from requests import Request
 
@@ -12,6 +14,71 @@ from quaker.globals import UPPER_LIMIT
 
 
 logger = logging.getLogger(__name__)
+
+# class Writer:
+#     def __init__(self, )
+
+
+class BaseWriter(ABC):
+    """Base class for object that transform requests into files."""
+
+    def __init__(
+        self,
+        output_file: Union[Path, str],
+        last_events: Optional[Cache],
+    ):
+        self.output_file = str(output_file)
+        self.last_events = last_events or Cache([], maxlen=UPPER_LIMIT)
+
+        self.header_written = False
+
+    def __call__(self, download: Request):
+        error_recived = None
+        mode = "w" if not path.exists(self.output_file) else "a"
+        with open(self.output_file, mode, encoding="utf-8") as file:
+            try:
+                lines_written = self.write_lines(download)
+
+
+            except KeyboardInterrupt:
+                logger.error("Keyboard interrupt recieved, safely closing file.")
+
+            except Exception as error:  # pylint: disable=broad-except
+                logger.error("Unknown error recieved, safely closing file.")
+                error_recived = error
+
+        if error_recived is not None:  # Signal to process that keyboard interrupt was received.
+            raise error_recived
+        ...
+
+    def write_lines(self, download: Request) -> int:
+        lines_written = 0
+        lines = download.iter_lines(decode_unicode=True)
+        if not self.header_written:
+            self.write_header(download)
+        # TODO
+        # lines_written, last_events = write(
+        #     file, lines, last_events, write_header, write_footer
+        # )
+        if lines_written == 0:
+            raise ValueError(f"No lines were written to {self.output_file} from {str(query)}")
+
+
+    @abstractmethod
+    def header(self, download):
+        pass
+
+    @abstractmethod
+    def body(self, download):
+        pass
+
+    @abstractmethod
+    def footer(self, download):
+        pass
+
+
+class CSVWriter(BaseWriter):
+    pass
 
 
 def write_content(
