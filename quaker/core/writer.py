@@ -26,7 +26,7 @@ def write_content(
 
     Args:
         download: Returned response from request.
-        output_file: Location of file to rite results to.
+        output_file: Location of file to write results to.
         query: Metadata for request.
         write_header: Flag controlling whether to write the header to the file.
         write_footer: Flag controlling whether to write the footer to the file.
