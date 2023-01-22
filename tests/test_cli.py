@@ -5,7 +5,7 @@ import pytest
 from quaker.cli import run
 
 
-@mock.patch("quaker.cli.download")
+@mock.patch("quaker.cli.Client.execute")
 @pytest.mark.parametrize("args", ["-h", "--help", "", "download --help"])
 def test_cli_help(mock_download, capsys, args):
     """Test that the help dialog is printed to stderr if given help flag."""
@@ -16,7 +16,7 @@ def test_cli_help(mock_download, capsys, args):
     mock_download.assert_not_called()
 
 
-@mock.patch("quaker.cli.download")
+@mock.patch("quaker.cli.Client.execute")
 @pytest.mark.parametrize(
     "args",
     [
@@ -33,7 +33,7 @@ def test_cli_raise_invalid_args(mock_download, args):
     mock_download.assert_not_called()
 
 
-@mock.patch("quaker.cli.download")
+@mock.patch("quaker.cli.Client.execute")
 def test_cli_empty_query(mock_download):
     args = "download"
     run(args.split())
