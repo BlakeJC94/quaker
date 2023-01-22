@@ -31,7 +31,7 @@ class Client:
             logger.info(f"Directory {parent_dir} doesnt exist, creating.")
             makedirs(parent_dir, exist_ok=True)
 
-    def execute_paginated(self, query: Query):
+    def execute(self, query: Query):
         error_recived = None
         try:
             # TODO Make run_query a client method
@@ -45,7 +45,7 @@ class Client:
         if error_recived is not None:
             raise error_recived
 
-    def execute(self, query: Query):
+    def lookup(self, query: Query):
         out = None
         with self.session as session:
             for attempts in range(MAX_ATTEMPTS):
