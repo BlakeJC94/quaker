@@ -23,19 +23,21 @@ METAVARS = {
 
 
 def run(cli_input: Optional[List[str]] = None) -> int:
+    exit_code = 0
     parser = get_parser()
     query_input = parser.parse_args(cli_input)
     if all(var is None for _, var in vars(query_input).items()):
         parser.parse_args(["-h"])
+
     # pylint: disable=unsupported-membership-test
     query = Query(**{k: v for k, v in vars(query_input).items() if k in Query.fields})
     if query_input.mode == "download":
-        download(output_file="/dev/stdout", query=query)
+        download(query, output_file="/dev/stdout")
     else:
         logger.error("Only 'download' mode is supported for now")
-        # logger.error("Invalid mode selected")
-        return 1
-    return 0
+        exit_code = 1
+
+    return exit_code
 
 
 def get_parser() -> argparse.ArgumentParser:
