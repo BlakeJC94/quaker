@@ -33,12 +33,13 @@ class Client:
 
         error_recived = None
         try:
-            # TODO Make run_query a client method
+            # TODO Make run_query a client method (execute_paginiated)
             run_query(query, self.session, self.output_file)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
             logger.error(f"Unknown error recieved ({repr(error)}), safely closing session.")
+            # TODO cleanup output_file
             error_recived = error
 
         if error_recived is not None:
