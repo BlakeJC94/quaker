@@ -1,7 +1,7 @@
 import logging
-from os import path, makedirs
+from os import PathLike, path, makedirs
 from time import sleep
-from typing import Union
+from typing import Optional, Union
 from requests.sessions import Session
 from quaker.core.query import Query
 from quaker.core.run import run_query
@@ -11,10 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class Client:
-    def __init__(self, output_file: str):
-        self._validate_output_file(output_file)
-        self.output_file = output_file
-
+    def __init__(self):
         self.session = Session()
 
     @staticmethod
@@ -31,7 +28,9 @@ class Client:
             logger.info(f"Directory {parent_dir} doesnt exist, creating.")
             makedirs(parent_dir, exist_ok=True)
 
-    def execute(self, query: Query):
+    def execute(self, query: Query, output_file: PathLike):
+        self._validate_output_file(output_file)
+
         error_recived = None
         try:
             # TODO Make run_query a client method

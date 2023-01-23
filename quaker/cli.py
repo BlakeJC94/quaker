@@ -4,7 +4,7 @@ from typing import Optional, List
 
 from . import (
     __version__,
-    download,
+    Client,
     Query,
 )
 
@@ -32,7 +32,8 @@ def run(cli_input: Optional[List[str]] = None) -> int:
     # pylint: disable=unsupported-membership-test
     query = Query(**{k: v for k, v in vars(query_input).items() if k in Query.fields})
     if query_input.mode == "download":
-        download(query, output_file="/dev/stdout")
+        client = Client()
+        client.execute(query, output_file="/dev/stdout")
     else:
         logger.error("Only 'download' mode is supported for now")
         exit_code = 1
