@@ -1,6 +1,5 @@
 from pkg_resources import get_distribution
 
-from .download import download
 from .log import setup_logging
 from .core.query import Query
 from .core.client import Client
