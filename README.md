@@ -113,17 +113,18 @@ For more details on the available query parameters, use `quaker --help` or view 
 
 Using the python API is also fairly straight-forward:
 ```python
->>> from quaker import Query, download
+>>> from quaker import Query, Client
+>>> client = Client()
 # An empty query defaults to all events in the last 30 days
 >>> events_from_last_30_days = Query()
->>> download(events_from_last_30_days, "./path/to/example/output_1.csv")
+>>> client.execute(events_from_last_30_days, "./path/to/example/output_1.csv")
 # Large queries can also be handled
 >>> events_from_last_5_months = Query(
 ...     format="csv",
 ...     starttime="2022-05-01",
 ...     endtime="2022-10-01",
 ... )
->>> download(events_from_last_5_months, "./path/to/example/output_2.csv")
+>>> client.execute(events_from_last_5_months, "./path/to/example/output_2.csv")
 # You can filter results by location using the API
 >>> fields = {
 ...     "format": "csv",
@@ -135,7 +136,7 @@ Using the python API is also fairly straight-forward:
 ...     "minmagnitude": 3.0,
 ... }
 >>> events_in_august_in_120km_within_tokyo_above_mag_3 = Query(**fields)
->>> download(events_in_august_in_120km_within_tokyo_above_mag_3, "./path/to/example/output_3.csv")
+>>> client.execute(events_in_august_in_120km_within_tokyo_above_mag_3, "./path/to/example/output_3.csv")
 # See `help(Query)` and https://earthquake.usgs.gov/fdsnws/event/1/ for more details
 ```
 
