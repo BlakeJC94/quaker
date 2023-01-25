@@ -5,7 +5,7 @@ from typing import Optional, Union
 from requests.sessions import Session
 from quaker.core.query import Query
 from quaker.core.run import run_query
-from quaker.globals import BASE_URL, MAX_ATTEMPTS, RESPONSE_NOT_FOUND, UPPER_LIMIT
+from quaker.globals import BASE_URL, MAX_ATTEMPTS, RESPONSE_BAD_REQUEST, RESPONSE_NO_CONTENT, RESPONSE_NOT_FOUND, RESPONSE_OK, UPPER_LIMIT
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 class Client:
     def __init__(self):
         self.session = Session()
+        self.history = []
 
     @staticmethod
     def _validate_output_file(output_file: str):
@@ -95,7 +96,9 @@ class Client:
             ...
         ...
 
-    def _execute(self, query: Query):  # Based on get_data
+    def _execute(self, query: Query) -> Result:  # Based on get_data
+        self.history.append(query)
+
         out = None
         with self.session as session:
             for attempts in range(MAX_ATTEMPTS):
