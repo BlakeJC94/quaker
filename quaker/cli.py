@@ -7,6 +7,7 @@ from . import (
     Client,
     Query,
 )
+from .globals import STDOUT
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ def run(cli_input: Optional[List[str]] = None) -> int:
     query = Query(**{k: v for k, v in vars(query_input).items() if k in Query.fields})
     if query_input.mode == "download":
         client = Client()
-        client.execute(query, output_file="/dev/stdout")
+        client.execute(query, output_file=STDOUT)
     else:
         logger.error("Only 'download' mode is supported for now")
         exit_code = 1

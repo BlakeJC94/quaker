@@ -1,6 +1,7 @@
 """Global values used throughout quaker."""
 BASE_URL = "https://earthquake.usgs.gov/fdsnws/event/1/query"
 
+STDOUT = "/dev/stdout"
 ISO8601_DT_FORMAT = "%Y-%m-%dT%H:%M:%S.%f"
 
 RESPONSE_BAD_REQUEST = 400

@@ -5,7 +5,17 @@ from typing import Optional, Union
 from requests.sessions import Session
 from quaker.core.query import Query
 from quaker.core.run import run_query
-from quaker.globals import BASE_URL, MAX_ATTEMPTS, RESPONSE_BAD_REQUEST, RESPONSE_NO_CONTENT, RESPONSE_NOT_FOUND, RESPONSE_OK, UPPER_LIMIT
+from quaker.globals import (
+    BASE_URL,
+    MAX_ATTEMPTS,
+    RESPONSE_BAD_REQUEST,
+    RESPONSE_NO_CONTENT,
+    RESPONSE_NOT_FOUND,
+    RESPONSE_OK,
+    UPPER_LIMIT,
+    STDOUT,
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +26,8 @@ class Client:
         self.history = []
 
     @staticmethod
-    def _validate_output_file(output_file: str):
-        if output_file == "/dev/stdout":
+    def _validate_output_file(output_file: PathLike):
+        if output_file == STDOUT:
             return
 
         output_file = path.abspath(output_file)
