@@ -39,6 +39,11 @@ class Client:
             logger.info(f"Directory {parent_dir} doesnt exist, creating.")
             makedirs(parent_dir, exist_ok=True)
 
+    @staticmethod
+    def cleanup_output(output_file: PathLike):
+        if output_file != STDOUT and path.exists(output_file):
+            remove(output_file)
+
     def execute(self, query: Query, output_file: PathLike):
         self._validate_output_file(output_file)
 
@@ -50,8 +55,9 @@ class Client:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
             logger.error(f"Unknown error recieved ({repr(error)}), safely closing session.")
-            # TODO cleanup output_file
             error_recived = error
+        finally:
+            self.cleanup_output(output_file)
 
         if error_recived is not None:
             raise error_recived
