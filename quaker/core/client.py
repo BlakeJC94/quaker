@@ -48,23 +48,43 @@ class Client:
     def _execute_paginiated(self, query: Query, output_file: PathLike):
         has_next_page = True
 
+        # TODO create writer class (resolve format to subclass)
+        writer = Writer(output_file, format=query.format)
+
         # TODO Keep track of number of records in loop
         # TODO implement __len__ method for result
         if query.limit is not None:
             raise UserWarning("query.limit not supported yet")
             # self._execute()
 
-        # TODO Add history attr for client
-
         _index = 0
         while has_next_page:
             if _index > 5:
                 raise RecursionError()
-            # Set limit
-            # Exec query
+
+            query.limit = UPPER_LIMIT
+            result = self._execute(query)
+            status = result.download.status_code
+
             # Break if empty
+            if status == RESPONSE_NO_CONTENT:
+                logger.info("No data found, exiting loop")
+                break
+
+            # Crash on unexpected errors
+            if status != RESPONSE_OK:
+                if status == RESPONSE_BAD_REQUEST:
+                    msg = f"Invalid query given query ({RESPONSE_BAD_REQUEST})."
+                else:
+                    msg = f"Unexpected response code on query ({status})."
+                logger.error(msg)
+                raise RuntimeError(msg)
+
             # Write results
-            # If output doesn't exist, write header
+            # TODO add writer methods on __call__
+            # TODO writer logic, eg If output doesn't exist, write header
+            writer(result)
+
             # Get order/last field
             # Update query
             # Goto start
