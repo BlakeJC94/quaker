@@ -253,6 +253,7 @@ class _QueryOther(_BaseQuery):
         self.assert_fields_ordered("mindepth", "maxdepth")
         self.assert_fields_bounded(["minmagnitude", "maxmagnitude"], 0, 12)
         self.assert_fields_bounded(["offset"], 1, None)
+        self.assert_fields_bounded(["limit"], 0, None)
 
 
 @dataclass
