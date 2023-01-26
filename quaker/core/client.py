@@ -63,16 +63,19 @@ class Client:
             download = self._execute(query)
             status = download.status_code
 
-            # Break if empty
-            if status == RESPONSE_NO_CONTENT:
-                logger.info("No data found, exiting loop")
-                has_next_page = False
+            if not download.ok:
+                status = download.status_code
 
-            # Crash on unexpected errors
-            if status != RESPONSE_OK:
+                # Break if empty
+                if status == RESPONSE_NO_CONTENT:
+                    logger.info("No data found, exiting loop")
+                    has_next_page = False
+
+                # Crash on unexpected errors
                 msg = f"Unexpected response code on query ({status})."
                 if status == RESPONSE_BAD_REQUEST:
-                    msg = f"Invalid query given query ({RESPONSE_BAD_REQUEST})."
+                    msg = f"Invalid query ({RESPONSE_BAD_REQUEST})."
+
                 logger.error(msg)
                 raise RuntimeError(msg)
 
