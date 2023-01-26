@@ -111,6 +111,26 @@ class Client:
 
             ...
         ...
+    def _next_page(
+        self,
+        query: Query,
+        order_params: Tuple[str],
+        limit: Optional[int] = None,
+    ) -> Query:
+        last_time, last_magnitude = order_params
+        next_fields = {
+            "time": ("endtime", last_time),
+            "time-asc": ("starttime", last_time),
+            "magnitude": ("maxmagnitude", last_magnitude),
+            "magnitude-asc": ("minmagnitude", last_magnitude),
+        }
+        next_name, next_value = next_fields[query.orderby]
+
+        query_dict = query.dict()
+        query_dict[next_name] = next_value
+        query_dict["limit"] = limit
+
+        return Query(**query_dict)
 
     def _execute(self, query: Query) -> Request:  # Based on get_data
         self.history.append(query)
