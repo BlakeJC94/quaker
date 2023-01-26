@@ -70,13 +70,16 @@ class CSVParser(Parser, BaseParser):
         self.delimiter = ","
 
     def header(self, lines):
+        # logger.info("header")
         return lines[:1]
 
     def records(self, lines):
-        return lines[1:]
+        return [l for l in lines[1:] if len(l) > 0]
 
     def event_record(self, line):
-        record_values = line.split(self.delimiter)[11]
+        record_values = line.split(self.delimiter)
+        if len(record_values) < 11:
+            breakpoint()
         return {
             "event_id": record_values[11],
             "event_time": record_values[0],

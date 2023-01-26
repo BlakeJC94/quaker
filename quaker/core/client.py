@@ -34,8 +34,8 @@ class Client:
 
         error_recived = None
         try:
-            run_query(query, self.session, self.output_file)  # TODO deprecate
-            # self._execute_paginiated(query, writer)
+            # run_query(query, self.session, self.output_file)  # TODO deprecate
+            self._execute_paginiated(query, writer)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
@@ -54,14 +54,16 @@ class Client:
         has_next_page = True
         header, body, footer = [], [], []
         while has_next_page:
+            logger.info(f"{_page_index=}")
             if _page_index > 5:
                 raise RecursionError()
 
             limit = query.limit
             query.limit = UPPER_LIMIT if limit is None else min(limit, UPPER_LIMIT)
 
+            logger.info("_execute")
             download = self._execute(query)
-            status = download.status_code
+            # breakpoint()
 
             if not download.ok:
                 status = download.status_code
@@ -79,20 +81,26 @@ class Client:
                 logger.error(msg)
                 raise RuntimeError(msg)
 
+            logger.info("parse response")
             header, body, footer = parser(download)
             if _page_index == 0:
+                logger.info("header")
                 writer(header)
 
+            logger.info("body")
             writer(body)
             if len(body) == 0:
                 logger.warning("No new records found on page, exiting loop")
                 has_next_page = False
 
+            logger.info("last_record")
             last_record = parser.event_record(body[-1])
             if limit is not None:
                 limit -= len(body)
 
+            logger.info("split_query")
             query = self._next_page(query, last_record, limit)
+            _page_index += 1
 
         writer(footer)
 
@@ -102,7 +110,7 @@ class Client:
         last_record: Dict[str, str],
         limit: Optional[int] = None,
     ) -> Query:
-        last_time, last_magnitude = last_record["time"], last_record["magnitude"]
+        last_time, last_magnitude = last_record["event_time"], last_record["event_magnitude"]
         next_fields = {
             "time": ("endtime", last_time),
             "time-asc": ("starttime", last_time),
