@@ -5,7 +5,7 @@ from dataclasses import dataclass, fields, asdict, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
 from typing import Optional, get_args, Any, List, Dict
-from quaker.globals import DEFAULT_FORMAT
+from quaker.globals import DEFAULT_FORMAT, ENABLED_FORMATS
 
 
 class _FieldHelper:
@@ -331,9 +331,8 @@ class _QueryFormat(_BaseQuery):
 
     def __post_init__(self):
         super().__post_init__()
-        # TODO Add 'xml', 'quakeml', 'kml'
         self.format = self.format or DEFAULT_FORMAT
-        self.assert_field_allowed_values("format", ["csv", "geojson", "text"])
+        self.assert_field_allowed_values("format", ENABLED_FORMATS)
 
 
 # TODO usage docs
