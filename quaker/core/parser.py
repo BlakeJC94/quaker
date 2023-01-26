@@ -1,21 +1,21 @@
-from typing import List, Tuple
+from os import PathLike
+from typing import Dict, List, Tuple
 from abc import ABC, abstractmethod
 
 from quaker.core.cache import Cache  # TODO move cache into here
+from quaker.core.query import Query
 
 
 class Parser:
-    def __new__(cls, *args, **kwargs):
-        query_format = kwargs.get("query_format") or next(
-            arg for arg in args if isinstance(arg, str)
-        )
+    def __new__(cls, query: Query):
         parser = {
             "csv": CSVParser,
             "text": TextParser,
-        }.get(query_format)
+        }.get(query.format)
 
         if parser is None:
             raise NotImplementedError()
+
         return super().__new__(parser)
 
     def __init__(self, *_):
@@ -36,20 +36,23 @@ class BaseParser(ABC):
         pass
 
     @abstractmethod
-    def records(self, line) -> List[str]:
+    def records(self, lines) -> List[str]:
         pass
 
     @abstractmethod
     @staticmethod
-    def event_id(line) -> str:
-        # get event_id
-        pass
+    def event_data(line) -> Tuple[str, str, str]:
+        """Parse event_id, event_time, event_magnitude from a line."""
 
     def body(self, lines) -> List[str]:
         body = []
         for line in self.records(lines):
-            if self.event_id(line) not in self.cache:
+            event_id, *_ = self.event_data(line)
+
+            if event_id not in self.cache:
                 body.append(line)
+                self.cache.append(event_id)
+
         return body
 
     @abstractmethod
