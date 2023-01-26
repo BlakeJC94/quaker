@@ -40,14 +40,13 @@ class BaseParser(ABC):
         pass
 
     @abstractmethod
-    @staticmethod
-    def event_data(line) -> Tuple[str, str, str]:
+    def event_record(self, line) -> Tuple[str, str, str]:
         """Parse event_id, event_time, event_magnitude from a line."""
 
     def body(self, lines) -> List[str]:
         body = []
         for line in self.records(lines):
-            event_id, *_ = self.event_data(line)
+            event_id = self.event_record(line)['event_id']
 
             if event_id not in self.cache:
                 body.append(line)

@@ -114,10 +114,10 @@ class Client:
     def _next_page(
         self,
         query: Query,
-        order_params: Tuple[str],
+        last_record: Dict[str, str],
         limit: Optional[int] = None,
     ) -> Query:
-        last_time, last_magnitude = order_params
+        last_time, last_magnitude = last_record["time"], last_record["magnitude"]
         next_fields = {
             "time": ("endtime", last_time),
             "time-asc": ("starttime", last_time),
