@@ -16,6 +16,11 @@ setup(
     install_requires=[
         "requests",
     ],
+    extra_requires={
+        "dev": [
+            "requests-mock",
+        ],
+    },
     entry_points={
         "console_scripts": ["quaker=quaker.__main__:main"],
     },
