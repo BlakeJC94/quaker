@@ -83,5 +83,6 @@ class CSVParser(Parser, BaseParser):
 
 
 class TextParser(CSVParser):
-    def event_id(self, line):
-        return line.split("|")[11]
+    def __init__(self, *_):
+        super().__init__(*_)
+        self.delimiter = "|"
