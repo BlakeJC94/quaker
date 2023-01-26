@@ -112,7 +112,7 @@ class Client:
             ...
         ...
 
-    def _execute(self, query: Query) -> Result:  # Based on get_data
+    def _execute(self, query: Query) -> Request:  # Based on get_data
         self.history.append(query)
 
         out = None
@@ -128,4 +128,5 @@ class Client:
                 sleep(2)
 
             logger.error("No connection could be made.")
+
         return out
