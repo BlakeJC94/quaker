@@ -120,8 +120,8 @@ class Client:
     ) -> Query:
         last_time, last_magnitude = last_record["event_time"], last_record["event_magnitude"]
         next_fields = {
-            "time": ("endtime", last_time),
-            "time-asc": ("starttime", last_time),
+            "time": ("starttime", last_time),
+            "time-asc": ("endtime", last_time),
             "magnitude": ("maxmagnitude", last_magnitude),
             "magnitude-asc": ("minmagnitude", last_magnitude),
         }
