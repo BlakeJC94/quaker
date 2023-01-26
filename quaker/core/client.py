@@ -69,10 +69,9 @@ class Client:
 
             # Crash on unexpected errors
             if status != RESPONSE_OK:
+                msg = f"Unexpected response code on query ({status})."
                 if status == RESPONSE_BAD_REQUEST:
                     msg = f"Invalid query given query ({RESPONSE_BAD_REQUEST})."
-                else:
-                    msg = f"Unexpected response code on query ({status})."
                 logger.error(msg)
                 raise RuntimeError(msg)
 
