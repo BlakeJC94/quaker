@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple
 from requests import Response
 from requests.sessions import Request, Session
 from quaker.core.query import Query
+from quaker.core.cache import Cache
 from quaker.core.run import run_query
 from quaker.globals import (
     BASE_URL,
@@ -132,6 +133,24 @@ class Client:
         query_dict["limit"] = limit
 
         return Query(**query_dict)
+
+    def _filter_records(self, records) -> List[str]:
+        if self.parser is None or self.cache is None:
+            raise ValueError()
+        body = []
+        duplicate_events = 0
+        for line in records:
+            event_id = self.parser.event_record(line)["event_id"]
+
+            if event_id in self.cache:
+                duplicate_events += 1
+            else:
+                body.append(line)
+                self.cache.append(event_id)
+
+        if duplicate_events > 0:
+            logger.warning(f"{duplicate_events} found on page")
+        return body
 
     def _execute(self, query: Query) -> Response:  # Based on get_data
         self.history.append(query)

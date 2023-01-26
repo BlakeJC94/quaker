@@ -21,14 +21,11 @@ class Parser:
 
         return super().__new__(parser)
 
-    def __init__(self, *_):
-        self.cache = Cache()
-
     def parse_response(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
-        lines = download.text.split('\n')
+        lines = download.text.removesuffix('\n').split('\n')
         return (
             self.header(lines),
-            self.body(lines),
+            self.records(lines),
             self.footer(lines),
         )
 
@@ -48,38 +45,22 @@ class BaseParser(ABC):
     def event_record(self, line) -> Tuple[str, str, str]:
         """Parse event_id, event_time, event_magnitude from a line."""
 
-    def body(self, lines) -> List[str]:
-        body = []
-        for line in self.records(lines):
-            event_id = self.event_record(line)['event_id']
-
-            if event_id not in self.cache:
-                body.append(line)
-                self.cache.append(event_id)
-
-        return body
-
     @abstractmethod
     def footer(self, lines) -> List[str]:
         pass
 
-
 class CSVParser(Parser, BaseParser):
     def __init__(self, *_):
-        super().__init__(*_)
         self.delimiter = ","
 
     def header(self, lines):
-        # logger.info("header")
         return lines[:1]
 
     def records(self, lines):
-        return [l for l in lines[1:] if len(l) > 0]
+        return lines[1:]
 
     def event_record(self, line):
         record_values = line.split(self.delimiter)
-        if len(record_values) < 11:
-            breakpoint()
         return {
             "event_id": record_values[11],
             "event_time": record_values[0],
