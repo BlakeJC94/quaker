@@ -33,6 +33,7 @@ class Client:
         writer = Writer(output_file)
 
         error_recived = None
+        do_cleanup = True
         try:
             # run_query(query, self.session, self.output_file)  # TODO deprecate
             self._execute_paginiated(query, writer)
@@ -41,7 +42,10 @@ class Client:
         except Exception as error:  # pylint: disable=broad-except
             logger.error(f"Unknown error recieved ({repr(error)}), safely closing session.")
             error_recived = error
-        finally:
+        else:
+            do_cleanup = False
+
+        if do_cleanup:
             writer.cleanup_output(output_file)
 
         if error_recived is not None:
