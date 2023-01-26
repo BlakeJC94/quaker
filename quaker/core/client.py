@@ -62,31 +62,26 @@ class Client:
         if error_recived is not None:
             raise error_recived
 
-    def _execute_paginiated(self, query: Query, output_file: PathLike):
+    def _execute_paginiated(self, query: Query, writer: Writer):
+        parser = Parser(query.format)
+
+        _page_index = 0
         has_next_page = True
-
-        # TODO create writer class (resolve format to subclass)
-        writer = Writer(output_file, format=query.format)
-
-        # TODO Keep track of number of records in loop
-        # TODO implement __len__ method for result
-        if query.limit is not None:
-            raise UserWarning("query.limit not supported yet")
-            # self._execute()
-
-        _index = 0
+        header, body, footer = [], [], []
         while has_next_page:
-            if _index > 5:
+            if _page_index > 5:
                 raise RecursionError()
 
-            query.limit = UPPER_LIMIT
-            result = self._execute(query)
-            status = result.download.status_code
+            limit = query.limit
+            query.limit = UPPER_LIMIT if limit is None else min(limit, UPPER_LIMIT)
+
+            download = self._execute(query)
+            status = download.status_code
 
             # Break if empty
             if status == RESPONSE_NO_CONTENT:
                 logger.info("No data found, exiting loop")
-                break
+                has_next_page = False
 
             # Crash on unexpected errors
             if status != RESPONSE_OK:
@@ -97,20 +92,23 @@ class Client:
                 logger.error(msg)
                 raise RuntimeError(msg)
 
-            # Write results
-            # TODO add writer methods on __call__
-            # TODO writer logic, eg If output doesn't exist, write header
-            writer(result)
+            header, body, footer = parser(download)
+            if _page_index == 0:
+                writer(header)
 
-            # Get order/last field
-            # Update query
-            # Goto start
+            writer(body)
+            if len(body) == 0:
+                logger.warning("No new records found on page, exiting loop")
+                has_next_page = False
 
-        # Check if whole query was empty
-        # Write footer of last result
+            last_record = parser.event_record(body[-1])
+            if limit is not None:
+                limit -= len(body)
 
-            ...
-        ...
+            query = self._next_page(query, last_record, limit)
+
+        writer(footer)
+
     def _next_page(
         self,
         query: Query,
