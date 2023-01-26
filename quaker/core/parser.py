@@ -60,15 +60,23 @@ class BaseParser(ABC):
 
 
 class CSVParser(Parser, BaseParser):
+    def __init__(self, *_):
+        super().__init__(*_)
+        self.delimiter = ","
+
     def header(self, lines):
         return lines[:1]
 
     def records(self, lines):
         return lines[1:]
 
-    @staticmethod
-    def event_id(line):
-        return line.split(",")[11]
+    def event_record(self, line):
+        record_values = line.split(self.delimiter)[11]
+        return {
+            "event_id": record_values[11],
+            "event_time": record_values[0],
+            "event_magnitude": record_values[4],
+        }
 
     def footer(self, _):
         return []
