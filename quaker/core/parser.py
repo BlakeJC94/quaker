@@ -6,6 +6,7 @@ from requests import Response
 
 from quaker.core.cache import Cache  # TODO move cache into here
 from quaker.core.query import Query
+from quaker.globals import DEFAULT_FORMAT
 
 
 class Parser:
@@ -13,7 +14,7 @@ class Parser:
         parser = {
             "csv": CSVParser,
             "text": TextParser,
-        }.get(query.format)
+        }.get(query.format or DEFAULT_FORMAT)
 
         if parser is None:
             raise NotImplementedError()
