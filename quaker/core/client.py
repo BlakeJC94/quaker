@@ -3,6 +3,7 @@ from pathlib import Path
 from os import PathLike, path, makedirs, remove
 from time import sleep
 from typing import Dict, List, Optional, Tuple
+from requests import Response
 from requests.sessions import Request, Session
 from quaker.core.query import Query
 from quaker.core.run import run_query
@@ -47,7 +48,7 @@ class Client:
             raise error_recived
 
     def _execute_paginiated(self, query: Query, writer: Writer):
-        parser = Parser(query.format)
+        parser = Parser(query)
 
         _page_index = 0
         has_next_page = True
@@ -113,7 +114,7 @@ class Client:
 
         return Query(**query_dict)
 
-    def _execute(self, query: Query) -> Request:  # Based on get_data
+    def _execute(self, query: Query) -> Response:  # Based on get_data
         self.history.append(query)
 
         out = None

@@ -2,6 +2,8 @@ from os import PathLike
 from typing import Dict, List, Tuple
 from abc import ABC, abstractmethod
 
+from requests import Response
+
 from quaker.core.cache import Cache  # TODO move cache into here
 from quaker.core.query import Query
 
@@ -21,14 +23,16 @@ class Parser:
     def __init__(self, *_):
         self.cache = Cache()
 
-    def __call__(self, download) -> Tuple[List[str], List[str], List[str]]:
-        download_lines = download.readlines()
+    def parse_response(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
+        lines = download.text.split('\n')
         return (
-            self.header(download_lines),
-            self.body(download_lines),
-            self.footer(download_lines),
+            self.header(lines),
+            self.body(lines),
+            self.footer(lines),
         )
 
+    def __call__(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
+        return self.parse_response(download)
 
 class BaseParser(ABC):
     @abstractmethod
