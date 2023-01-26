@@ -47,8 +47,8 @@ class Client:
         else:
             do_cleanup = False
 
-        if do_cleanup:
-            writer.cleanup_output(output_file)
+        if do_cleanup and self.writer is not None:
+            self.writer.cleanup_output(output_file)
 
         if error_recived is not None:
             raise error_recived
@@ -61,7 +61,7 @@ class Client:
 
         _page_index = 0
         has_next_page = True
-        header, body, footer = [], [], []
+        header, records, footer = [], [], []
         while has_next_page:
             logger.info(f"{_page_index=}")
             if _page_index > 5:
@@ -72,7 +72,6 @@ class Client:
 
             logger.info("_execute")
             download = self._execute(query)
-            # breakpoint()
 
             if not download.ok:
                 status = download.status_code
@@ -80,7 +79,7 @@ class Client:
                 # Break if empty
                 if status == RESPONSE_NO_CONTENT:
                     logger.info("No data found, exiting loop")
-                    has_next_page = False
+                    break
 
                 # Crash on unexpected errors
                 msg = f"Unexpected response code on query ({status})."
@@ -91,27 +90,40 @@ class Client:
                 raise RuntimeError(msg)
 
             logger.info("parse response")
-            header, body, footer = parser(download)
+            header, records, footer = self.parser(download)
+
             if _page_index == 0:
                 logger.info("header")
-                writer(header)
+                self.writer(header)
 
-            logger.info("body")
-            writer(body)
-            if len(body) == 0:
+            n_results_raw = len(records)
+            logger.info(f"{n_results_raw=}")
+            records = self._filter_records(records)
+            n_results = len(records)
+            logger.info(f"{n_results=}")
+
+            if n_results == 0:
                 logger.warning("No new records found on page, exiting loop")
-                has_next_page = False
+                break
+
+            logger.info("records")
+            self.writer(records)
+
+            if n_results_raw < UPPER_LIMIT:
+                logger.info("Written last page, exiting loop")
+                break
 
             logger.info("last_record")
-            last_record = parser.event_record(body[-1])
+            last_record = self.parser.event_record(records[-1])
             if limit is not None:
-                limit -= len(body)
+                limit -= n_results_raw
 
             logger.info("split_query")
             query = self._next_page(query, last_record, limit)
             _page_index += 1
 
-        writer(footer)
+        logger.info("footer")
+        self.writer(footer)
 
     def _next_page(
         self,
