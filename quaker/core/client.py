@@ -105,7 +105,7 @@ class Client:
             "magnitude": ("maxmagnitude", last_magnitude),
             "magnitude-asc": ("minmagnitude", last_magnitude),
         }
-        next_name, next_value = next_fields[query.orderby]
+        next_name, next_value = next_fields[query.orderby or "time"]
 
         query_dict = query.dict()
         query_dict[next_name] = next_value
