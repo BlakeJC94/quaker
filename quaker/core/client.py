@@ -1,8 +1,9 @@
 import logging
-from os import PathLike, path, makedirs
+from pathlib import Path
+from os import PathLike, path, makedirs, remove
 from time import sleep
-from typing import Optional, Union
-from requests.sessions import Session
+from typing import Dict, List, Optional, Tuple
+from requests.sessions import Request, Session
 from quaker.core.query import Query
 from quaker.core.run import run_query
 from quaker.globals import (
@@ -15,6 +16,8 @@ from quaker.globals import (
     UPPER_LIMIT,
     STDOUT,
 )
+from quaker.core.parser import Parser
+from quaker.core.writer import Writer
 
 
 logger = logging.getLogger(__name__)
@@ -25,39 +28,20 @@ class Client:
         self.session = Session()
         self.history = []
 
-    @staticmethod
-    def _validate_output_file(output_file: PathLike):
-        if output_file == STDOUT:
-            return
-
-        output_file = path.abspath(output_file)
-        if path.exists(output_file):
-            raise FileExistsError("File exists, remove the file or select a different destination.")
-
-        parent_dir, _ = path.split(output_file)
-        if not path.exists(parent_dir):
-            logger.info(f"Directory {parent_dir} doesnt exist, creating.")
-            makedirs(parent_dir, exist_ok=True)
-
-    @staticmethod
-    def cleanup_output(output_file: PathLike):
-        if output_file != STDOUT and path.exists(output_file):
-            remove(output_file)
-
     def execute(self, query: Query, output_file: PathLike):
-        self._validate_output_file(output_file)
+        writer = Writer(output_file)
 
         error_recived = None
         try:
-            # TODO Make run_query a client method (execute_paginiated)
-            run_query(query, self.session, self.output_file)
+            run_query(query, self.session, self.output_file)  # TODO deprecate
+            # self._execute_paginiated(query, writer)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
             logger.error(f"Unknown error recieved ({repr(error)}), safely closing session.")
             error_recived = error
         finally:
-            self.cleanup_output(output_file)
+            writer.cleanup_output(output_file)
 
         if error_recived is not None:
             raise error_recived
