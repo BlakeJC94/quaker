@@ -1,78 +1,66 @@
 """Functions for writing data to disk."""
 import logging
 import re
-from os import path
+from os import path, remove, PathLike, makedirs
+from pathlib import Path
 from typing import Iterable, Optional, Tuple, TextIO
 
 from requests import Request
 
 from quaker.core.cache import Cache
 from quaker.core.query import Query
-from quaker.globals import UPPER_LIMIT
+from quaker.globals import UPPER_LIMIT, STDOUT
 
 
 logger = logging.getLogger(__name__)
 
-# class BaseWriter(ABC):
-#     """Base class for object that transform requests into files."""
+class Writer:
+    def __init__(self, output_file: PathLike):
+        self.output_file = self._validate_output_file(output_file)
 
-#     def __init__(
-#         self,
-#         output_file: Union[Path, str],
-#         last_events: Optional[Cache],
-#     ):
-#         self.output_file = str(output_file)
-#         self.last_events = last_events or Cache([], maxlen=UPPER_LIMIT)
+    @staticmethod
+    def _validate_output_file(output_file: PathLike) -> PathLike:
+        if output_file == STDOUT:
+            return output_file
 
-#         self.header_written = False
+        output_file = path.abspath(output_file)
+        if path.exists(output_file):
+            raise FileExistsError("File exists, remove the file or select a different destination.")
 
-#     def __call__(self, download: Request):
-#         error_recived = None
-#         mode = "w" if not path.exists(self.output_file) else "a"
-#         with open(self.output_file, mode, encoding="utf-8") as file:
-#             try:
-#                 lines_written = self.write_lines(download)
+        parent_dir, _ = path.split(output_file)
+        if not path.exists(parent_dir):
+            logger.info(f"Directory {parent_dir} doesnt exist, creating.")
+            makedirs(parent_dir, exist_ok=True)
 
+        # TODO upgrade to pathlib
+        Path(output_file).touch()
+        return output_file
 
-#             except KeyboardInterrupt:
-#                 logger.error("Keyboard interrupt recieved, safely closing file.")
+    @staticmethod
+    def cleanup_output(output_file: PathLike):
+        if output_file != STDOUT and path.exists(output_file):
+            remove(output_file)
 
-#             except Exception as error:  # pylint: disable=broad-except
-#                 logger.error("Unknown error recieved, safely closing file.")
-#                 error_recived = error
+    def write_lines(self, lines):
+        if len(lines) == 0:
+            logger.warning("Empty list of lines recieved")
+            return
 
-#         if error_recived is not None:  # Signal to process that keyboard interrupt was received.
-#             raise error_recived
-#         ...
+        error_recived = None
+        with open(self.output_file, "a", encoding="utf-8") as f:
+            try:
+                f.writelines(lines)
+            except KeyboardInterrupt:
+                logger.error("Keyboard interrupt recieved, safely closing file.")
+            except Exception as error:  # pylint: disable=broad-except
+                logger.error("Unknown error recieved, safely closing file.")
+                error_recived = error
 
-#     def write_lines(self, download: Request) -> int:
-#         lines_written = 0
-#         lines = download.iter_lines(decode_unicode=True)
-#         if not self.header_written:
-#             self.write_header(download)
-#         # TODO
-#         # lines_written, last_events = write(
-#         #     file, lines, last_events, write_header, write_footer
-#         # )
-#         if lines_written == 0:
-#             raise ValueError(f"No lines were written to {self.output_file} from {str(query)}")
+        if error_recived is not None:  # Signal to process that keyboard interrupt was received.
+            raise error_recived
 
-
-#     @abstractmethod
-#     def header(self, download):
-#         pass
-
-#     @abstractmethod
-#     def body(self, download):
-#         pass
-
-#     @abstractmethod
-#     def footer(self, download):
-#         pass
-
-
-# class CSVWriter(BaseWriter):
-#     pass
+    def __call__(self, lines):
+        self.write_lines(lines)
 
 
 def write_content(
