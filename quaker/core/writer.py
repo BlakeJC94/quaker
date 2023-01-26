@@ -49,7 +49,7 @@ class Writer:
         error_recived = None
         with open(self.output_file, "a", encoding="utf-8") as f:
             try:
-                f.writelines(lines)
+                f.writelines(f"{l}\n" for l in lines)
             except KeyboardInterrupt:
                 logger.error("Keyboard interrupt recieved, safely closing file.")
             except Exception as error:  # pylint: disable=broad-except
