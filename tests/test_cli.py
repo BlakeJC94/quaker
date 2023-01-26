@@ -38,7 +38,3 @@ def test_cli_empty_query(mock_execute):
     args = "download"
     run(args.split())
     mock_execute.assert_called()
-
-
-# TODO test single page query works
-# TODO test multipage page query works
