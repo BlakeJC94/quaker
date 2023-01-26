@@ -28,15 +28,16 @@ class Client:
     def __init__(self):
         self.session = Session()
         self.history = []
+        self.cache = None
+        self.parser = None
+        self.writer = None
 
     def execute(self, query: Query, output_file: PathLike):
-        writer = Writer(output_file)
-
         error_recived = None
         do_cleanup = True
         try:
             # run_query(query, self.session, self.output_file)  # TODO deprecate
-            self._execute_paginiated(query, writer)
+            self._execute_paginiated(query, output_file)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
@@ -51,8 +52,11 @@ class Client:
         if error_recived is not None:
             raise error_recived
 
-    def _execute_paginiated(self, query: Query, writer: Writer):
-        parser = Parser(query)
+    def _execute_paginiated(self, query: Query, output_file: PathLike):
+        logger.info(f"{output_file=}")
+        self.parser = Parser(query)
+        self.writer = Writer(output_file)
+        self.cache = Cache()
 
         _page_index = 0
         has_next_page = True
