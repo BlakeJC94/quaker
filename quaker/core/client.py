@@ -20,6 +20,7 @@ from quaker.globals import (
 )
 from quaker.core.parser import Parser
 from quaker.core.writer import Writer
+import pandas as pd
 
 
 logger = logging.getLogger(__name__)
@@ -31,29 +32,58 @@ class Client:
         self.history = []
         self.cache = None
         self.parser = None
-        self.writer = None
 
-    def execute(self, query: Query, output_file: PathLike):
+    def execute(self, query: Query, output_file: Optional[PathLike]) -> Optional[pd.DataFrame]:
+        if output_file is None:
+            query.format = 'csv'
+
         error_recived = None
-        do_cleanup = True
+        status_ok = False
+        results = []
         try:
             # run_query(query, self.session, self.output_file)  # TODO deprecate
-            self._execute_paginiated(query, output_file)
+            results = self._execute_paginiated(query)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
             logger.error(f"Unknown error recieved ({repr(error)}), safely closing session.")
             error_recived = error
         else:
+            status_ok = True
+
+        if not status_ok:
+            if error_recived is not None:
+                raise error_recived
+            return
+
+        if status_ok and output_file is None:
+            return pd.readcsv(StringIO('\n'.join(results)))
+
+        writer = Writer(output_file)
+        do_cleanup = True
+        output = None
+        try:
+            if output_file is None:
+                output = pd.readcsv(StringIO('\n'.join(results)))
+            else:
+                writer(results)
+        except KeyboardInterrupt:
+            logger.error("Keyboard interrupt recieved, safely closing file.")
+        except Exception as error:  # pylint: disable=broad-except
+            logger.error(f"Unknown error recieved ({repr(error)}), safely closing file.")
+            error_recived = error
+        else:
             do_cleanup = False
 
-        if do_cleanup and self.writer is not None:
-            self.writer.cleanup_output(output_file)
+        if do_cleanup and writer is not None:
+            writer.cleanup_output(output_file)
 
         if error_recived is not None:
             raise error_recived
 
-    def _execute_paginiated(self, query: Query, output_file: PathLike):
+        return output
+
+    def _execute_paginiated(self, query: Query, output_file: PathLike) -> List[str]:
         logger.info(f"{output_file=}")
         self.parser = Parser(query)
         self.writer = Writer(output_file)
