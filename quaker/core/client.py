@@ -31,8 +31,6 @@ class Client:
     def __init__(self):
         self.session = Session()
         self.history = []
-        self.cache = None
-        self.parser = None
 
     def execute(self, query: Query, output_file: Optional[PathLike]) -> Optional[pd.DataFrame]:
         if output_file is None:
@@ -77,8 +75,8 @@ class Client:
         return output
 
     def _execute_paginiated(self, query: Query) -> List[str]:
-        self.parser = Parser(query)
-        self.cache = Cache()
+        parser = Parser(query)
+        cache = Cache()
 
         _page_index = 0
         has_next_page = True
@@ -114,7 +112,7 @@ class Client:
                 raise RuntimeError(msg)
 
             logger.info("parse response")
-            header, records, footer = self.parser(download)
+            header, records, footer = parser(download)
 
             if _page_index == 0:
                 logger.info("header")
@@ -127,7 +125,7 @@ class Client:
                 has_next_page = False
 
             if not empty_page:
-                records = self._filter_records(records)
+                records = self._filter_records(records, parser, cache)
                 n_results = len(records)
                 logger.info(f"{n_results=}")
                 if n_results == 0:
@@ -143,7 +141,7 @@ class Client:
 
             if has_next_page:
                 logger.info("last_record")
-                last_record = self.parser.event_record(records[-1])
+                last_record = parser.event_record(records[-1])
                 if limit is not None:
                     limit -= n_results_raw
 
@@ -179,19 +177,19 @@ class Client:
 
         return Query(**query_dict)
 
-    def _filter_records(self, records) -> List[str]:
-        if self.parser is None or self.cache is None:
-            raise ValueError()
+    def _filter_records(self, records, parser, cache = None) -> List[str]:
+        if cache is None:
+            return records
         body = []
         duplicate_events = 0
         for line in records:
-            event_id = self.parser.event_record(line)["event_id"]
+            event_id = parser.event_record(line)["event_id"]
 
             if event_id in self.cache:
                 duplicate_events += 1
             else:
                 body.append(line)
-                self.cache.append(event_id)
+                cache.append(event_id)
 
         if duplicate_events > 0:
             logger.warning(f"{duplicate_events} found on page")
