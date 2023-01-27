@@ -38,9 +38,7 @@ class Client:
         if output_file is None:
             query.format = 'csv'
 
-        error_recived = None
-        status_ok = False
-        results = []
+        error_recived, results, status_ok = None, [], False
         try:
             # run_query(query, self.session, self.output_file)  # TODO deprecate
             results = self._execute_paginiated(query)
@@ -55,14 +53,10 @@ class Client:
         if not status_ok:
             if error_recived is not None:
                 raise error_recived
-            return
-
-        if status_ok and output_file is None:
-            return pd.readcsv(StringIO('\n'.join(results)))
+            return None
 
         logger.info(f"{output_file=}")
-        do_cleanup = True
-        output, writer = None, None
+        output, writer, do_cleanup = None, None, True
         try:
             if output_file is None:
                 output = pd.readcsv(StringIO('\n'.join(results)))
