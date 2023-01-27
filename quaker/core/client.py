@@ -60,13 +60,14 @@ class Client:
         if status_ok and output_file is None:
             return pd.readcsv(StringIO('\n'.join(results)))
 
-        writer = Writer(output_file)
+        logger.info(f"{output_file=}")
         do_cleanup = True
-        output = None
+        output, writer = None, None
         try:
             if output_file is None:
                 output = pd.readcsv(StringIO('\n'.join(results)))
             else:
+                writer = Writer(output_file)
                 writer(results)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing file.")
@@ -84,8 +85,7 @@ class Client:
 
         return output
 
-    def _execute_paginiated(self, query: Query, output_file: PathLike) -> List[str]:
-        logger.info(f"{output_file=}")
+    def _execute_paginiated(self, query: Query) -> List[str]:
         self.parser = Parser(query)
         self.cache = Cache()
 
