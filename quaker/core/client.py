@@ -1,3 +1,4 @@
+from io import StringIO
 import logging
 from pathlib import Path
 from os import PathLike, path, makedirs, remove
@@ -86,30 +87,32 @@ class Client:
     def _execute_paginiated(self, query: Query, output_file: PathLike) -> List[str]:
         logger.info(f"{output_file=}")
         self.parser = Parser(query)
-        self.writer = Writer(output_file)
         self.cache = Cache()
 
         _page_index = 0
         has_next_page = True
         header, records, footer = [], [], []
+        results = []
         while has_next_page:
             logger.info(f"{_page_index=}")
             if _page_index > 5:
                 raise RecursionError()
 
+            n_results_raw = 0
             limit = query.limit
             query.limit = UPPER_LIMIT if limit is None else min(limit, UPPER_LIMIT)
 
             logger.info("_execute")
             download = self._execute(query)
 
+            empty_page = False
             if not download.ok:
                 status = download.status_code
 
                 # Break if empty
                 if status == RESPONSE_NO_CONTENT:
                     logger.info("No data found, exiting loop")
-                    break
+                    empty_page = True
 
                 # Crash on unexpected errors
                 msg = f"Unexpected response code on query ({status})."
@@ -124,36 +127,43 @@ class Client:
 
             if _page_index == 0:
                 logger.info("header")
-                self.writer(header)
+                results += header
 
             n_results_raw = len(records)
             logger.info(f"{n_results_raw=}")
-            records = self._filter_records(records)
-            n_results = len(records)
-            logger.info(f"{n_results=}")
+            if n_results_raw == 0:
+                empty_page = True
+                has_next_page = False
 
-            if n_results == 0:
-                logger.warning("No new records found on page, exiting loop")
-                break
+            if not empty_page:
+                records = self._filter_records(records)
+                n_results = len(records)
+                logger.info(f"{n_results=}")
+                if n_results == 0:
+                    logger.warning("No new records found on page, exiting loop")
+                    has_next_page = False
 
-            logger.info("records")
-            self.writer(records)
+                logger.info("records")
+                results += records
 
-            if n_results_raw < UPPER_LIMIT:
-                logger.info("Written last page, exiting loop")
-                break
+                if n_results_raw < UPPER_LIMIT:
+                    logger.info("Written last page, exiting loop")
+                    has_next_page = False
 
-            logger.info("last_record")
-            last_record = self.parser.event_record(records[-1])
-            if limit is not None:
-                limit -= n_results_raw
+            if has_next_page:
+                logger.info("last_record")
+                last_record = self.parser.event_record(records[-1])
+                if limit is not None:
+                    limit -= n_results_raw
 
-            logger.info("split_query")
-            query = self._next_page(query, last_record, limit)
-            _page_index += 1
+                logger.info("split_query")
+                query = self._next_page(query, last_record, limit)
+                _page_index += 1
 
         logger.info("footer")
-        self.writer(footer)
+        results += footer
+
+        return results
 
     def _next_page(
         self,
