@@ -156,6 +156,8 @@ class Client:
 
         return results
 
+    # TODO if sorting by magnitude, each page needs to have more than one magnitude value on there
+    # This is a funcamental issue with the API limit, can't be fixed
     def _next_page(
         self,
         query: Query,
@@ -164,8 +166,8 @@ class Client:
     ) -> Query:
         last_time, last_magnitude = last_record["event_time"], last_record["event_magnitude"]
         next_fields = {
-            "time": ("starttime", last_time),
-            "time-asc": ("endtime", last_time),
+            "time": ("endtime", last_time),
+            "time-asc": ("starttime", last_time),
             "magnitude": ("maxmagnitude", last_magnitude),
             "magnitude-asc": ("minmagnitude", last_magnitude),
         }
