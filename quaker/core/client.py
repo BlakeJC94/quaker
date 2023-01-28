@@ -34,7 +34,7 @@ class Client:
 
     def execute(self, query: Query, output_file: Optional[PathLike]) -> Optional[pd.DataFrame]:
         if output_file is None:
-            query.format = 'csv'
+            query.format = "csv"
 
         error_recived, results, status_ok = None, [], False
         try:
@@ -55,7 +55,7 @@ class Client:
         output, writer, do_cleanup = None, None, True
         try:
             if writer is None:
-                output = pd.readcsv(StringIO('\n'.join(results)))
+                output = pd.readcsv(StringIO("\n".join(results)))
             else:
                 writer(results)
         except KeyboardInterrupt:
@@ -122,10 +122,22 @@ class Client:
             n_results_raw = len(records)
             logger.info(f"{n_results_raw=}")
             if n_results_raw == 0:
+                logger.info("empty page found")
                 empty_page = True
                 has_next_page = False
 
             if not empty_page:
+
+                if (
+                    query.orderby.removesuffix("-asc") == "magnitude"
+                    and len(set(event_magnitudes)) == 1
+                ):
+                    logger.warning(
+                        "Page contains only one magnitude value, so cannot determine "
+                        "next page. Exiting loop."
+                    )
+                    has_next_page = False
+
                 records = self._filter_records(records, parser, cache)
                 n_results = len(records)
                 logger.info(f"{n_results=}")
@@ -142,7 +154,7 @@ class Client:
 
             if has_next_page:
                 logger.info("last_record")
-                last_record = parser.event_record(records[-1])
+                last_record = (event_ids[-1], event_times[-1], event_magnitudes[-1])
                 if limit is not None:
                     limit -= n_results_raw
 
@@ -155,8 +167,6 @@ class Client:
 
         return results
 
-    # TODO if sorting by magnitude, each page needs to have more than one magnitude value on there
-    # This is a funcamental issue with the API limit, can't be fixed
     def _next_page(
         self,
         query: Query,
@@ -178,7 +188,7 @@ class Client:
 
         return Query(**query_dict)
 
-    def _filter_records(self, records, parser, cache = None) -> List[str]:
+    def _filter_records(self, records, parser, cache=None) -> List[str]:
         if cache is None:
             return records
         body = []
