@@ -188,24 +188,6 @@ class Client:
 
         return Query(**query_dict)
 
-    def _filter_records(self, records, parser, cache=None) -> List[str]:
-        if cache is None:
-            return records
-        body = []
-        duplicate_events = 0
-        for line in records:
-            event_id = parser.event_record(line)["event_id"]
-
-            if event_id in self.cache:
-                duplicate_events += 1
-            else:
-                body.append(line)
-                cache.append(event_id)
-
-        if duplicate_events > 0:
-            logger.warning(f"{duplicate_events} found on page")
-        return body
-
     def _execute(self, query: Query) -> Response:  # Based on get_data
         self.history.append(query)
 

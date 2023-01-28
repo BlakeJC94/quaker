@@ -31,3 +31,16 @@ class Cache:
     def __repr__(self):
         name = self.__class__.__name__
         return repr(self.stash).replace("deque", name, 1)
+
+class RecordFilter(Cache):
+    def __call__(self, records, event_ids):
+        body = []
+        duplicate_events = 0
+        for event_id, line in zip(event_ids, records):
+            if event_id in self.cache:
+                duplicate_events += 1
+            else:
+                body.append(line)
+                self.append(event_id)
+
+        return body
