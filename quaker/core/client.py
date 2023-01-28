@@ -99,7 +99,6 @@ class Client:
 
             logger.info("parse response")
             header, records_raw, footer = parser.unpack_response(download)
-            breakpoint()
 
             if page_index == 0:
                 logger.info("header")

@@ -27,7 +27,6 @@ class Parser:
 
     def unpack_response(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
         lines = download.text.removesuffix('\n').split('\n')
-        breakpoint()
         return (
             self.header(lines),
             self.records(lines),
