@@ -37,7 +37,7 @@ class RecordFilter(Cache):
         body = []
         duplicate_events = 0
         for event_id, line in zip(event_ids, records):
-            if event_id in self.cache:
+            if event_id in self:
                 duplicate_events += 1
             else:
                 body.append(line)
