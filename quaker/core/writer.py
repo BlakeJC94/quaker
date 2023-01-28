@@ -36,10 +36,10 @@ class Writer:
         Path(output_file).touch()
         return output_file
 
-    @staticmethod
-    def cleanup_output(output_file: PathLike):
-        if output_file != STDOUT and path.exists(output_file):
-            remove(output_file)
+    def cleanup_output(self):
+        # TODO pathlib
+        if self.output_file != STDOUT and path.exists(self.output_file):
+            remove(self.output_file)
 
     def write_lines(self, lines):
         if len(lines) == 0:
