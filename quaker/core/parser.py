@@ -1,3 +1,5 @@
+import re
+from datetime import datetime
 from os import PathLike
 from typing import Dict, List, Tuple, Union
 from abc import ABC, abstractmethod
@@ -15,6 +17,7 @@ class Parser:
         parser = {
             "csv": CSVParser,
             "text": TextParser,
+            "geojson": GeojsonParser,
         }.get(query.format or DEFAULT_FORMAT)
 
         if parser is None:
@@ -24,6 +27,7 @@ class Parser:
 
     def unpack_response(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
         lines = download.text.removesuffix('\n').split('\n')
+        breakpoint()
         return (
             self.header(lines),
             self.records(lines),
@@ -76,3 +80,31 @@ class TextParser(CSVParser):
     def __init__(self, *_):
         super().__init__(*_)
         self.delimiter = "|"
+
+class GeojsonParser(Parser, BaseParser):
+    def event_record(self, line):
+        event_id = re.search(r"\"id\":\"([\w\d]+)\"", line)[1]
+        event_timestamp = int(re.search('time:([^,]+)', line)[1])
+        event_time = datetime.utcfromtimestamp(event_timestamp * 1e-3).isoformat()
+        event_magnitude = re.search('magnitude:([^,]+)', line)[1]
+        return (
+            event_id,
+            event_time,
+            event_magnitude,
+        )
+
+    def header(self, lines):
+        return [lines[0].split('[', 1)[0] + '[']
+
+    def footer(self, lines):
+        return ["".join(lines[-1].split(']')[2:])]
+
+    # TODO watch out for the trailing comma
+    def records(self, lines):
+        return [
+            lines[0].split('[', 1)[1],
+            *[l.removesuffix(',') for l in lines[1:-1]],
+            "".join(lines[-1].split(']')[:2])
+        ]
+
+
