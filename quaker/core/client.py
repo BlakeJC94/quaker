@@ -97,20 +97,7 @@ class Client:
 
             empty_page = False
             if not download.ok:
-                status = download.status_code
-
-                # Break if empty
-                if status == RESPONSE_NO_CONTENT:
-                    logger.info("No data found, exiting loop")
-                    empty_page = True
-
-                # Crash on unexpected errors
-                msg = f"Unexpected response code on query ({status})."
-                if status == RESPONSE_BAD_REQUEST:
-                    msg = f"Invalid query ({RESPONSE_BAD_REQUEST})."
-
-                logger.error(msg)
-                raise RuntimeError(msg)
+                empty_page = self._check_download_error(download.status_code)
 
             logger.info("parse response")
             header, records, footer = parser.unpack_response(download)
@@ -169,6 +156,20 @@ class Client:
         results += footer
 
         return results
+    @staticmethod
+    def _check_download_error(status):
+        # Break if empty
+        if status == RESPONSE_NO_CONTENT:
+            logger.info("No data found, exiting loop")
+            return True
+
+        # Crash on unexpected errors
+        msg = f"Unexpected response code on query ({status})."
+        if status == RESPONSE_BAD_REQUEST:
+            msg = f"Invalid query ({RESPONSE_BAD_REQUEST})."
+
+        logger.error(msg)
+        raise RuntimeError(msg)
 
     def _next_page(
         self,
