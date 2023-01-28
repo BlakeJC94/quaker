@@ -67,6 +67,24 @@ class Writer:
     def __call__(self, lines):
         self.write_lines(lines)
 
+class JsonWriter(Writer):
+    def __call__(self, lines):
+        if len(lines) <= 2:
+            self.write_lines(["".join(lines)])
+            return
+
+        if len(lines) > 3: # more than one record, header and footer
+            # Append commas to all records except last one
+            for i in range(1, len(lines) - 2):
+                lines[i] += ","
+
+        # join header onto first record
+        lines[1] = lines[0] + lines[1]
+
+        # join footer onto last record
+        lines[-2] = lines[-2] + lines[-1]
+
+        self.write_lines(lines[1:-1])
 
 def write_content(
     download: Request,
