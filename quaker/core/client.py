@@ -32,8 +32,6 @@ class Client:
         self.history = []
 
     def execute(self, query: Query, output_file: Optional[PathLike]) -> Optional[pd.DataFrame]:
-        output = None
-
         logger.info(f"{output_file=}")
         writer = None
         if output_file is None:
@@ -41,13 +39,25 @@ class Client:
         else:
             writer = Writer(output_file)
 
+        results = self._get_results(query)
+        output, error_recived = self._write_results(results, writer)
+        if error_recived is not None:
+            raise error_recived
+
+        return output
+
+    def _get_results(self, query):
         results = []
         try:
             results = self._execute_paginiated(query)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
+        return results
 
-        do_cleanup, error_recived = False, None
+    @staticmethod
+    def _write_results(results, writer):
+        output = None
+        do_cleanup, error_recived = True, None
         try:
             if writer is None:
                 output = pd.readcsv(StringIO("\n".join(results)))
@@ -55,7 +65,6 @@ class Client:
                 writer(results)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing file.")
-            do_cleanup = True
         except Exception as error:  # pylint: disable=broad-except
             logger.error(f"Unknown error recieved ({repr(error)}), safely closing file.")
             error_recived = error
@@ -63,11 +72,9 @@ class Client:
             do_cleanup = False
 
         if do_cleanup and writer is not None:
-            writer.cleanup_output(output_file)
-            if error_recived is not None:
-                raise error_recived
+            writer.cleanup_output()
 
-        return output
+        return output, error_recived
 
     def _execute_paginiated(self, query: Query) -> List[str]:
         results = []
