@@ -62,11 +62,11 @@ class CSVParser(Parser, BaseParser):
 
     def event_record(self, line):
         record_values = line.split(self.delimiter)
-        return {
-            "event_id": record_values[11],
-            "event_time": record_values[0].removesuffix('Z'),
-            "event_magnitude": record_values[4],
-        }
+        return (
+            record_values[11],
+            record_values[0].removesuffix('Z'),
+            record_values[4],
+        )
 
     def footer(self, _):
         return []
