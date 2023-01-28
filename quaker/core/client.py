@@ -99,7 +99,7 @@ class Client:
 
             logger.info("parse response")
             header, records_raw, footer = parser.unpack_response(download)
-            event_ids, event_times, event_magnitudes = parser.unpack_records(records_raw)
+            breakpoint()
 
             if page_index == 0:
                 logger.info("header")
@@ -111,6 +111,11 @@ class Client:
                 has_next_page = False
 
             if not empty_page:
+                (
+                    event_ids,
+                    event_times,
+                    event_magnitudes,
+                ) = parser.unpack_records(records_raw)
                 records = record_filter(records_raw, event_ids)
                 has_next_page = self._check_filtered_results(records, records_raw)
                 has_next_page = self._check_valid_magnitude_results(query, event_magnitudes)
