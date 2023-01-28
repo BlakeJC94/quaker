@@ -80,7 +80,7 @@ class Client:
         results = []
         parser, record_filter = Parser(query), RecordFilter()
 
-        header, records, footer = [], [], []
+        header, records_raw, records, footer = [], [], [], []
         page_index, has_next_page = 0, True
         while has_next_page:
             logger.info(f"{page_index=}")
@@ -88,7 +88,6 @@ class Client:
                 logger.info("Hit page limit, exiting")
                 break
 
-            n_results_raw = 0
             limit = query.limit
             query.limit = UPPER_LIMIT if limit is None else min(limit, UPPER_LIMIT)
 
@@ -100,62 +99,66 @@ class Client:
                 empty_page = self._check_download_error(download.status_code)
 
             logger.info("parse response")
-            header, records, footer = parser.unpack_response(download)
-            event_ids, event_times, event_magnitudes = parser.unpack_records(records)
+            header, records_raw, footer = parser.unpack_response(download)
+            event_ids, event_times, event_magnitudes = parser.unpack_records(records_raw)
 
             if page_index == 0:
                 logger.info("header")
                 results += header
 
-            n_results_raw = len(records)
-            logger.info(f"{n_results_raw=}")
-            if n_results_raw == 0:
+            if len(records_raw) == 0:
                 logger.info("empty page found")
                 empty_page = True
                 has_next_page = False
 
             if not empty_page:
-
-                if (
-                    query.orderby.removesuffix("-asc") == "magnitude"
-                    and len(set(event_magnitudes)) == 1
-                ):
-                    logger.warning(
-                        "Page contains only one magnitude value, so cannot determine "
-                        "next page. Exiting loop."
-                    )
-                    has_next_page = False
-
-                records = record_filter(records, event_ids)
-                n_results = len(records)
-                logger.info(f"{n_results=}")
-                if (duplicate_events := n_results - n_results_raw) > 0:
-                    logger.warning(f"{duplicate_events} found on page")
-                if n_results == 0:
-                    logger.warning("No new records found on page, exiting loop")
-                    has_next_page = False
-
+                records = record_filter(records_raw, event_ids)
+                has_next_page = self._check_filtered_results(records, records_raw)
+                has_next_page = self._check_valid_magnitude_results(query, event_magnitudes)
                 logger.info("records")
                 results += records
 
-                if n_results_raw < UPPER_LIMIT:
-                    logger.info("Written last page, exiting loop")
-                    has_next_page = False
-
             if has_next_page:
-                logger.info("last_record")
-                last_record = (event_ids[-1], event_times[-1], event_magnitudes[-1])
-                if limit is not None:
-                    limit -= n_results_raw
-
                 logger.info("split_query")
-                query = self._next_page(query, last_record, limit)
+                limit = None if limit is None else limit - len(records_raw)
+                query = self._next_page(query, event_times[-1], event_magnitudes[-1], limit)
                 page_index += 1
 
         logger.info("footer")
         results += footer
 
         return results
+
+    @staticmethod
+    def _check_filtered_results(records_filtered, records) -> bool:
+        has_next_page = True
+        n_results, n_results_raw = len(records_filtered), len(records)
+        logger.info(f"{n_results_raw=}")
+        logger.info(f"{n_results=}")
+        if (duplicate_events := n_results - n_results_raw) > 0:
+            logger.warning(f"{duplicate_events} found on page")
+        if n_results == 0:
+            logger.warning("No new records found on page, exiting loop")
+            has_next_page = False
+        if n_results_raw < UPPER_LIMIT:
+            logger.info("Written last page, exiting loop")
+            has_next_page = False
+        return has_next_page
+
+    @staticmethod
+    def _check_valid_magnitude_results(query, event_magnitudes) -> bool:
+        has_next_page = True
+        if (
+            query.orderby.removesuffix("-asc") == "magnitude"
+            and len(set(event_magnitudes)) == 1
+        ):
+            logger.warning(
+                "Page contains only one magnitude value, so cannot determine "
+                "next page. Exiting loop."
+            )
+            has_next_page = False
+        return has_next_page
+
     @staticmethod
     def _check_download_error(status):
         # Break if empty
@@ -174,10 +177,10 @@ class Client:
     def _next_page(
         self,
         query: Query,
-        last_record: Dict[str, str],
+        last_time,
+        last_magnitude,
         limit: Optional[int] = None,
     ) -> Query:
-        last_time, last_magnitude = last_record["event_time"], last_record["event_magnitude"]
         next_fields = {
             "time": ("endtime", last_time),
             "time-asc": ("starttime", last_time),
