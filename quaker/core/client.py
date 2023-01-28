@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Tuple
 from requests import Response
 from requests.sessions import Request, Session
 from quaker.core.query import Query
-from quaker.core.cache import Cache
+from quaker.core.cache import Cache, RecordFilter
 from quaker.core.run import run_query
 from quaker.globals import (
     BASE_URL,
@@ -74,16 +74,14 @@ class Client:
         return output
 
     def _execute_paginiated(self, query: Query) -> List[str]:
-        parser = Parser(query)
-        cache = Cache()
-
-        _page_index = 0
-        has_next_page = True
-        header, records, footer = [], [], []
         results = []
+        parser, record_filter = Parser(query), RecordFilter()
+
+        header, records, footer = [], [], []
+        page_index, has_next_page = 0, True
         while has_next_page:
-            logger.info(f"{_page_index=}")
-            if _page_index > MAX_PAGES:
+            logger.info(f"{page_index=}")
+            if page_index >= MAX_PAGES:
                 logger.info("Hit page limit, exiting")
                 break
 
@@ -115,7 +113,7 @@ class Client:
             header, records, footer = parser.unpack_response(download)
             event_ids, event_times, event_magnitudes = parser.unpack_records(records)
 
-            if _page_index == 0:
+            if page_index == 0:
                 logger.info("header")
                 results += header
 
@@ -138,9 +136,11 @@ class Client:
                     )
                     has_next_page = False
 
-                records = self._filter_records(records, parser, cache)
+                records = record_filter(records, event_ids)
                 n_results = len(records)
                 logger.info(f"{n_results=}")
+                if (duplicate_events := n_results - n_results_raw) > 0:
+                    logger.warning(f"{duplicate_events} found on page")
                 if n_results == 0:
                     logger.warning("No new records found on page, exiting loop")
                     has_next_page = False
@@ -160,7 +160,7 @@ class Client:
 
                 logger.info("split_query")
                 query = self._next_page(query, last_record, limit)
-                _page_index += 1
+                page_index += 1
 
         logger.info("footer")
         results += footer
