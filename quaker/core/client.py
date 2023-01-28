@@ -148,7 +148,8 @@ class Client:
     def _check_valid_magnitude_results(query, event_magnitudes) -> bool:
         has_next_page = True
         if (
-            query.orderby.removesuffix("-asc") == "magnitude"
+            query.orderby is not None
+            and query.orderby.removesuffix("-asc") == "magnitude"
             and len(set(event_magnitudes)) == 1
         ):
             logger.warning(
