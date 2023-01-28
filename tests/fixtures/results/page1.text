@@ -1,0 +1,22 @@
+#EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName
+ak022glaqrr3|2022-12-27T16:35:22.556|55.3905|-162.0427|116.4|ak|ak|ak|ak022glaqrr3|ml|2|ak|40 km NNE of King Cove, Alaska
+ak022glaolir|2022-12-27T16:25:08.675|51.2212|-178.4993|23.9|ak|ak|ak|ak022glaolir|ml|2.2|ak|148 km WSW of Adak, Alaska
+ak022glanbga|2022-12-27T16:19:12.421|60.1362|-153.1622|134.8|ak|ak|ak|ak022glanbga|ml|1.9|ak|64 km E of Port Alsworth, Alaska
+ak022glamjgs|2022-12-27T16:15:35.188|59.9003|-153.9665|177.8|ak|ak|ak|ak022glamjgs|ml|2.2|ak|14 km NNE of Pedro Bay, Alaska
+tx2022zizf|2022-12-27T16:13:01.982|31.64076554|-104.4632122|7.314135742|tx|tx|tx|tx2022zizf|ml|2.3|tx|59 km S of Whites City, New Mexico
+av91081983|2022-12-27T16:07:17.340|58.261|-155.082833333333|4.85|av|av|av|av91081983|ml|-0.37|av|85 km NNW of Karluk, Alaska
+ak022glaj8pv|2022-12-27T16:00:09.955|55.6529|-157.1695|39.1|ak|ak|ak|ak022glaj8pv|ml|2.1|ak|105 km SE of Chignik, Alaska
+pr71389278|2022-12-27T15:53:02.010|17.9175|-66.8796666666667|15.18|pr|pr|pr|pr71389278|md|2.28|pr|Puerto Rico region
+ak022gla84q8|2022-12-27T15:48:26.063|64.8839|-147.3461|15.6|ak|ak|ak|ak022gla84q8|ml|0.8|ak|12 km NE of Badger, Alaska
+ci40150615|2022-12-27T15:43:08.420|34.5485|-119.1796667|2.58|ci|ci|ci|ci40150615|ml|1.6|ci|13km NNE of Ojai, CA
+ak022gla42wu|2022-12-27T15:29:37.344|61.6775|-146.5424|20.1|ak|ak|ak|ak022gla42wu|ml|1.8|ak|37 km SSE of Nelchina, Alaska
+ci40150607|2022-12-27T15:28:25.360|33.2673333|-116.4221667|4.53|ci|ci|ci|ci40150607|ml|1.23|ci|5km WNW of Borrego Springs, CA
+ak022gla2afl|2022-12-27T15:21:00.587|58.5761|-154.3558|10.9|ak|ak|ak|ak022gla2afl|ml|1.1|ak|99 km SSE of Kokhanok, Alaska
+av91081968|2022-12-27T15:10:33.290|51.8386666666667|-178.043666666667|-0.85|av|av|av|av91081968|ml|1.27|av|
+hv73284702|2022-12-27T15:06:46.690|19.2363338470459|-155.385665893555|30.5799999237061|hv|hv|hv|hv73284702|md|1.94000006|hv|10 km ENE of P?hala, Hawaii
+nc73825706|2022-12-27T14:55:26.940|37.4301667|-118.5611667|3.02|nc|nc|nc|nc73825706|md|1.46|nc|4km ENE of Round Valley, CA
+ci40150599|2022-12-27T14:50:47.040|34.5795|-116.8873333|5.53|ci|ci|ci|ci40150599|ml|2.99|ci|17km NNE of Lucerne Valley, CA
+us7000j35l|2022-12-27T14:48:11.567|38.2753|142.0636|79.525|us|us|us|us7000j35l|mb|4.3|us|68 km ESE of Ishinomaki, Japan
+ak022gl9lsdl|2022-12-27T14:44:01.692|62.8334|-150.4092|81.7|ak|ak|ak|ak022gl9lsdl|ml|1.2|ak|41 km NNE of Petersville, Alaska
+ak022gl9le5s|2022-12-27T14:42:17.445|60.4051|-148.2473|15.4|ak|ak|ak|ak022gl9le5s|ml|1.5|ak|39 km NNW of Chenega, Alaska
+

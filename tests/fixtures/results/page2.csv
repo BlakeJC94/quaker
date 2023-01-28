@@ -1,0 +1,22 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2023-01-26T05:29:43.518Z,62.1501,-148.6362,34.3,1.2,ml,,,,0.35,ak,ak0231734hzj,2023-01-26T05:32:15.036Z,"40 km NNW of Chickaloon, Alaska",earthquake,,0.3,,,automatic,ak,ak
+2023-01-26T05:21:19.220Z,33.4838333,-116.4046667,8.71,0.86,ml,25,90,0.1286,0.18,ci,ci40161943,2023-01-26T05:24:56.660Z,"22km SSW of La Quinta, CA",earthquake,0.26,1,0.113,21,automatic,ci,ci
+2023-01-26T04:56:36.558Z,61.8635,-149.3468,19.8,1.5,ml,,,,0.55,ak,ak023172ou6f,2023-01-26T04:58:46.865Z,"14 km NNW of Fishhook, Alaska",earthquake,,0.2,,,automatic,ak,ak
+2023-01-26T04:54:04.310Z,34.5181667,-118.6006667,8.67,1.33,ml,38,46,0.02513,0.25,ci,ci40161935,2023-01-26T05:04:54.920Z,"4km NNE of Castaic, CA",earthquake,0.33,0.95,0.12,28,automatic,ci,ci
+2023-01-26T04:51:29.140Z,33.9033333,-118.7026667,15.68,1.75,ml,24,166,0.1329,0.28,ci,ci40161927,2023-01-26T04:55:10.919Z,"14km S of Malibu Beach, CA",earthquake,0.66,0.87,0.163,29,automatic,ci,ci
+2023-01-26T04:46:25.230Z,33.9846667,-116.6858333,10.97,0.61,ml,11,65,0.06226,0.14,ci,ci40161919,2023-01-26T04:49:54.227Z,"12km SW of Morongo Valley, CA",earthquake,0.28,0.73,0.108,14,automatic,ci,ci
+2023-01-26T04:43:50.800Z,33.4371667,-118.2303333,13.34,1.91,ml,7,212,0.4759,0.26,ci,ci40161911,2023-01-26T04:47:29.486Z,"14km NE of Avalon, CA",earthquake,2.39,31.61,0.197,25,automatic,ci,ci
+2023-01-26T04:36:28.760Z,38.8268318,-122.8251648,0.93,1.9,md,10,101,0.008553,0.03,nc,nc73837511,2023-01-26T05:00:13.911Z,"8km NW of The Geysers, CA",earthquake,0.31,0.76,0.59,3,automatic,nc,nc
+2023-01-26T04:32:15.710Z,18.9818325042725,-155.432495117188,36.5400009155273,2.12,ml,43,259,,0.140000001,hv,hv73313027,2023-01-26T04:37:46.490Z,"18 km ESE of Naalehu, Hawaii",earthquake,0.64,1.32000005,3.85,3,automatic,hv,hv
+2023-01-26T04:29:44.721Z,-0.0988,-77.4813,10,4.1,mb,12,117,0.28,0.78,us,us6000jjbm,2023-01-26T05:03:59.040Z,"Ecuador",earthquake,1.95,1.975,0.261,4,reviewed,us,us
+2023-01-26T04:23:51.367Z,2.8727,126.967,35,5.7,mww,90,38,2.125,0.82,us,us6000jjbj,2023-01-26T05:30:58.761Z,"171 km NW of Tobelo, Indonesia",earthquake,4.97,1.892,0.061,26,reviewed,us,us
+2023-01-26T04:20:14.820Z,38.3904991,-122.4189987,5.77,1.6,md,12,137,0.04052,0.07,nc,nc73837506,2023-01-26T04:37:15.758Z,"5km WSW of Yountville, CA",earthquake,0.51,0.85,0.23,11,automatic,nc,nc
+2023-01-26T04:16:06.492Z,16.6106,-25.6047,10,5.3,mb,58,72,9.064,0.68,us,us6000jjbh,2023-01-26T05:34:28.086Z,"73 km SW of Porto Novo, Cabo Verde",earthquake,10.44,1.864,0.026,488,reviewed,us,us
+2023-01-26T04:07:56.356Z,-30.3135,-178.7238,35,4.4,mb,12,177,1.259,0.77,us,us6000jjbd,2023-01-26T04:48:51.040Z,"Kermadec Islands, New Zealand",earthquake,9.76,2.007,0.203,11,reviewed,us,us
+2023-01-26T04:01:41.250Z,38.8371658,-122.8013306,2.24,0.78,md,9,67,0.00867,0.01,nc,nc73837501,2023-01-26T04:21:13.652Z,"7km WNW of Cobb, CA",earthquake,0.44,1.29,0.35,9,automatic,nc,nc
+2023-01-26T03:43:15.465Z,61.8364,-150.8749,32,1.6,ml,,,,0.75,ak,ak0231720kmy,2023-01-26T03:45:19.850Z,"32 km ESE of Skwentna, Alaska",earthquake,,1.6,,,automatic,ak,ak
+2023-01-26T03:35:13.550Z,19.1781673431396,-155.346832275391,27.8099994659424,1.89999998,md,41,184,,0.140000001,hv,hv73313012,2023-01-26T03:38:18.530Z,"14 km E of P?hala, Hawaii",earthquake,0.58,1.01999998,0.889999986,15,automatic,hv,hv
+2023-01-26T03:16:22.081Z,-1.963,-79.9953,75.211,4.4,mb,21,137,0.491,0.29,us,us6000jjb9,2023-01-26T03:32:59.040Z,"4 km SW of El Triunfo, Ecuador",earthquake,5.37,9.012,0.204,7,reviewed,us,us
+2023-01-26T02:26:19.140Z,17.9728333333333,-66.8753333333333,16.03,2.2,md,6,199,0.004339,0.07,pr,pr71394478,2023-01-26T02:38:48.370Z,"1 km ESE of Maria Antonia, Puerto Rico",earthquake,0.44,0.55,0.0628114320303155,5,reviewed,pr,pr
+2023-01-26T02:23:06.320Z,33.1445,-116.501,11.35,0.89,ml,27,51,0.1029,0.21,ci,ci40161903,2023-01-26T02:26:38.486Z,"12km NE of Julian, CA",earthquake,0.34,0.76,0.102,14,automatic,ci,ci
+
