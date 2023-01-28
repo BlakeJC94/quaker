@@ -7,7 +7,6 @@ from typing import Iterable, Optional, Tuple, TextIO
 
 from requests import Request
 
-from quaker.core.cache import Cache
 from quaker.core.query import Query
 from quaker.globals import UPPER_LIMIT, STDOUT
 

@@ -2,7 +2,7 @@ from collections import deque
 
 from pytest import fixture
 
-from quaker.core import Cache
+from quaker.core.record_filter import Cache, RecordFilter
 
 
 class TestCache:
@@ -42,3 +42,7 @@ class TestCache:
         removed = cache.pop()
         assert not removed in cache
         assert removed == cache_input[-1]
+
+
+def test_record_filter():
+

@@ -7,7 +7,7 @@ from typing import Dict, List, Optional, Tuple
 from requests import Response
 from requests.sessions import Request, Session
 from quaker.core.query import Query
-from quaker.core.cache import Cache, RecordFilter
+from quaker.core.record_filter import RecordFilter
 from quaker.globals import (
     BASE_URL,
     MAX_ATTEMPTS,
