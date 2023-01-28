@@ -29,8 +29,10 @@ class Parser:
             self.footer(lines),
         )
 
-    def __call__(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
-        return self.parse_response(download)
+    def __call__(self, result: Union[Response, List[str]]) -> Tuple[List[str], List[str], List[str]]:
+        if isinstance(result, Response):
+            return self.parse_response(result)
+        return tuple(zip(*(self.event_record(line) for line in result)))
 
 class BaseParser(ABC):
     @abstractmethod
