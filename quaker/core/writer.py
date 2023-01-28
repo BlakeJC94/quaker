@@ -15,7 +15,12 @@ from quaker.globals import UPPER_LIMIT, STDOUT
 logger = logging.getLogger(__name__)
 
 class Writer:
-    def __init__(self, output_file: PathLike):
+    def __new__(cls, _output_file, query):
+        if query.format == 'geojson':
+            return super().__new__(JsonWriter)
+        return super().__new__(cls)
+
+    def __init__(self, output_file: PathLike, _query: Query):
         self.output_file = self._validate_output_file(output_file)
 
     @staticmethod
