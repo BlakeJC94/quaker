@@ -1,5 +1,5 @@
 from os import PathLike
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 from abc import ABC, abstractmethod
 
 from requests import Response
@@ -9,6 +9,7 @@ from quaker.core.query import Query
 from quaker.globals import DEFAULT_FORMAT
 
 
+# TODO add more parsers
 class Parser:
     def __new__(cls, query: Query):
         parser = {
@@ -21,7 +22,7 @@ class Parser:
 
         return super().__new__(parser)
 
-    def parse_response(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
+    def unpack_response(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
         lines = download.text.removesuffix('\n').split('\n')
         return (
             self.header(lines),
@@ -29,10 +30,8 @@ class Parser:
             self.footer(lines),
         )
 
-    def __call__(self, result: Union[Response, List[str]]) -> Tuple[List[str], List[str], List[str]]:
-        if isinstance(result, Response):
-            return self.parse_response(result)
-        return tuple(zip(*(self.event_record(line) for line in result)))
+    def unpack_records(self, records: List[str]) -> Tuple[List[str], List[str], List[str]]:
+        return tuple(zip(*(self.event_record(line) for line in records)))
 
 class BaseParser(ABC):
     @abstractmethod
@@ -65,7 +64,7 @@ class CSVParser(Parser, BaseParser):
         record_values = line.split(self.delimiter)
         return {
             "event_id": record_values[11],
-            "event_time": record_values[0],
+            "event_time": record_values[0].removesuffix('Z'),
             "event_magnitude": record_values[4],
         }
 

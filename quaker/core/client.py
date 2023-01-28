@@ -112,7 +112,8 @@ class Client:
                 raise RuntimeError(msg)
 
             logger.info("parse response")
-            header, records, footer = parser(download)
+            header, records, footer = parser.unpack_response(download)
+            event_ids, event_times, event_magnitudes = parser.unpack_records(records)
 
             if _page_index == 0:
                 logger.info("header")
