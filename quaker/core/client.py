@@ -32,15 +32,12 @@ class Client:
         self.history = []
 
     def execute(self, query: Query, output_file: Optional[PathLike]) -> Optional[pd.DataFrame]:
-        logger.info(f"{output_file=}")
-        writer = None
         if output_file is None:
             query.format = "csv"
-        else:
-            writer = Writer(output_file)
 
         results = self._get_results(query)
-        output, error_recived = self._write_results(results, writer)
+        output, error_recived = self._write_results(results, output_file, query)
+
         if error_recived is not None:
             raise error_recived
 
@@ -55,7 +52,10 @@ class Client:
         return results
 
     @staticmethod
-    def _write_results(results, writer):
+    def _write_results(results, output_file, query):
+        logger.info(f"{output_file=}")
+        writer = None if output_file is None else Writer(output_file, query)
+
         output = None
         do_cleanup, error_recived = True, None
         try:
@@ -78,7 +78,7 @@ class Client:
 
     def _execute_paginiated(self, query: Query) -> List[str]:
         results = []
-        parser, record_filter = Parser(query), RecordFilter()
+        parser, record_filter = Parser(query), RecordFilter([], maxlen=UPPER_LIMIT)
 
         header, records_raw, records, footer = [], [], [], []
         page_index, has_next_page = 0, True
