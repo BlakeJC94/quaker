@@ -15,9 +15,8 @@ from quaker.globals import (
     RESPONSE_BAD_REQUEST,
     RESPONSE_NO_CONTENT,
     RESPONSE_NOT_FOUND,
-    RESPONSE_OK,
     UPPER_LIMIT,
-    STDOUT,
+    MAX_PAGES,
 )
 from quaker.core.parser import Parser
 from quaker.core.writer import Writer
@@ -84,8 +83,9 @@ class Client:
         results = []
         while has_next_page:
             logger.info(f"{_page_index=}")
-            if _page_index > 5:
-                raise RecursionError()
+            if _page_index > MAX_PAGES:
+                logger.info("Hit page limit, exiting")
+                break
 
             n_results_raw = 0
             limit = query.limit

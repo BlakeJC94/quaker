@@ -8,7 +8,7 @@ if os.path.exists(OUT):
     os.remove(OUT)
 
 client = Client()
-query = Query(starttime=datetime.now() - timedelta(days=20))
+query = Query(starttime=datetime.now() - timedelta(days=100))
 
 foo = client.execute(query, OUT)
 
