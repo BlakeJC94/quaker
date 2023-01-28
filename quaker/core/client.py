@@ -45,10 +45,8 @@ class Client:
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing session.")
         except Exception as error:  # pylint: disable=broad-except
-            logger.error(f"Unknown error recieved ({repr(error)}), safely closing session.")
-            error_recived = error
-        else:
-            status_ok = True
+            logger.error(f"Unknown error recieved ({repr(error)})")
+            raise error
 
         if not status_ok:
             if error_recived is not None:
@@ -58,10 +56,9 @@ class Client:
         logger.info(f"{output_file=}")
         output, writer, do_cleanup = None, None, True
         try:
-            if output_file is None:
+            if writer is None:
                 output = pd.readcsv(StringIO('\n'.join(results)))
             else:
-                writer = Writer(output_file)
                 writer(results)
         except KeyboardInterrupt:
             logger.error("Keyboard interrupt recieved, safely closing file.")
