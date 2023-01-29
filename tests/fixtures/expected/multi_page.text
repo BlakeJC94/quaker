@@ -1,0 +1,61 @@
+#EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName
+ak022f7olw94|2022-11-27T16:33:06.042|57.1342|-156.35|6.4|ak|ak|ak|ak022f7olw94|ml|2.1|ak|
+us6000j63n|2022-11-27T16:23:48.031|2.6479|128.0317|163.978|us|us|us|us6000j63n|mb|4.4|us|101 km N of Tobelo, Indonesia
+ok2022xgel|2022-11-27T16:22:27.899|35.27066667|-98.03683333|10.16|ok|ok|ok|ok2022xgel|ml|1.59|ok|9 km WSW of Minco, Oklahoma
+ok2022xgek|2022-11-27T16:22:00.860|35.29616667|-98.01166667|4.21|ok|ok|ok|ok2022xgek|ml|1.46|ok|6 km WSW of Minco, Oklahoma
+ak022f7oiyw3|2022-11-27T16:19:38.222|51.8552|-177.9586|3.6|ak|ak|ak|ak022f7oiyw3|ml|1.8|ak|91 km W of Adak, Alaska
+nn00852342|2022-11-27T16:15:55.365|37.1495|-117.1188|5.7|nn|nn|nn|nn00852342|ml|0.3|nn|41 km NW of Beatty, Nevada
+hv73238797|2022-11-27T16:13:20.740|19.5048332214355|-155.296340942383|8.09000015258789|hv|hv|hv|hv73238797|ml|2.37|hv|9 km NW of Volcano, Hawaii
+us6000j63m|2022-11-27T16:12:31.377|-2.9093|141.951|31.267|us|us|us|us6000j63m|mb|4.3|us|50 km WNW of Aitape, Papua New Guinea
+ak022f7oh9n6|2022-11-27T16:11:47.060|53.5111|-165.3056|40.8|ak|ak|ak|ak022f7oh9n6|ml|2.3|ak|75 km SSE of Akutan, Alaska
+nn00852122|2022-11-27T16:10:04.617|38.1683|-117.8921|8.3|nn|nn|nn|nn00852122|ml|0.6|nn|31 km SE of Mina, Nevada
+nn00852119|2022-11-27T16:08:28.714|38.1675|-117.8933|8.5|nn|nn|nn|nn00852119|ml|1.4|nn|31 km SE of Mina, Nevada
+av91722816|2022-11-27T15:59:13.720|51.8636666666667|-177.981333333333|6.77|av|av|av|av91722816|ml|1.29|av|92 km W of Adak, Alaska
+ak022f7o3sib|2022-11-27T15:48:59.713|56.6374|-154.9353|9.7|ak|ak|ak|ak022f7o3sib|ml|1.8|ak|57 km SW of Akhiok, Alaska
+ak022f7o3gi0|2022-11-27T15:47:04.112|61.6813|-151.0344|69|ak|ak|ak|ak022f7o3gi0|ml|1.6|ak|31 km WNW of Susitna, Alaska
+ci40381560|2022-11-27T15:43:38.000|33.4701667|-116.5661667|8.7|ci|ci|ci|ci40381560|ml|0.54|ci|14km SE of Anza, CA
+av91722806|2022-11-27T15:40:50.960|51.8491666666667|-177.983666666667|-1.62|av|av|av|av91722806|ml|1.13|av|93 km W of Adak, Alaska
+av91722801|2022-11-27T15:39:47.330|51.8448333333333|-178.003666666667|-1.73|av|av|av|av91722801|ml|1.09|av|Andreanof Islands, Aleutian Islands, Alaska
+av91078048|2022-11-27T15:30:25.710|51.8533333333333|-177.976|4.53|av|av|av|av91078048|ml|1.12|av|Andreanof Islands, Aleutian Islands, Alaska
+us7000isrm|2022-11-27T15:29:38.281|-34.692|-71.8408|43.754|us|us|us|us7000isrm|mb|4.2|us|43 km W of Santa Cruz, Chile
+ok2022xgcr|2022-11-27T15:29:25.730|34.51233333|-97.2385|4.53|ok|ok|ok|ok2022xgcr|ml|1.82|ok|10 km W of Davis, Oklahoma
+ak022glaqrr3|2022-12-27T16:35:22.556|55.3905|-162.0427|116.4|ak|ak|ak|ak022glaqrr3|ml|2|ak|40 km NNE of King Cove, Alaska
+ak022glaolir|2022-12-27T16:25:08.675|51.2212|-178.4993|23.9|ak|ak|ak|ak022glaolir|ml|2.2|ak|148 km WSW of Adak, Alaska
+ak022glanbga|2022-12-27T16:19:12.421|60.1362|-153.1622|134.8|ak|ak|ak|ak022glanbga|ml|1.9|ak|64 km E of Port Alsworth, Alaska
+ak022glamjgs|2022-12-27T16:15:35.188|59.9003|-153.9665|177.8|ak|ak|ak|ak022glamjgs|ml|2.2|ak|14 km NNE of Pedro Bay, Alaska
+tx2022zizf|2022-12-27T16:13:01.982|31.64076554|-104.4632122|7.314135742|tx|tx|tx|tx2022zizf|ml|2.3|tx|59 km S of Whites City, New Mexico
+av91081983|2022-12-27T16:07:17.340|58.261|-155.082833333333|4.85|av|av|av|av91081983|ml|-0.37|av|85 km NNW of Karluk, Alaska
+ak022glaj8pv|2022-12-27T16:00:09.955|55.6529|-157.1695|39.1|ak|ak|ak|ak022glaj8pv|ml|2.1|ak|105 km SE of Chignik, Alaska
+pr71389278|2022-12-27T15:53:02.010|17.9175|-66.8796666666667|15.18|pr|pr|pr|pr71389278|md|2.28|pr|Puerto Rico region
+ak022gla84q8|2022-12-27T15:48:26.063|64.8839|-147.3461|15.6|ak|ak|ak|ak022gla84q8|ml|0.8|ak|12 km NE of Badger, Alaska
+ci40150615|2022-12-27T15:43:08.420|34.5485|-119.1796667|2.58|ci|ci|ci|ci40150615|ml|1.6|ci|13km NNE of Ojai, CA
+ak022gla42wu|2022-12-27T15:29:37.344|61.6775|-146.5424|20.1|ak|ak|ak|ak022gla42wu|ml|1.8|ak|37 km SSE of Nelchina, Alaska
+ci40150607|2022-12-27T15:28:25.360|33.2673333|-116.4221667|4.53|ci|ci|ci|ci40150607|ml|1.23|ci|5km WNW of Borrego Springs, CA
+ak022gla2afl|2022-12-27T15:21:00.587|58.5761|-154.3558|10.9|ak|ak|ak|ak022gla2afl|ml|1.1|ak|99 km SSE of Kokhanok, Alaska
+av91081968|2022-12-27T15:10:33.290|51.8386666666667|-178.043666666667|-0.85|av|av|av|av91081968|ml|1.27|av|
+hv73284702|2022-12-27T15:06:46.690|19.2363338470459|-155.385665893555|30.5799999237061|hv|hv|hv|hv73284702|md|1.94000006|hv|10 km ENE of P?hala, Hawaii
+nc73825706|2022-12-27T14:55:26.940|37.4301667|-118.5611667|3.02|nc|nc|nc|nc73825706|md|1.46|nc|4km ENE of Round Valley, CA
+ci40150599|2022-12-27T14:50:47.040|34.5795|-116.8873333|5.53|ci|ci|ci|ci40150599|ml|2.99|ci|17km NNE of Lucerne Valley, CA
+us7000j35l|2022-12-27T14:48:11.567|38.2753|142.0636|79.525|us|us|us|us7000j35l|mb|4.3|us|68 km ESE of Ishinomaki, Japan
+ak022gl9lsdl|2022-12-27T14:44:01.692|62.8334|-150.4092|81.7|ak|ak|ak|ak022gl9lsdl|ml|1.2|ak|41 km NNE of Petersville, Alaska
+ak022gl9le5s|2022-12-27T14:42:17.445|60.4051|-148.2473|15.4|ak|ak|ak|ak022gl9le5s|ml|1.5|ak|39 km NNW of Chenega, Alaska
+ak0231734hzj|2023-01-26T05:29:43.518|62.1501|-148.6362|34.3|ak|ak|ak|ak0231734hzj|ml|1.2|ak|40 km NNW of Chickaloon, Alaska
+ci40161943|2023-01-26T05:21:19.220|33.4838333|-116.4046667|8.71|ci|ci|ci|ci40161943|ml|0.86|ci|22km SSW of La Quinta, CA
+ak023172ou6f|2023-01-26T04:56:36.558|61.8635|-149.3468|19.8|ak|ak|ak|ak023172ou6f|ml|1.5|ak|14 km NNW of Fishhook, Alaska
+ci40161935|2023-01-26T04:54:04.310|34.5181667|-118.6006667|8.67|ci|ci|ci|ci40161935|ml|1.33|ci|4km NNE of Castaic, CA
+ci40161927|2023-01-26T04:51:29.140|33.9033333|-118.7026667|15.68|ci|ci|ci|ci40161927|ml|1.75|ci|14km S of Malibu Beach, CA
+ci40161919|2023-01-26T04:46:25.230|33.9846667|-116.6858333|10.97|ci|ci|ci|ci40161919|ml|0.61|ci|12km SW of Morongo Valley, CA
+ci40161911|2023-01-26T04:43:50.800|33.4371667|-118.2303333|13.34|ci|ci|ci|ci40161911|ml|1.91|ci|14km NE of Avalon, CA
+nc73837511|2023-01-26T04:36:28.760|38.8268318|-122.8251648|0.93|nc|nc|nc|nc73837511|md|1.9|nc|8km NW of The Geysers, CA
+hv73313027|2023-01-26T04:32:15.710|18.9818325042725|-155.432495117188|36.5400009155273|hv|hv|hv|hv73313027|ml|2.12|hv|18 km ESE of Naalehu, Hawaii
+us6000jjbm|2023-01-26T04:29:44.721|-0.0988|-77.4813|10|us|us|us|us6000jjbm|mb|4.1|us|Ecuador
+us6000jjbj|2023-01-26T04:23:51.367|2.8727|126.967|35|us|us|us|us6000jjbj|mww|5.7|us|171 km NW of Tobelo, Indonesia
+nc73837506|2023-01-26T04:20:14.820|38.3904991|-122.4189987|5.77|nc|nc|nc|nc73837506|md|1.6|nc|5km WSW of Yountville, CA
+us6000jjbh|2023-01-26T04:16:06.492|16.6106|-25.6047|10|us|us|us|us6000jjbh|mb|5.3|us|73 km SW of Porto Novo, Cabo Verde
+us6000jjbd|2023-01-26T04:07:56.356|-30.3135|-178.7238|35|us|us|us|us6000jjbd|mb|4.4|us|Kermadec Islands, New Zealand
+nc73837501|2023-01-26T04:01:41.250|38.8371658|-122.8013306|2.24|nc|nc|nc|nc73837501|md|0.78|nc|7km WNW of Cobb, CA
+ak0231720kmy|2023-01-26T03:43:15.465|61.8364|-150.8749|32|ak|ak|ak|ak0231720kmy|ml|1.6|ak|32 km ESE of Skwentna, Alaska
+hv73313012|2023-01-26T03:35:13.550|19.1781673431396|-155.346832275391|27.8099994659424|hv|hv|hv|hv73313012|md|1.89999998|hv|14 km E of P?hala, Hawaii
+us6000jjb9|2023-01-26T03:16:22.081|-1.963|-79.9953|75.211|us|us|us|us6000jjb9|mb|4.4|us|4 km SW of El Triunfo, Ecuador
+pr71394478|2023-01-26T02:26:19.140|17.9728333333333|-66.8753333333333|16.03|pr|pr|pr|pr71394478|md|2.2|pr|1 km ESE of Maria Antonia, Puerto Rico
+ci40161903|2023-01-26T02:23:06.320|33.1445|-116.501|11.35|ci|ci|ci|ci40161903|ml|0.89|ci|12km NE of Julian, CA
