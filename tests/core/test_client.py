@@ -3,6 +3,7 @@ from typing import Union
 from pathlib import Path
 
 import pytest
+import pandas as pd
 from requests import Session
 
 from quaker.globals import BASE_URL, RESPONSE_OK, RESPONSE_BAD_REQUEST, ENABLED_FORMATS
@@ -34,8 +35,25 @@ class TestClient:
         requests_mock.get(BASE_URL, requests)
         return requests_mock
 
-    def test_execute_dataframe(self):
-        ...
+    @pytest.mark.parametrize("multi_page", [False, True])
+    def test_execute_dataframe(self, requests_mock, mocker, multi_page):
+        mocker.patch('quaker.core.client.UPPER_LIMIT', 20)
+        n_pages, expected_filename = (1, "single_page") if not multi_page else (3, "multi_page")
+
+        fixture_data = [
+            (RESPONSE_OK, f"./tests/fixtures/results/page{k}.csv")
+            for k in range(n_pages)
+        ]
+        expected_file = f"./tests/fixtures/expected/{expected_filename}.csv"
+        self.load_mock_requests(requests_mock, fixture_data=fixture_data)
+
+        client = Client()
+        mock_query = Query()
+
+        output = client.execute(mock_query)
+        expected = pd.read_csv(expected_file)
+
+        assert output.equals(expected)
 
     @pytest.mark.parametrize("query_format", ENABLED_FORMATS)
     @pytest.mark.parametrize("multi_page", [False, True])

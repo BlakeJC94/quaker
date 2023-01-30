@@ -65,7 +65,7 @@ class Client:
         do_cleanup, error_recived = True, None
         try:
             if writer is None:
-                output = pd.readcsv(StringIO("\n".join(results)))
+                output = pd.read_csv(StringIO("\n".join(results)))
             else:
                 writer(results)
         except KeyboardInterrupt:
