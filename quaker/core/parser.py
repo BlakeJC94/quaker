@@ -111,14 +111,13 @@ class GeojsonParser(Parser, BaseParser):
         return [lines[0].split('[', 1)[0] + '[']
 
     def footer(self, lines):
-        return ["".join(lines[-1].split(']')[2:])]
+        return [']' + "]".join(lines[-1].split(']')[2:]).removesuffix(',')]
 
-    # TODO watch out for the trailing comma
     def records(self, lines):
         return [
-            lines[0].split('[', 1)[1],
+            lines[0].split('[', 1)[1].removesuffix(','),
             *[l.removesuffix(',') for l in lines[1:-1]],
-            "".join(lines[-1].split(']')[:2])
+            "]".join(lines[-1].split(']')[:2]).removesuffix(',')
         ]
 
 
