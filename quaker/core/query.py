@@ -331,7 +331,7 @@ class _QueryFormat(_BaseQuery):
 
     def __post_init__(self):
         super().__post_init__()
-        self.format = self.format or DEFAULT_FORMAT
+        self.format = self.format
         self.assert_field_allowed_values("format", ENABLED_FORMATS)
 
 
