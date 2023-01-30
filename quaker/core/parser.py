@@ -24,6 +24,8 @@ class Parser:
             "csv": CSVParser,
             "text": TextParser,
             "geojson": GeojsonParser,
+            "xml": XmlParser,
+            "quakeml": XmlParser,
         }.get(query.format or DEFAULT_FORMAT)
 
         if parser is None:
@@ -124,3 +126,22 @@ class GeojsonParser(Parser, BaseParser):
         ]
 
 
+class XmlParser(Parser, BaseParser):
+    def event_record(self, line):
+        event_id = re.search(r"catalog:eventid=\"([^,]+)\"\s", line)[1]
+        event_time = re.search(r"<time>.*<value>([^,]+)</value>.*</time>", line)[1]
+        event_magnitude = re.search(r"<mag>.*<value>([^,]+)</value>.*</mag>", line)[1]
+        return (
+            event_id,
+            event_time.removesuffix('Z'),
+            event_magnitude,
+        )
+
+    def header(self, lines):
+        return lines[:3]
+
+    def footer(self, lines):
+        return lines[-2:]
+
+    def records(self, lines):
+        return lines[3:-2]
