@@ -145,3 +145,23 @@ class XmlParser(Parser, BaseParser):
 
     def records(self, lines):
         return lines[3:-2]
+
+class KmlParser(Parser):
+    def event_record(self, line):
+        event_id = re.search(r"id=\"([^,]+)\"", line)[1]
+        event_time = re.search(r"<dt>Time</dt><dd>([\d-]+\s[\d:]+)\sUTC</dd>", line)[1]
+        event_magnitude = re.search(r"M\s([^,]+)\s-", line)[1]
+        return (
+            event_id,
+            event_time.replace(' ', "T"),
+            event_magnitude,
+        )
+
+    def header(self, lines):
+        return lines[:13]
+
+    def footer(self, lines):
+        return lines[-3:]
+
+    def records(self, lines):
+        return lines[13:-3]
