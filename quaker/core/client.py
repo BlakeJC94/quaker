@@ -36,7 +36,7 @@ class Client:
         self.session = Session()
         self.history = []
 
-    def execute(self, query: Query, output_file: Optional[PathLike]) -> Optional[pd.DataFrame]:
+    def execute(self, query: Query, output_file: Optional[PathLike] = None) -> Optional[pd.DataFrame]:
         if output_file is None:
             query.format = "csv"
 

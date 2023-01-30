@@ -14,6 +14,7 @@ setup(
     python_requires=">=3.9",
     packages=find_packages(),
     install_requires=[
+        "pandas",
         "requests",
     ],
     extra_requires={
