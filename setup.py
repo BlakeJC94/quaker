@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as f:
 
 setup(
     name="quaker",
-    version="0.7.2",
+    version="1.0.0",
     description="Lightweight python API to USGS earthquake dataset",
     long_description=long_description,
     author="BlakeJC94",
