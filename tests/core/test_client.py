@@ -72,6 +72,3 @@ class TestClient:
         client.execute(mock_query, output_file=output_file)
 
         self.assert_files_equal(output_file, expected_file)
-
-    def test_query_not_ok(self):
-        ...
