@@ -24,13 +24,6 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
-# TODO Test execute
-# - [X] Dataframes
-# - [/] For each format,
-#     - [X] Single page
-#     - [X] Multi page
-#     - [ ] Exception
-
 class Client:
     def __init__(self):
         self.session = Session()
@@ -90,7 +83,7 @@ class Client:
         while has_next_page:
             logger.info(f"{page_index=}")
             if page_index >= MAX_PAGES:
-                logger.info("Hit page limit, exiting")
+                logger.error("Hit page limit, exiting loop")
                 break
 
             limit = query.limit
