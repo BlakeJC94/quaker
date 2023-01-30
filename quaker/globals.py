@@ -9,9 +9,9 @@ ENABLED_FORMATS = [
     "csv",
     "geojson",
     "text",
-    "kml",
-    "xml",
-    "quakeml",
+    # "kml",
+    # "xml",
+    # "quakeml",
 ]
 
 RESPONSE_BAD_REQUEST = 400

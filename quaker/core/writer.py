@@ -8,8 +8,15 @@ from typing import Iterable, Optional, Tuple, TextIO
 from requests import Request
 
 from quaker.core.query import Query
-from quaker.globals import UPPER_LIMIT, STDOUT
+from quaker.globals import STDOUT
 
+# TODO Test Writer
+# - [ ] __init__
+# - [ ] cleanup
+# - [ ] write_lines
+# TODO Test JsonWriter
+# - [ ] __new__ resolution
+# - [ ] line joins
 
 logger = logging.getLogger(__name__)
 

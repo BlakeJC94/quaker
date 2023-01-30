@@ -24,6 +24,12 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
+# TODO Test execute
+# - [ ] Dataframes
+# - [/] For each format,
+#     - [X] Single page
+#     - [X] Multi page
+#     - [ ] Exception
 
 class Client:
     def __init__(self):

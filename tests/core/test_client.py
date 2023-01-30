@@ -37,10 +37,11 @@ class TestClient:
     def test_execute_dataframe(self):
         ...
 
-    # @pytest.mark.parametrize("query_format", ENABLED_FORMATS)  # TODO fix geojson
-    @pytest.mark.parametrize("query_format", ["csv", "text"])
+    @pytest.mark.parametrize("query_format", ENABLED_FORMATS)
     @pytest.mark.parametrize("multi_page", [False, True])
-    def test_exectute_output_file(self, requests_mock, tmp_path, query_format, multi_page):
+    def test_exectute_output_file(self, mocker, requests_mock, tmp_path, query_format, multi_page):
+        mocker.patch('quaker.core.client.UPPER_LIMIT', 20)
+
         output_file = tmp_path / f"test_execute.{query_format}"
         n_pages, expected_filename = (1, "single_page") if not multi_page else (3, "multi_page")
 
