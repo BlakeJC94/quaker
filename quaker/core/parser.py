@@ -26,6 +26,7 @@ class Parser:
             "geojson": GeojsonParser,
             "xml": XmlParser,
             "quakeml": XmlParser,
+            "kml": KmlParser,
         }.get(query.format or DEFAULT_FORMAT)
 
         if parser is None:
@@ -44,8 +45,6 @@ class Parser:
     def unpack_records(self, records: List[str]) -> Tuple[List[str], List[str], List[str]]:
         return tuple(zip(*(self.event_record(line) for line in records)))
 
-
-class BaseParser(ABC):
     @abstractmethod
     def header(self, lines) -> List[str]:
         pass
@@ -63,7 +62,7 @@ class BaseParser(ABC):
         pass
 
 
-class CSVParser(Parser, BaseParser):
+class CSVParser(Parser):
     def header(self, lines):
         return lines[:1]
 
@@ -82,7 +81,7 @@ class CSVParser(Parser, BaseParser):
         return []
 
 
-class TextParser(Parser, BaseParser):
+class TextParser(Parser):
     def header(self, lines):
         return lines[:1]
 
@@ -101,7 +100,7 @@ class TextParser(Parser, BaseParser):
         return []
 
 
-class GeojsonParser(Parser, BaseParser):
+class GeojsonParser(Parser):
     def event_record(self, line):
         event_id = re.search(r"\"id\":\"([^,]+)\"", line)[1]
         event_timestamp = re.search(r"\"time\":([^,]+)", line)[1]
@@ -126,7 +125,7 @@ class GeojsonParser(Parser, BaseParser):
         ]
 
 
-class XmlParser(Parser, BaseParser):
+class XmlParser(Parser):
     def event_record(self, line):
         event_id = re.search(r"catalog:eventid=\"([^,]+)\"\s", line)[1]
         event_time = re.search(r"<time>.*<value>([^,]+)</value>.*</time>", line)[1]
