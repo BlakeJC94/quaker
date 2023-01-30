@@ -81,13 +81,12 @@ class TextParser(CSVParser):
 
 class GeojsonParser(Parser, BaseParser):
     def event_record(self, line):
-        event_id = re.search(r"\"id\":\"([\w\d]+)\"", line)[1]
-        event_timestamp = int(re.search('time:([^,]+)', line)[1])
-        event_time = datetime.utcfromtimestamp(event_timestamp * 1e-3).isoformat()
-        event_magnitude = re.search('magnitude:([^,]+)', line)[1]
+        event_id = re.search(r"\"id\":\"([^,]+)\"", line)[1]
+        event_timestamp = re.search(r"\"time\":([^,]+)", line)[1]
+        event_magnitude = re.search(r"\"mag\":([^,]+)", line)[1]
         return (
             event_id,
-            event_time,
+            datetime.utcfromtimestamp(float(event_timestamp) * 1e-3).isoformat(),
             event_magnitude,
         )
 

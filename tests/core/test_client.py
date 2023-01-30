@@ -52,7 +52,7 @@ class TestClient:
         self.load_mock_requests(requests_mock, fixture_data=fixture_data)
 
         client = Client()
-        mock_query = Query()
+        mock_query = Query(format=query_format)
 
         client.execute(mock_query, output_file=output_file)
 
