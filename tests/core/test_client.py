@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 from requests import Session
 
-from quaker.globals import BASE_URL, RESPONSE_OK, RESPONSE_BAD_REQUEST, ENABLED_FORMATS
+from quaker.globals import BASE_URL, RESPONSE_OK, RESPONSE_BAD_REQUEST
 from quaker.core.query import Query
 from quaker.core.client import Client
 
@@ -55,7 +55,7 @@ class TestClient:
 
         assert output.equals(expected)
 
-    @pytest.mark.parametrize("query_format", ENABLED_FORMATS)
+    @pytest.mark.parametrize("query_format", ["csv", "text", "geojson", "xml", "quakeml", "xml"])
     @pytest.mark.parametrize("multi_page", [False, True])
     def test_exectute_output_file(self, mocker, requests_mock, tmp_path, query_format, multi_page):
         mocker.patch('quaker.core.client.UPPER_LIMIT', 20)
