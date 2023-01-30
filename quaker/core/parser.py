@@ -17,6 +17,7 @@ from quaker.globals import DEFAULT_FORMAT
 # TODO KmlParser
 # TODO XmlParser (same as QuakeML)
 
+
 class Parser:
     def __new__(cls, query: Query):
         parser = {
@@ -31,7 +32,7 @@ class Parser:
         return super().__new__(parser)
 
     def unpack_response(self, download: Response) -> Tuple[List[str], List[str], List[str]]:
-        lines = download.text.strip().split('\n')
+        lines = download.text.strip().split("\n")
         return (
             self.header(lines),
             self.records(lines),
@@ -40,6 +41,7 @@ class Parser:
 
     def unpack_records(self, records: List[str]) -> Tuple[List[str], List[str], List[str]]:
         return tuple(zip(*(self.event_record(line) for line in records)))
+
 
 class BaseParser(ABC):
     @abstractmethod
@@ -58,8 +60,8 @@ class BaseParser(ABC):
     def footer(self, lines) -> List[str]:
         pass
 
-class CSVParser(Parser, BaseParser):
 
+class CSVParser(Parser, BaseParser):
     def header(self, lines):
         return lines[:1]
 
@@ -70,7 +72,7 @@ class CSVParser(Parser, BaseParser):
         record_values = line.split(",")
         return (
             record_values[11],
-            record_values[0].removesuffix('Z'),
+            record_values[0].removesuffix("Z"),
             record_values[4],
         )
 
@@ -86,14 +88,16 @@ class TextParser(Parser, BaseParser):
         return lines[1:]
 
     def event_record(self, line):
-        record_values = line.split('|')
+        record_values = line.split("|")
         return (
             record_values[0],
             record_values[1],
             record_values[10],
         )
+
     def footer(self, _):
         return []
+
 
 class GeojsonParser(Parser, BaseParser):
     def event_record(self, line):
@@ -107,16 +111,16 @@ class GeojsonParser(Parser, BaseParser):
         )
 
     def header(self, lines):
-        return [lines[0].split('[', 1)[0] + '[']
+        return [lines[0].split("[", 1)[0] + "["]
 
     def footer(self, lines):
-        return [']' + "]".join(lines[-1].split(']')[2:]).removesuffix(',')]
+        return ["]" + "]".join(lines[-1].split("]")[2:]).removesuffix(",")]
 
     def records(self, lines):
         return [
-            lines[0].split('[', 1)[1].removesuffix(','),
-            *[l.removesuffix(',') for l in lines[1:-1]],
-            "]".join(lines[-1].split(']')[:2]).removesuffix(',')
+            lines[0].split("[", 1)[1].removesuffix(","),
+            *[l.removesuffix(",") for l in lines[1:-1]],
+            "]".join(lines[-1].split("]")[:2]).removesuffix(","),
         ]
 
 
