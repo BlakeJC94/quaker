@@ -9,8 +9,15 @@ from requests import Response
 from quaker.core.query import Query
 from quaker.globals import DEFAULT_FORMAT
 
+# TODO Test
+# - [ ] __new__ subclass resolution
+# - [ ] Unpack methods w/ mock parser
+# - [ ] For each format
+#     - [ ] check how a page is parsed
 
-# TODO add more parsers
+# TODO KmlParser
+# TODO XmlParser
+
 class Parser:
     def __new__(cls, query: Query):
         parser = {
@@ -53,8 +60,6 @@ class BaseParser(ABC):
         pass
 
 class CSVParser(Parser, BaseParser):
-    def __init__(self, *_):
-        self.delimiter = ","
 
     def header(self, lines):
         return lines[:1]
@@ -63,7 +68,7 @@ class CSVParser(Parser, BaseParser):
         return lines[1:]
 
     def event_record(self, line):
-        record_values = line.split(self.delimiter)
+        record_values = line.split(",")
         return (
             record_values[11],
             record_values[0].removesuffix('Z'),
@@ -74,10 +79,22 @@ class CSVParser(Parser, BaseParser):
         return []
 
 
-class TextParser(CSVParser):
-    def __init__(self, *_):
-        super().__init__(*_)
-        self.delimiter = "|"
+class TextParser(Parser, BaseParser):
+    def header(self, lines):
+        return lines[:1]
+
+    def records(self, lines):
+        return lines[1:]
+
+    def event_record(self, line):
+        record_values = line.split('|')
+        return (
+            record_values[0],
+            record_values[1],
+            record_values[10],
+        )
+    def footer(self, _):
+        return []
 
 class GeojsonParser(Parser, BaseParser):
     def event_record(self, line):
