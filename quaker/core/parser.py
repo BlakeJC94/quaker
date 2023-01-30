@@ -1,7 +1,6 @@
 import re
 from datetime import datetime
-from os import PathLike
-from typing import Dict, List, Tuple, Union
+from typing import List, Tuple
 from abc import ABC, abstractmethod
 
 from requests import Response
@@ -16,7 +15,7 @@ from quaker.globals import DEFAULT_FORMAT
 #     - [ ] check how a page is parsed
 
 # TODO KmlParser
-# TODO XmlParser
+# TODO XmlParser (same as QuakeML)
 
 class Parser:
     def __new__(cls, query: Query):

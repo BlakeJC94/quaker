@@ -5,7 +5,7 @@ from dataclasses import dataclass, fields, asdict, Field
 from datetime import datetime as dt
 from inspect import getdoc, getmro
 from typing import Optional, get_args, Any, List, Dict
-from quaker.globals import DEFAULT_FORMAT, ENABLED_FORMATS
+from quaker.globals import ENABLED_FORMATS
 
 
 class _FieldHelper:

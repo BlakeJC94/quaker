@@ -1,6 +1,0 @@
-time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
-2022-12-29T02:16:25.700Z,35.2953333,-118.4981667,3.69,1.19,ml,16,58,0.06342,0.19,ci,ci40150935,2022-12-29T02:20:01.646Z,"19km NNW of Tehachapi, CA",earthquake,0.32,0.9,0.172,11,automatic,ci,ci
-2022-12-29T02:11:19.880Z,36.5753326,-121.1531677,7.11,0.98,md,8,122,0.0262,0.03,nc,nc73826211,2022-12-29T03:04:11.988Z,"5km N of Pinnacles, CA",earthquake,0.61,0.78,0.28,6,automatic,nc,nc
-2022-12-29T02:01:41.460Z,19.2220001220703,-155.389663696289,31.3899993896484,2.4,ml,45,151,,0.159999996,hv,hv73285937,2022-12-29T02:07:13.110Z,"9 km ENE of P?hala, Hawaii",earthquake,0.66,0.810000002,2.9,17,automatic,hv,hv
-2022-12-29T02:01:00.860Z,17.95,-66.9675,10.56,2.22,md,6,212,0.07554,0.08,pr,pr71389498,2022-12-29T02:13:14.880Z,"6 km WSW of Guánica, Puerto Rico",earthquake,0.48,0.79,0.0314611286393356,4,reviewed,pr,pr
-2022-12-29T01:51:59.127Z,61.2274,-150.7181,14,1.6,ml,,,,0.74,ak,ak022goczgy0,2022-12-29T01:54:54.880Z,"21 km ENE of Beluga, Alaska",earthquake,,0.2,,,automatic,ak,ak

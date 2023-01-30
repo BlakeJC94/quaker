@@ -1,11 +1,7 @@
 """Functions for writing data to disk."""
 import logging
-import re
 from os import path, remove, PathLike, makedirs
 from pathlib import Path
-from typing import Iterable, Optional, Tuple, TextIO
-
-from requests import Request
 
 from quaker.core.query import Query
 from quaker.globals import STDOUT
