@@ -253,6 +253,7 @@ class _QueryOther(_BaseQuery):
         self.assert_fields_ordered("mindepth", "maxdepth")
         self.assert_fields_bounded(["minmagnitude", "maxmagnitude"], 0, 12)
         self.assert_fields_bounded(["offset"], 1, None)
+        self.assert_fields_bounded(["limit"], 0, None)
 
 
 @dataclass
@@ -321,16 +322,18 @@ class _QueryFormat(_BaseQuery):
 
     Args:
         [Format]
-        format: Specify the output format (only "csv", "geojson", and "text" supported for now.
-            kml", "quakeml", and "xml" to be added in upcoming release).
+        format: Specify the output format (one of "csv", "geojson", "text", kml", "quakeml", or
+            "xml").
     """
 
     format: Optional[str] = None
 
     def __post_init__(self):
         super().__post_init__()
-        # TODO Add 'xml', 'quakeml', 'kml'
-        self.assert_field_allowed_values("format", ["csv", "geojson", "text"])
+        self.format = self.format
+        self.assert_field_allowed_values(
+            "format", ["csv", "text", "geojson", "xml", "quakeml", "xml"]
+        )
 
 
 # TODO usage docs

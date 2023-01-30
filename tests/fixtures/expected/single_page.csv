@@ -1,0 +1,21 @@
+time,latitude,longitude,depth,mag,magType,nst,gap,dmin,rms,net,id,updated,place,type,horizontalError,depthError,magError,magNst,status,locationSource,magSource
+2022-11-27T16:33:06.042Z,57.1342,-156.35,6.4,2.1,ml,,,,0.38,ak,ak022f7olw94,2022-12-12T14:33:23.810Z,"",earthquake,,0.1,,,reviewed,ak,ak
+2022-11-27T16:23:48.031Z,2.6479,128.0317,163.978,4.4,mb,35,110,1.979,0.62,us,us6000j63n,2022-12-01T18:10:24.040Z,"101 km N of Tobelo, Indonesia",earthquake,12.15,8.691,0.11,24,reviewed,us,us
+2022-11-27T16:22:27.899Z,35.27066667,-98.03683333,10.16,1.59,ml,12,98,0.06118799283,0.17,ok,ok2022xgel,2022-11-28T15:38:12.584Z,"9 km WSW of Minco, Oklahoma",earthquake,,1.3,0.25,3,reviewed,ok,ok
+2022-11-27T16:22:00.860Z,35.29616667,-98.01166667,4.21,1.46,ml,62,73,0.09358163609,0.34,ok,ok2022xgek,2022-11-28T15:38:32.841Z,"6 km WSW of Minco, Oklahoma",earthquake,,0.8,0.18,3,reviewed,ok,ok
+2022-11-27T16:19:38.222Z,51.8552,-177.9586,3.6,1.8,ml,,,,0.63,ak,ak022f7oiyw3,2022-12-12T14:33:23.615Z,"91 km W of Adak, Alaska",earthquake,,0.1,,,reviewed,ak,ak
+2022-11-27T16:15:55.365Z,37.1495,-117.1188,5.7,0.3,ml,8,213.74,0.189,0.1127,nn,nn00852342,2022-11-30T23:08:41.024Z,"41 km NW of Beatty, Nevada",earthquake,,5.3,1.47,6,reviewed,nn,nn
+2022-11-27T16:13:20.740Z,19.5048332214355,-155.296340942383,8.09000015258789,2.37,ml,47,74,,0.209999993,hv,hv73238797,2022-11-27T16:18:51.980Z,"9 km NW of Volcano, Hawaii",earthquake,0.39,0.709999979,0.3,5,automatic,hv,hv
+2022-11-27T16:12:31.377Z,-2.9093,141.951,31.267,4.3,mb,27,99,1.306,0.41,us,us6000j63m,2022-12-01T17:44:58.040Z,"50 km WNW of Aitape, Papua New Guinea",earthquake,8.44,5.453,0.142,14,reviewed,us,us
+2022-11-27T16:11:47.060Z,53.5111,-165.3056,40.8,2.3,ml,,,,0.33,ak,ak022f7oh9n6,2022-12-12T14:33:30.377Z,"75 km SSE of Akutan, Alaska",earthquake,,2.5,,,reviewed,ak,ak
+2022-11-27T16:10:04.617Z,38.1683,-117.8921,8.3,0.6,ml,16,160.26,0.061,0.1434,nn,nn00852122,2022-11-30T22:00:15.200Z,"31 km SE of Mina, Nevada",earthquake,,1.3,0.42,2,reviewed,nn,nn
+2022-11-27T16:08:28.714Z,38.1675,-117.8933,8.5,1.4,ml,18,130.62,0.059,0.1687,nn,nn00852119,2022-11-30T21:16:55.911Z,"31 km SE of Mina, Nevada",earthquake,,1.2,0.42,4,reviewed,nn,nn
+2022-11-27T15:59:13.720Z,51.8636666666667,-177.981333333333,6.77,1.29,ml,6,105,,0.06,av,av91722816,2022-11-29T04:04:52.290Z,"92 km W of Adak, Alaska",earthquake,0.33,0.42,0.196914049372555,7,reviewed,av,av
+2022-11-27T15:48:59.713Z,56.6374,-154.9353,9.7,1.8,ml,,,,0.7,ak,ak022f7o3sib,2022-12-10T08:10:26.541Z,"57 km SW of Akhiok, Alaska",earthquake,,0.4,,,reviewed,ak,ak
+2022-11-27T15:47:04.112Z,61.6813,-151.0344,69,1.6,ml,,,,0.53,ak,ak022f7o3gi0,2022-12-10T08:10:17.256Z,"31 km WNW of Susitna, Alaska",earthquake,,0.4,,,reviewed,ak,ak
+2022-11-27T15:43:38.000Z,33.4701667,-116.5661667,8.7,0.54,ml,17,113,0.0388,0.11,ci,ci40381560,2022-11-30T20:33:17.415Z,"14km SE of Anza, CA",earthquake,0.28,0.45,0.176,14,reviewed,ci,ci
+2022-11-27T15:40:50.960Z,51.8491666666667,-177.983666666667,-1.62,1.13,ml,6,109,,0.17,av,av91722806,2022-11-29T04:00:05.780Z,"93 km W of Adak, Alaska",earthquake,0.4,1.17,0.163480202382698,7,reviewed,av,av
+2022-11-27T15:39:47.330Z,51.8448333333333,-178.003666666667,-1.73,1.09,ml,5,133,,0.12,av,av91722801,2022-11-29T03:52:08.750Z,"Andreanof Islands, Aleutian Islands, Alaska",earthquake,0.3,1.24,0.143509723977443,5,reviewed,av,av
+2022-11-27T15:30:25.710Z,51.8533333333333,-177.976,4.53,1.12,ml,4,161,,0.03,av,av91078048,2022-12-01T00:44:21.970Z,"Andreanof Islands, Aleutian Islands, Alaska",earthquake,0.37,0.7,0.153971557884817,4,reviewed,av,av
+2022-11-27T15:29:38.281Z,-34.692,-71.8408,43.754,4.2,mb,34,122,0.326,0.55,us,us7000isrm,2022-12-01T17:28:58.040Z,"43 km W of Santa Cruz, Chile",earthquake,4.73,6.897,0.146,13,reviewed,us,us
+2022-11-27T15:29:25.730Z,34.51233333,-97.2385,4.53,1.82,ml,45,60,0.1097784577,0.33,ok,ok2022xgcr,2022-11-29T18:01:57.103Z,"10 km W of Davis, Oklahoma",earthquake,,1,0.23,8,reviewed,ok,ok

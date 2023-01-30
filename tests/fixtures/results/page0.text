@@ -1,0 +1,22 @@
+#EventID|Time|Latitude|Longitude|Depth/km|Author|Catalog|Contributor|ContributorID|MagType|Magnitude|MagAuthor|EventLocationName
+ak022f7olw94|2022-11-27T16:33:06.042|57.1342|-156.35|6.4|ak|ak|ak|ak022f7olw94|ml|2.1|ak|
+us6000j63n|2022-11-27T16:23:48.031|2.6479|128.0317|163.978|us|us|us|us6000j63n|mb|4.4|us|101 km N of Tobelo, Indonesia
+ok2022xgel|2022-11-27T16:22:27.899|35.27066667|-98.03683333|10.16|ok|ok|ok|ok2022xgel|ml|1.59|ok|9 km WSW of Minco, Oklahoma
+ok2022xgek|2022-11-27T16:22:00.860|35.29616667|-98.01166667|4.21|ok|ok|ok|ok2022xgek|ml|1.46|ok|6 km WSW of Minco, Oklahoma
+ak022f7oiyw3|2022-11-27T16:19:38.222|51.8552|-177.9586|3.6|ak|ak|ak|ak022f7oiyw3|ml|1.8|ak|91 km W of Adak, Alaska
+nn00852342|2022-11-27T16:15:55.365|37.1495|-117.1188|5.7|nn|nn|nn|nn00852342|ml|0.3|nn|41 km NW of Beatty, Nevada
+hv73238797|2022-11-27T16:13:20.740|19.5048332214355|-155.296340942383|8.09000015258789|hv|hv|hv|hv73238797|ml|2.37|hv|9 km NW of Volcano, Hawaii
+us6000j63m|2022-11-27T16:12:31.377|-2.9093|141.951|31.267|us|us|us|us6000j63m|mb|4.3|us|50 km WNW of Aitape, Papua New Guinea
+ak022f7oh9n6|2022-11-27T16:11:47.060|53.5111|-165.3056|40.8|ak|ak|ak|ak022f7oh9n6|ml|2.3|ak|75 km SSE of Akutan, Alaska
+nn00852122|2022-11-27T16:10:04.617|38.1683|-117.8921|8.3|nn|nn|nn|nn00852122|ml|0.6|nn|31 km SE of Mina, Nevada
+nn00852119|2022-11-27T16:08:28.714|38.1675|-117.8933|8.5|nn|nn|nn|nn00852119|ml|1.4|nn|31 km SE of Mina, Nevada
+av91722816|2022-11-27T15:59:13.720|51.8636666666667|-177.981333333333|6.77|av|av|av|av91722816|ml|1.29|av|92 km W of Adak, Alaska
+ak022f7o3sib|2022-11-27T15:48:59.713|56.6374|-154.9353|9.7|ak|ak|ak|ak022f7o3sib|ml|1.8|ak|57 km SW of Akhiok, Alaska
+ak022f7o3gi0|2022-11-27T15:47:04.112|61.6813|-151.0344|69|ak|ak|ak|ak022f7o3gi0|ml|1.6|ak|31 km WNW of Susitna, Alaska
+ci40381560|2022-11-27T15:43:38.000|33.4701667|-116.5661667|8.7|ci|ci|ci|ci40381560|ml|0.54|ci|14km SE of Anza, CA
+av91722806|2022-11-27T15:40:50.960|51.8491666666667|-177.983666666667|-1.62|av|av|av|av91722806|ml|1.13|av|93 km W of Adak, Alaska
+av91722801|2022-11-27T15:39:47.330|51.8448333333333|-178.003666666667|-1.73|av|av|av|av91722801|ml|1.09|av|Andreanof Islands, Aleutian Islands, Alaska
+av91078048|2022-11-27T15:30:25.710|51.8533333333333|-177.976|4.53|av|av|av|av91078048|ml|1.12|av|Andreanof Islands, Aleutian Islands, Alaska
+us7000isrm|2022-11-27T15:29:38.281|-34.692|-71.8408|43.754|us|us|us|us7000isrm|mb|4.2|us|43 km W of Santa Cruz, Chile
+ok2022xgcr|2022-11-27T15:29:25.730|34.51233333|-97.2385|4.53|ok|ok|ok|ok2022xgcr|ml|1.82|ok|10 km W of Davis, Oklahoma
+
