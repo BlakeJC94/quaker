@@ -44,5 +44,18 @@ class TestCache:
         assert removed == cache_input[-1]
 
 
-def test_record_filter():
+# TODO
+# class TestRecordFilter:
+#     def test_call(self):
+#         record_filter  = RecordFilter([], maxlen=10)
+#         n_duplicates = 4
+
+#         records = [...]
+#         event_ids = [...]
+
+#         body = record_filter(records, event_ids)
+
+#         assert all(l in body for l in records)
+#         assert len(body) == len(set(event_ids))
+
 
