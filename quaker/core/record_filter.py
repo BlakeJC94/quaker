@@ -1,5 +1,11 @@
+import logging
 from collections import deque
 
+logger = logging.getLogger(__name__)
+
+# TODO Test RecordFilter
+# - [ ] filtered input, retained IDs
+# - [ ] check events are retained up to maxlen
 
 class Cache:
     """Container class with a deque and a set for fast append/pop/lookup operations"""
@@ -43,4 +49,6 @@ class RecordFilter(Cache):
                 body.append(line)
                 self.append(event_id)
 
+        if duplicate_events > 0:
+            logger.warning(f"{duplicate_events=}")
         return body
