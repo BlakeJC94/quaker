@@ -25,7 +25,7 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 # TODO Test execute
-# - [ ] Dataframes
+# - [X] Dataframes
 # - [/] For each format,
 #     - [X] Single page
 #     - [X] Multi page
