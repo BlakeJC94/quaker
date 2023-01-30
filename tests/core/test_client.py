@@ -1,12 +1,8 @@
-from unittest import mock
-from typing import Union
-from pathlib import Path
-
 import pytest
 import pandas as pd
 from requests import Session
 
-from quaker.globals import BASE_URL, RESPONSE_OK, RESPONSE_BAD_REQUEST
+from quaker.globals import BASE_URL, RESPONSE_OK
 from quaker.core.query import Query
 from quaker.core.client import Client
 
