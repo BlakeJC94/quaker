@@ -157,10 +157,9 @@ This is a small personal project, but pull requests are most welcome!
     * Minor version: most changes - new features, models or improvements
     * Patch version: small bug fixes and documentation-only changes
 
-Virtual environment handling by `pyenv` is preferred:
+Virtual environment handling by `poetry` is preferred:
 ```bash
 # in the project directory
-$ pyenv virtualenv 3.9.7 quaker
-$ pyenv local quaker
-$ pip install -e .
+$ poetry install
+$ poetry shell
 ```
