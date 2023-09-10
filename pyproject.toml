@@ -138,7 +138,7 @@ min-public-methods = 0
 
 
 [tool.poetry]
-name = "quaker"
+name = "quaker-db"
 version = "1.0.0"
 description = "Lightweight python API to USGS earthquake dataset"
 authors = ["BlakeJC94 <blakejamescook@gmail.com>"]
