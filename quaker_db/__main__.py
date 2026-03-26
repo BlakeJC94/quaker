@@ -151,6 +151,7 @@ def main():
                 args[k] = v
 
     client = Client()
+    args.pop('argfile', None)
     result = client.execute(**args)
 
     print(result)
